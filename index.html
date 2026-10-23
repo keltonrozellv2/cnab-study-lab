@@ -162,6 +162,10 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 @keyframes flagaura{0%,100%{box-shadow:0 0 0 3px rgba(60,130,255,.12),0 0 18px rgba(60,130,255,.25)}50%{box-shadow:0 0 0 3px rgba(60,130,255,.22),0 0 34px rgba(60,130,255,.5)}}
 .flagico{position:absolute;left:12px;top:10px;font-size:1.3rem}
 .weakrow.flagged{border-color:rgba(60,130,255,.6);border-style:solid;box-shadow:0 0 12px rgba(60,130,255,.3)}
+.pccard{text-align:left!important;max-width:560px;width:calc(100vw - 32px);max-height:88vh;overflow:auto}
+.pclist{display:flex;flex-direction:column;gap:4px}
+.pcrow{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-radius:8px;cursor:pointer}.pcrow:hover{background:rgba(127,127,127,.08)}.pcrow input{margin-top:4px}.pcrow span span{display:block}.pcrow.off{opacity:.45}
+.pcshort{margin-top:10px;border:1px dashed var(--line)}
 .pccode.short{min-height:64px;font-size:.9rem;letter-spacing:.04em}
 .pccode{width:100%;min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72rem;word-break:break-all;line-height:1.35;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--ink);resize:vertical}
 .weakrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px}
@@ -265,7 +269,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v51</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v52</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1878,27 +1882,48 @@ function importProgress(file,box){
   const rd=new FileReader();rd.onload=()=>{let d;try{d=JSON.parse(rd.result)}catch(e){box.innerHTML=`<div class="fb wrong"><span class="mk">Couldn't read that file.</span> It isn't a progress export from this app.</div>`;return}
     importData(d,box,"file")};rd.readAsText(file);
 }
-function profileSummary(xp,hist,when){const L=levelFor((xp&&xp.xp)||0);return `Lv ${L.lvl} · ${(xp&&xp.gold)||0} gold · ${hist.length} attempt${hist.length===1?"":"s"}${when?" · saved "+new Date(when).toLocaleString():""}`}
+function profileSummary(xp,hist,when){const parts=[];if(xp&&xp.xp!==undefined)parts.push("Lv "+levelFor(xp.xp||0).lvl);if(xp&&xp.gold!==undefined)parts.push((xp.gold||0)+" gold");parts.push(hist.length+" attempt"+(hist.length===1?"":"s"));if(when)parts.push("saved "+new Date(when).toLocaleString());return parts.join(" · ")}
 function importData(d,box,kind){
     if(!d||d.app!=="cnab-lab-pro"||!Array.isArray(d.hist)){box.innerHTML=`<div class="fb wrong"><span class="mk">Not a valid progress ${kind==="code"?"code":"file"}.</span></div>`;return}
     const cur=jload(HIST,[]);const n=d.hist.length;const localX=gameLoad();const codeT=d.exported?Date.parse(d.exported):0;const older=codeT&&localX.savedAt&&localX.savedAt>codeT+60000&&cur.length>0;
-    askInline(box,`Load this ${kind==="code"?"profile code":"file"}? It holds: ${profileSummary(d.xp,d.hist,d.exported)}. This device: ${profileSummary(localX,cur,localX.savedAt)}.${older?" ⚠ This device has NEWER progress than the "+(kind==="code"?"code":"file")+" — loading will roll gold, items and map progress back to the older state.":""} ${cur.length?"Attempt history and weak spots merge (duplicates skipped); everything else is restored from the "+(kind==="code"?"code":"file")+".":""}`,older?"Load anyway":"Load",()=>{
+    const secNames=Array.isArray(d.sections)&&d.sections.length<PC_SECTIONS.length?" Carries only: "+PC_SECTIONS.filter(x=>d.sections.includes(x.id)).map(x=>x.n).join(", ")+" — everything else on this device stays as it is.":"";
+    askInline(box,`Load this ${kind==="code"?"profile code":"file"}? It holds: ${profileSummary(d.xp,d.hist,d.exported)}.${secNames} This device: ${profileSummary(localX,cur,localX.savedAt)}.${older?" ⚠ This device has NEWER progress than the "+(kind==="code"?"code":"file")+" — loading will roll gold, items and map progress back to the older state.":""} ${cur.length?"Attempt history and weak spots merge (duplicates skipped); everything else is restored from the "+(kind==="code"?"code":"file")+".":""}`,older?"Load anyway":"Load",()=>{
       const seen=new Set(cur.map(a=>a.date+"|"+a.mode+"|"+a.ok+"|"+a.total));const merged=cur.concat(d.hist.filter(a=>a&&a.date&&!seen.has(a.date+"|"+a.mode+"|"+a.ok+"|"+a.total))).sort((a,b)=>a.date<b.date?-1:1);
       jsave(HIST,merged.slice(-200));
       const w=jload(WEAK,[]);const wk=new Set(w.map(x=>x.q));jsave(WEAK,w.concat((d.weak||[]).filter(x=>x&&x.q&&!wk.has(x.q))));
       // Restore, don't merge: a merge-with-max let people spend gold, re-import and get it back.
-      const X=xpLoad();const Y=d.xp||{};if(Y&&typeof Y==="object"&&Y.xp!==undefined){const keep={};for(const k of ["cos"])keep[k]=X[k];const Z=JSON.parse(JSON.stringify(Y));if(!Z.cos&&keep.cos)Z.cos=keep.cos;for(const k in X)if(Z[k]===undefined)Z[k]=X[k];for(const k in Z)X[k]=Z[k]}
+      const X=xpLoad();const Y=d.xp||{};if(Y&&typeof Y==="object"){const Z=JSON.parse(JSON.stringify(Y));for(const k in Z)X[k]=Z[k]}
       xpSave(X);applyCosmetics();renderXPBar();renderProgress();if(typeof renderBadges==="function")renderBadges();if(typeof toastMsg==="function")toastMsg("Profile loaded — "+profileSummary(X,jload(HIST,[])));
     });
 }
 /* ================= PROFILE CODE: offline device-to-device transfer (deflate + base64url + CRC32) ================= */
+const PC_SECTIONS=[
+ {id:"level",n:"Level & XP",d:"Your level and rank progress",short:true},
+ {id:"gold",n:"Gold, items & power-ups",d:"Gold, aids in the backpack, shields, lucky coins, magnets, streak freezes",short:true},
+ {id:"map",n:"Map & mastery",d:"Sub-topic scores, mastered topics, cleared sectors, labs, Learn cards read",short:true},
+ {id:"matrix",n:"Matrix track",d:"Steps passed and best scores (full code also carries per-family matrix stats)",short:true},
+ {id:"badges",n:"Badges",d:"Achievements and their dates",short:true},
+ {id:"cos",n:"Themes & companions",d:"Everything bought in the shop and what's equipped",short:true},
+ {id:"streak",n:"Daily streak",d:"Which days you studied, plus milestones already claimed",short:true},
+ {id:"weak",n:"Weak spots",d:"Missed and flagged questions (the short code only carries questions from the written bank)",short:true},
+ {id:"quests",n:"Today's quests & uncollected rewards",d:"Daily quest progress and anything waiting on Home",short:true},
+ {id:"history",n:"Attempt history",d:"Every logged practice run, test and matrix run (full code only)",short:false},
+ {id:"boss",n:"Boss record",d:"Miss counts that feed boss fights, boss wins and names (full code only)",short:false}
+];
+function pcAll(){const o={};PC_SECTIONS.forEach(x=>o[x.id]=true);return o}
 const PC_PREFIX="CNAB1";
 const CRC_T=(()=>{const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[i]=c>>>0}return t})();
 function crc32(str){let c=0xFFFFFFFF;for(let i=0;i<str.length;i++)c=CRC_T[(c^str.charCodeAt(i))&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
 function b64uEnc(bytes){let s="";for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
 function b64uDec(str){str=str.replace(/-/g,"+").replace(/_/g,"/");while(str.length%4)str+="=";const bin=atob(str);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}
-function exportObject(compact){const hist=jload(HIST,[]);const weak=jload(WEAK,[]);return{app:"cnab-lab-pro",v:1,exported:new Date().toISOString(),hist:compact?hist.slice(-120):hist,weak:compact?weak.map(w=>({q:w.q,code:w.code||null,opts:(w.opts||[]).map(o=>({t:o.t,why:o.why||undefined})),a:w.a,w:w.w||null,areaCNT:w.areaCNT,folder:w.folder,sub:w.sub,source:w.source,flag:w.flag||undefined})):weak,xp:xpLoad(),pref:jload(PREF,{zoom:100,theme:null})}}
-async function makeProfileCode(){const json=JSON.stringify(exportObject(true));let bytes=new TextEncoder().encode(json);let mode="R";
+function exportObject(opts){opts=opts||{};const sec=opts.sections||pcAll();const compact=!!opts.compact;let hist=jload(HIST,[]);let weak=jload(WEAK,[]);const X=JSON.parse(JSON.stringify(xpLoad()));
+  const drop=keys=>keys.forEach(k=>{delete X[k]});
+  if(!sec.level)drop(["xp"]);if(!sec.gold)drop(["gold","bag","pw","pwv"]);if(!sec.map)drop(["topics","at","sectorClaimed","labsDone","learned","masteredSeen"]);if(!sec.matrix)drop(["steps","mstats","gated"]);if(!sec.badges)drop(["achSeen","achAt","badges"]);if(!sec.cos)drop(["cos"]);if(!sec.streak)drop(["streakClaimed"]);if(!sec.quests)drop(["daily","weekly","questsDone","rewards"]);if(!sec.boss)drop(["miss","beatenAt","bossWins","bossHist","bossCool"]);
+  if(!sec.weak)weak=[];else if(compact)weak=weak.map(w=>({q:w.q,code:w.code||null,opts:(w.opts||[]).map(o=>({t:o.t,why:o.why||undefined})),a:w.a,w:w.w||null,areaCNT:w.areaCNT,folder:w.folder,sub:w.sub,source:w.source,flag:w.flag||undefined}));
+  if(!sec.history){if(sec.streak){const days=[...new Set(hist.map(a=>dayKey(a.date)))];hist=days.map(d=>({date:d+"T12:00:00.000Z",mode:"Practice",scope:"Study day (moved from another device)",ok:1,total:1,area:null,moved:true}));if(sec.map){const at=X.at||{};for(const a in at)if(at[a].t)hist.push({date:(days[days.length-1]||new Date().toISOString().slice(0,10))+"T12:00:00.000Z",mode:"Practice",scope:SHORT[a]+" practice (moved)",ok:at[a].ok,total:at[a].t,area:null,moved:true});if((X.sectorClaimed||[]).includes("cpu"))hist.push({date:new Date().toISOString(),mode:"Test (timed)",scope:"Full CNT (moved)",ok:40,total:50,secs:0,area:null,moved:true})}}else hist=[]}
+  else if(compact)hist=hist.slice(-120);
+  return{app:"cnab-lab-pro",v:1,exported:new Date().toISOString(),sections:Object.keys(sec).filter(k=>sec[k]),hist,weak,xp:X,pref:jload(PREF,{zoom:100,theme:null})}}
+async function makeProfileCode(opts){const json=JSON.stringify(exportObject(Object.assign({compact:true},opts||{})));let bytes=new TextEncoder().encode(json);let mode="R";
   if(typeof CompressionStream!=="undefined"){try{const cs=new CompressionStream("deflate-raw");const w=cs.writable.getWriter();w.write(bytes);w.close();bytes=new Uint8Array(await new Response(cs.readable).arrayBuffer());mode="D"}catch(e){}}
   const body=b64uEnc(bytes);return PC_PREFIX+mode+"."+body+"."+crc32(body).toString(36)}
 async function parseProfileCode(code){const c=String(code||"").replace(/\s+/g,"");const m=c.match(/^CNAB1([DR])\.([A-Za-z0-9_-]+)\.([0-9a-z]+)$/);if(!m)throw new Error("That doesn't look like a profile code (it should start with CNAB1).");
@@ -1916,55 +1941,63 @@ function scClusters(){return Object.entries(CLUSTERS).flatMap(([a,l])=>l.map(c=>
 function bankIndex(item){const key=(item.q+"|"+(item.code||"")).toLowerCase();return BANK.findIndex(q=>(q.q+"|"+(q.code||"")).toLowerCase()===key)}
 function rleZ(bytes){const o=[];for(let i=0;i<bytes.length;){if(bytes[i]===0){let n=0;while(i<bytes.length&&bytes[i]===0&&n<255){n++;i++}o.push(0,n)}else o.push(bytes[i++])}return Uint8Array.from(o)}
 function unrleZ(bytes){const o=[];for(let i=0;i<bytes.length;){if(bytes[i]===0){const n=bytes[i+1]||0;for(let k=0;k<n;k++)o.push(0);i+=2}else o.push(bytes[i++])}return Uint8Array.from(o)}
-function makeShortCode(){const X=gameLoad();const w=ByteW();const today=Math.floor(Date.now()/86400000);const cl=scClusters();
-  w.b(1);w.v(today);w.v(X.gold);w.v(X.xp);
-  for(const k of ["elim","reveal","time"])w.v((X.bag||{})[k]);
-  for(const k of ["shield","lucky","magnet","freeze","shieldOn","luckyLeft","magnetArmed"])w.v((X.pw||{})[k]);
-  for(const id of SC.steps){const st=(X.steps||{})[id]||{};w.v(st.passes);w.b(Math.round((st.best||0)*100))}
-  w.v(X.bossWins);w.v(X.questsDone);
-  w.bits(SC.badges.map(b=>(X.badges||[]).includes(b)));w.bits(SC.ach.map(a=>(X.achSeen||[]).includes(a)));
-  for(const k of cl){const t=(X.topics||{})[k]||{};w.v(t.ok);w.v(t.t)}
-  for(const a of SC.areas){const t=(X.at||{})[a]||{};w.v(t.ok);w.v(t.t)}
-  w.bits(SC.road.map(id=>(X.sectorClaimed||[]).includes(id)));w.bits(SC.labs.map(id=>(X.labsDone||[]).includes(id)));
-  w.bits(cl.map(k=>(X.learned||[]).includes(k)));w.bits(cl.map(k=>(X.masteredSeen||[]).includes(k)));w.bits(SC.ladder.map(n=>(X.streakClaimed||[]).includes(n)));
-  const cos=X.cos||{};w.bits(SC.themes.map(t=>(cos.themes||["default"]).includes(t)));w.bits(SC.buddies.map(t=>(cos.buddies||["none"]).includes(t)));w.b(Math.max(0,SC.themes.indexOf(cos.theme||"default")));w.b(Math.max(0,SC.buddies.indexOf(cos.buddy||"none")));
-  const days=studyDays();w.bits(Array.from({length:SC.DAYS},(_,i)=>days.has(new Date((today-i)*86400000).toISOString().slice(0,10))));
-  const weak=jload(WEAK,[]);const wb=new Array(BANK.length).fill(false),fb=new Array(BANK.length).fill(false);let lost=0;for(const it of weak){const i=bankIndex(it);if(i<0){lost++;continue}wb[i]=true;if(it.flag)fb[i]=true}w.bits(wb);w.bits(fb);
-  const d=(X.daily&&X.daily.date===todayKey())?X.daily:null;w.b(d?d.q.length:0);if(d)for(const q of d.q){w.b(Math.max(0,SC.quests.indexOf(q.id)));w.v(q.p);w.b((q.done?1:0)|(q.claimed?2:0))}w.b(d&&d.rerolled?1:0);
-  const rw=X.rewards||[];w.v(rw.length);for(const r of rw){w.v(r.gold);w.v(r.xp);w.str(r.icon||"");w.str(r.label||"")}
+const SC_ORDER=["level","gold","map","matrix","badges","cos","streak","weak","quests"];
+function makeShortCode(opts){opts=opts||{};const sec=opts.sections||pcAll();const X=gameLoad();const w=ByteW();const today=Math.floor(Date.now()/86400000);const cl=scClusters();let lost=0;
+  w.b(2);w.v(today);w.bits(SC_ORDER.map(k=>!!sec[k]));
+  if(sec.level)w.v(X.xp);
+  if(sec.gold){w.v(X.gold);for(const k of ["elim","reveal","time"])w.v((X.bag||{})[k]);for(const k of ["shield","lucky","magnet","freeze","shieldOn","luckyLeft","magnetArmed"])w.v((X.pw||{})[k])}
+  if(sec.map){for(const k of cl){const t=(X.topics||{})[k]||{};w.v(t.ok);w.v(t.t)}for(const a of SC.areas){const t=(X.at||{})[a]||{};w.v(t.ok);w.v(t.t)}w.bits(SC.road.map(id=>(X.sectorClaimed||[]).includes(id)));w.bits(SC.labs.map(id=>(X.labsDone||[]).includes(id)));w.bits(cl.map(k=>(X.learned||[]).includes(k)));w.bits(cl.map(k=>(X.masteredSeen||[]).includes(k)))}
+  if(sec.matrix){for(const id of SC.steps){const st=(X.steps||{})[id]||{};w.v(st.passes);w.b(Math.round((st.best||0)*100))}}
+  if(sec.badges){w.v(X.bossWins);w.bits(SC.badges.map(b=>(X.badges||[]).includes(b)));w.bits(SC.ach.map(a=>(X.achSeen||[]).includes(a)))}
+  if(sec.cos){const cos=X.cos||{};w.bits(SC.themes.map(t=>(cos.themes||["default"]).includes(t)));w.bits(SC.buddies.map(t=>(cos.buddies||["none"]).includes(t)));w.b(Math.max(0,SC.themes.indexOf(cos.theme||"default")));w.b(Math.max(0,SC.buddies.indexOf(cos.buddy||"none")))}
+  if(sec.streak){const days=studyDays();w.bits(Array.from({length:SC.DAYS},(_,i)=>days.has(new Date((today-i)*86400000).toISOString().slice(0,10))));w.bits(SC.ladder.map(n=>(X.streakClaimed||[]).includes(n)))}
+  if(sec.weak){const weak=jload(WEAK,[]);const wb=new Array(BANK.length).fill(false),fb=new Array(BANK.length).fill(false);for(const it of weak){const i=bankIndex(it);if(i<0){lost++;continue}wb[i]=true;if(it.flag)fb[i]=true}w.bits(wb);w.bits(fb)}
+  if(sec.quests){w.v(X.questsDone);const d=(X.daily&&X.daily.date===todayKey())?X.daily:null;w.b(d?d.q.length:0);if(d)for(const q of d.q){w.b(Math.max(0,SC.quests.indexOf(q.id)));w.v(q.p);w.b((q.done?1:0)|(q.claimed?2:0))}w.b(d&&d.rerolled?1:0);const rw=X.rewards||[];w.v(rw.length);for(const r of rw){w.v(r.gold);w.v(r.xp);w.str(r.icon||"");w.str(r.label||"")}}
   const body=b32enc(rleZ(w.bytes()));const crc=b32enc(Uint8Array.from([crc32(body)>>>24,(crc32(body)>>>16)&255,(crc32(body)>>>8)&255])).slice(0,4);
   return{code:"CNAB-"+body+"-"+crc,lost}}
 function parseShortCode(text){const raw=String(text||"").toUpperCase().replace(/[^0-9A-Z]/g,"");if(!raw.startsWith("CNAB"))throw new Error("That doesn't look like a profile code (it should start with CNAB).");
   const bodyCrc=raw.slice(4);const body=bodyCrc.slice(0,-4),crc=bodyCrc.slice(-4);const want=b32enc(Uint8Array.from([crc32(body)>>>24,(crc32(body)>>>16)&255,(crc32(body)>>>8)&255])).slice(0,4);
   if(crc!==want)throw new Error("The code is damaged — a character is missing or changed. Copy it again from the other device.");
-  const r=ByteR(unrleZ(b32dec(body)));const ver=r.b();if(ver!==1)throw new Error("This code was made by a newer version of the app — update first.");const cl=scClusters();
-  const X=gameLoad();const fresh=JSON.parse(JSON.stringify(X));const today=r.v();fresh.gold=r.v();fresh.xp=r.v();fresh.bag={};for(const k of ["elim","reveal","time"])fresh.bag[k]=r.v();fresh.pw={};for(const k of ["shield","lucky","magnet","freeze","shieldOn","luckyLeft","magnetArmed"])fresh.pw[k]=r.v();fresh.pwv=1;
-  fresh.steps={};for(const id of SC.steps){const p=r.v(),b=r.b()/100;if(p||b)fresh.steps[id]={passes:p,best:b}}
-  fresh.bossWins=r.v();fresh.questsDone=r.v();{const bb=r.bits(SC.badges.length);fresh.badges=SC.badges.filter((b,i)=>bb[i])}
-  {const bits=r.bits(SC.ach.length);fresh.achSeen=SC.ach.filter((a,i)=>bits[i]);fresh.achAt=fresh.achAt||{};for(const a of fresh.achSeen)if(!fresh.achAt[a])fresh.achAt[a]=today*86400000}
-  fresh.topics={};for(const k of cl){const ok=r.v(),t=r.v();if(t)fresh.topics[k]={ok,t}}fresh.at={};for(const a of SC.areas){const ok=r.v(),t=r.v();if(t)fresh.at[a]={ok,t}}
-  {let b=r.bits(SC.road.length);fresh.sectorClaimed=SC.road.filter((x,i)=>b[i]);b=r.bits(SC.labs.length);fresh.labsDone=SC.labs.filter((x,i)=>b[i]);b=r.bits(cl.length);fresh.learned=cl.filter((x,i)=>b[i]);b=r.bits(cl.length);fresh.masteredSeen=cl.filter((x,i)=>b[i]);b=r.bits(SC.ladder.length);fresh.streakClaimed=SC.ladder.filter((x,i)=>b[i])}
-  {const tb=r.bits(SC.themes.length),bb=r.bits(SC.buddies.length);fresh.cos={themes:SC.themes.filter((x,i)=>tb[i]),buddies:SC.buddies.filter((x,i)=>bb[i]),theme:SC.themes[r.b()]||"default",buddy:SC.buddies[r.b()]||"none"};if(!fresh.cos.themes.includes("default"))fresh.cos.themes.unshift("default");if(!fresh.cos.buddies.includes("none"))fresh.cos.buddies.unshift("none")}
-  const dayBits=r.bits(SC.DAYS);const hist=[];for(let i=SC.DAYS-1;i>=0;i--)if(dayBits[i])hist.push({date:new Date((today-i)*86400000+43200000).toISOString(),mode:"Practice",scope:"Study day (moved from another device)",ok:1,total:1,area:null,moved:true});
-  // keep sectors cleared: one summary attempt per area, and a passing test if the CPU sector was claimed
-  const last=hist.length?hist[hist.length-1].date:new Date(today*86400000+43200000).toISOString();for(const a of SC.areas){const t=fresh.at[a];if(t&&t.t)hist.push({date:last,mode:"Practice",scope:SHORT[a]+" practice (moved)",ok:t.ok,total:t.t,area:null,moved:true})}
-  if(fresh.sectorClaimed.includes("cpu"))hist.push({date:last,mode:"Test (timed)",scope:"Full CNT (moved)",ok:40,total:50,secs:0,area:null,moved:true});
-  const wb=r.bits(BANK.length),fb=r.bits(BANK.length);const weak=[];for(let i=0;i<BANK.length;i++)if(wb[i]){const it=statItem(BANK[i]);weak.push({q:it.q,code:it.code,opts:it.opts,a:it.a,w:it.w,areaCNT:it.areaCNT,folder:it.folder,sub:it.sub,source:"stat",flag:fb[i]||undefined})}
-  const nq=r.b();const dq=[];for(let i=0;i<nq;i++){const id=SC.quests[r.b()];const p=r.v();const f=r.b();if(id)dq.push({id,p,done:!!(f&1),claimed:!!(f&2)})}const rerolled=!!r.b();if(dq.length&&today===Math.floor(Date.now()/86400000))fresh.daily={date:todayKey(),q:dq,rerolled};
-  if(r.left()>0){const n=r.v();fresh.rewards=[];for(let i=0;i<n;i++){const gold=r.v(),xp=r.v(),icon=r.str(),label=r.str();fresh.rewards.push({id:"mv"+i+"-"+Date.now(),kind:"moved",icon,label,gold,xp})}}
-  fresh.miss={};fresh.beatenAt={};fresh.bossHist=[];delete fresh.weekly;
-  return{app:"cnab-lab-pro",v:1,exported:new Date(today*86400000+43200000).toISOString(),hist,weak,xp:fresh,short:true}}
-
-function renderProfileCodeUI(host){host.innerHTML=`<h3 style="margin:18px 0 6px">Profile code — move between devices</h3><p class="small muted" style="margin:0 0 8px">No account, nothing online. Your profile — gold, items, map, badges, mastery, weak spots, study days — packed into a short code with a checksum. Generate it here, paste it on the other device, keep studying. Make a fresh one each time you switch; the newest code wins.</p>
-  <div class="row"><button class="btn sm" id="pc-gen">Generate my profile code</button><button class="btn sm ghost" id="pc-load">Load a profile code</button><button class="link" id="pc-full" title="Longer code that also carries every attempt and generated-question weak spots">full code instead</button></div><div id="pc-box" style="margin-top:10px"></div>`;
+  const r=ByteR(unrleZ(b32dec(body)));const ver=r.b();if(ver!==2)throw new Error(ver<2?"This code comes from an older build — make a fresh one on the other device after it updates.":"This code was made by a newer version of the app — update first.");const cl=scClusters();
+  const today=r.v();const sb=r.bits(SC_ORDER.length);const sec={};SC_ORDER.forEach((k,i)=>sec[k]=sb[i]);
+  const fresh={};let hist=[],weak=[];
+  if(sec.level)fresh.xp=r.v();
+  if(sec.gold){fresh.gold=r.v();fresh.bag={};for(const k of ["elim","reveal","time"])fresh.bag[k]=r.v();fresh.pw={};for(const k of ["shield","lucky","magnet","freeze","shieldOn","luckyLeft","magnetArmed"])fresh.pw[k]=r.v();fresh.pwv=1}
+  if(sec.map){fresh.topics={};for(const k of cl){const ok=r.v(),t=r.v();if(t)fresh.topics[k]={ok,t}}fresh.at={};for(const a of SC.areas){const ok=r.v(),t=r.v();if(t)fresh.at[a]={ok,t}}let b=r.bits(SC.road.length);fresh.sectorClaimed=SC.road.filter((x,i)=>b[i]);b=r.bits(SC.labs.length);fresh.labsDone=SC.labs.filter((x,i)=>b[i]);b=r.bits(cl.length);fresh.learned=cl.filter((x,i)=>b[i]);b=r.bits(cl.length);fresh.masteredSeen=cl.filter((x,i)=>b[i])}
+  if(sec.matrix){fresh.steps={};for(const id of SC.steps){const p=r.v(),b=r.b()/100;if(p||b)fresh.steps[id]={passes:p,best:b}}}
+  if(sec.badges){fresh.bossWins=r.v();const bb=r.bits(SC.badges.length);fresh.badges=SC.badges.filter((b,i)=>bb[i]);const ab=r.bits(SC.ach.length);fresh.achSeen=SC.ach.filter((a,i)=>ab[i]);fresh.achAt={};for(const a of fresh.achSeen)fresh.achAt[a]=today*86400000}
+  if(sec.cos){const tb=r.bits(SC.themes.length),bb=r.bits(SC.buddies.length);fresh.cos={themes:SC.themes.filter((x,i)=>tb[i]),buddies:SC.buddies.filter((x,i)=>bb[i]),theme:SC.themes[r.b()]||"default",buddy:SC.buddies[r.b()]||"none"};if(!fresh.cos.themes.includes("default"))fresh.cos.themes.unshift("default");if(!fresh.cos.buddies.includes("none"))fresh.cos.buddies.unshift("none")}
+  if(sec.streak){const dayBits=r.bits(SC.DAYS);for(let i=SC.DAYS-1;i>=0;i--)if(dayBits[i])hist.push({date:new Date((today-i)*86400000+43200000).toISOString(),mode:"Practice",scope:"Study day (moved from another device)",ok:1,total:1,area:null,moved:true});const lb=r.bits(SC.ladder.length);fresh.streakClaimed=SC.ladder.filter((x,i)=>lb[i])}
+  if(sec.map){const last=hist.length?hist[hist.length-1].date:new Date(today*86400000+43200000).toISOString();for(const a of SC.areas){const t=fresh.at[a];if(t&&t.t)hist.push({date:last,mode:"Practice",scope:SHORT[a]+" practice (moved)",ok:t.ok,total:t.t,area:null,moved:true})}if(fresh.sectorClaimed.includes("cpu"))hist.push({date:last,mode:"Test (timed)",scope:"Full CNT (moved)",ok:40,total:50,secs:0,area:null,moved:true})}
+  if(sec.weak){const wb=r.bits(BANK.length),fb=r.bits(BANK.length);for(let i=0;i<BANK.length;i++)if(wb[i]){const it=statItem(BANK[i]);weak.push({q:it.q,code:it.code,opts:it.opts,a:it.a,w:it.w,areaCNT:it.areaCNT,folder:it.folder,sub:it.sub,source:"stat",flag:fb[i]||undefined})}}
+  if(sec.quests){fresh.questsDone=r.v();const nq=r.b();const dq=[];for(let i=0;i<nq;i++){const id=SC.quests[r.b()];const p=r.v();const f=r.b();if(id)dq.push({id,p,done:!!(f&1),claimed:!!(f&2)})}const rerolled=!!r.b();if(dq.length&&today===Math.floor(Date.now()/86400000))fresh.daily={date:todayKey(),q:dq,rerolled};const n=r.v();fresh.rewards=[];for(let i=0;i<n;i++){const gold=r.v(),xp=r.v(),icon=r.str(),label=r.str();fresh.rewards.push({id:"mv"+i+"-"+Date.now(),kind:"moved",icon,label,gold,xp})}}
+  return{app:"cnab-lab-pro",v:1,exported:new Date(today*86400000+43200000).toISOString(),sections:SC_ORDER.filter(k=>sec[k]),hist,weak,xp:fresh,short:true}}
+let PC_OPTS=null;
+function pcModal(onGo){if(document.getElementById("pcmodal"))return;const cur=PC_OPTS||{sections:pcAll(),short:false};
+  const o=document.createElement("div");o.id="pcmodal";o.className="lvlup mastered";o.innerHTML=`<div class="card pccard"><div class="small" style="letter-spacing:.14em;font-weight:800">CUSTOMIZE YOUR PROFILE CODE</div><p class="small muted" style="margin:6px 0 10px">Tick what should travel. Anything unticked stays as it is on the device you load the code onto.</p>
+   <div class="row" style="justify-content:center;gap:6px;margin-bottom:8px"><button class="btn sm ghost" data-preset="all">Everything</button><button class="btn sm ghost" data-preset="ess">Just the essentials</button><button class="btn sm ghost" data-preset="none">Nothing</button></div>
+   <div class="pclist">${PC_SECTIONS.map(x=>`<label class="pcrow"><input type="checkbox" data-sec="${x.id}" ${cur.sections[x.id]?"checked":""}><span><b>${esc(x.n)}</b><span class="small muted">${esc(x.d)}</span></span></label>`).join("")}</div>
+   <label class="pcrow pcshort"><input type="checkbox" id="pc-short" ${cur.short?"checked":""}><span><b>Short code</b><span class="small muted">Packed numbers instead of the full export: about 50–300 characters. Can't carry attempt history, the boss record or weak spots from generated drills.</span></span></label>
+   <div class="row" style="justify-content:center;gap:10px;margin-top:14px"><button class="btn ghost" id="pc-cancel">Cancel</button><button class="btn" id="pc-make">Generate code</button></div></div>`;
+  document.body.appendChild(o);setTimeout(()=>o.classList.add("show"),20);
+  const boxes=()=>[...o.querySelectorAll("[data-sec]")];const shortBox=o.querySelector("#pc-short");
+  const syncShort=()=>{const sh=shortBox.checked;boxes().forEach(b=>{const def=PC_SECTIONS.find(x=>x.id===b.dataset.sec);b.disabled=sh&&!def.short;b.closest(".pcrow").classList.toggle("off",sh&&!def.short)})};shortBox.onchange=syncShort;syncShort();
+  o.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{const p=b.dataset.preset;const ess=["level","gold","map","matrix","badges","cos","streak"];boxes().forEach(x=>x.checked=p==="all"?true:p==="none"?false:ess.includes(x.dataset.sec))});
+  o.querySelector("#pc-cancel").onclick=()=>o.remove();
+  o.querySelector("#pc-make").onclick=()=>{const sections={};boxes().forEach(b=>sections[b.dataset.sec]=b.checked&&!b.disabled);if(!Object.values(sections).some(Boolean)){o.querySelector("#pc-make").textContent="Tick at least one";return}PC_OPTS={sections,short:shortBox.checked};o.remove();onGo(PC_OPTS)}}
+function renderProfileCodeUI(host){host.innerHTML=`<h3 style="margin:18px 0 6px">Profile code — move between devices</h3><p class="small muted" style="margin:0 0 8px">No account, nothing online. Your whole profile packed into text with a checksum. Generate it here, paste it on the other device, keep studying. Make a fresh one each time you switch; the newest code wins. <b>Customize</b> picks what travels, and can make a much shorter code for chat.</p>
+  <div class="row"><button class="btn sm" id="pc-gen">Generate my profile code</button><button class="btn sm ghost" id="pc-custom">Customize…</button><button class="btn sm ghost" id="pc-load">Load a profile code</button></div><div id="pc-box" style="margin-top:10px"></div>`;
   const box=host.querySelector("#pc-box");
-  const gen=async(full)=>{box.innerHTML=`<p class="small muted">Packing…</p>`;try{let code,note="";if(full){code=await makeProfileCode()}else{const r=makeShortCode();code=r.code;if(r.lost)note=` · ${r.lost} weak spot${r.lost===1?"":"s"} from generated drills can't fit in the short code (use the full code to keep them)`}
-      const pending=(gameLoad().rewards||[]).length;box.innerHTML=`<textarea id="pc-out" class="pccode ${full?"":"short"}" readonly spellcheck="false"></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="pc-copy">Copy code</button><span class="small muted" id="pc-len">${code.length.toLocaleString()} characters · ${profileSummary(xpLoad(),jload(HIST,[]))}${note}</span></div><p class="small muted" style="margin:8px 0 0">Paste it anywhere that reaches your other device — a Discord message, a note, a text to yourself. Then open the app there → Progress → Load a profile code.${pending?" <b>You have "+pending+" uncollected reward"+(pending===1?"":"s")+" on Home — they travel with the code.</b>":""}</p>`;
+  const gen=async(opts)=>{box.innerHTML=`<p class="small muted">Packing…</p>`;try{let code,note="";const sections=opts.sections;const n=Object.values(sections).filter(Boolean).length;
+      if(opts.short){const r=makeShortCode({sections});code=r.code;if(r.lost)note=` · ${r.lost} weak spot${r.lost===1?"":"s"} from generated drills can't fit in the short code`}else code=await makeProfileCode({sections});
+      if(n<PC_SECTIONS.length)note+=` · carries ${n} of ${PC_SECTIONS.length} sections`;
+      const pending=sections.quests?(gameLoad().rewards||[]).length:0;box.innerHTML=`<textarea id="pc-out" class="pccode ${opts.short?"short":""}" readonly spellcheck="false"></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="pc-copy">Copy code</button><span class="small muted" id="pc-len">${code.length.toLocaleString()} characters · ${profileSummary(xpLoad(),jload(HIST,[]))}${note}</span></div><p class="small muted" style="margin:8px 0 0">Paste it anywhere that reaches your other device — a Discord message, a note, a text to yourself. Then open the app there → Progress → Load a profile code.${pending?" <b>You have "+pending+" uncollected reward"+(pending===1?"":"s")+" on Home — they travel with the code.</b>":""}</p>`;
       const ta=box.querySelector("#pc-out");ta.value=code;ta.onclick=()=>ta.select();box.querySelector("#pc-copy").onclick=async()=>{ta.select();let ok=false;try{await navigator.clipboard.writeText(code);ok=true}catch(e){try{ok=document.execCommand("copy")}catch(x){}}box.querySelector("#pc-copy").textContent=ok?"Copied ✓":"Select all and copy";if(ok)sfx("click")}}catch(e){box.innerHTML=`<div class="fb wrong"><span class="mk">Couldn't build the code.</span> ${esc(e.message||String(e))}</div>`}};
-  host.querySelector("#pc-gen").onclick=()=>gen(false);host.querySelector("#pc-full").onclick=()=>gen(true);
-  host.querySelector("#pc-load").onclick=()=>{box.innerHTML=`<textarea id="pc-in" class="pccode" placeholder="Paste a profile code here (starts with CNAB1)" spellcheck="false"></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="pc-go">Check &amp; load</button><button class="btn sm ghost" id="pc-paste">Paste from clipboard</button></div><div id="pc-msg"></div>`;
+  host.querySelector("#pc-gen").onclick=()=>gen(PC_OPTS||{sections:pcAll(),short:false});host.querySelector("#pc-custom").onclick=()=>pcModal(gen);
+  host.querySelector("#pc-load").onclick=()=>{box.innerHTML=`<textarea id="pc-in" class="pccode" placeholder="Paste a profile code here (starts with CNAB)" spellcheck="false"></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="pc-go">Check &amp; load</button><button class="btn sm ghost" id="pc-paste">Paste from clipboard</button></div><div id="pc-msg"></div>`;
     const ta=box.querySelector("#pc-in");box.querySelector("#pc-paste").onclick=async()=>{try{ta.value=await navigator.clipboard.readText()}catch(e){ta.focus()}};
     box.querySelector("#pc-go").onclick=async()=>{const msg=box.querySelector("#pc-msg");try{const t=ta.value.trim();const d=/^CNAB1[DR]\./i.test(t)?await parseProfileCode(t):parseShortCode(t);importData(d,msg,"code")}catch(e){msg.innerHTML=`<div class="fb wrong"><span class="mk">Can't load that.</span> ${esc(e.message||String(e))}</div>`}}}}
+
 function logAttempt(a){const h=jload(HIST,[]);h.push(Object.assign({date:new Date().toISOString()},a));jsave(HIST,h.slice(-200))}
 function dayKey(iso){return new Date(iso).toISOString().slice(0,10)}
 function renderProgress(){
@@ -2002,7 +2035,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v51. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v52. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div id="pcui"></div>
@@ -4055,7 +4088,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v51";
+const APP_VERSION="v52";
 window.__filter="all";
 window.__booted=true;
 (function(){
