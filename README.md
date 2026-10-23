@@ -1,6 +1,6 @@
 # CNAB / CNT Study Lab
 
-Prep app for the NSA Computer Network Assessment Battery. Installable, works offline, updates itself.
+Prep app for the Computer Network Assessment Battery. Installable, works offline, updates itself.
 
 **Open it:** https://keltonrozellv2.github.io/cnab-study-lab/
 
