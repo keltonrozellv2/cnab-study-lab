@@ -158,6 +158,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .casehost{position:relative;margin-top:-170px;transform:scale(1.15);opacity:0;transform:scale(.9);transition:opacity .4s,transform .4s;z-index:3}.casehost.show{opacity:1;transform:scale(1.15)}.casehost .casewrap{background:#121820;border-color:#2a3542}.casehost .lootcard{background:#121820;color:#fff}
 .mline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.82rem;margin:-4px 0 10px;color:var(--ink)}
 .retrytag{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 8px;font-weight:700;font-size:.8rem}
+.weakrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px}
 .qcount{display:inline-flex;align-items:center;gap:8px}.qstreak{background:#ffe9c7;color:#b8500b;border-radius:999px;padding:2px 8px;font-weight:800;animation:flick 1.4s ease-in-out infinite}html[data-theme=dark] .qstreak{background:#3a2208;color:#ffb067}.qtools{display:inline-flex;gap:4px}.qtb{border:1px solid var(--line);background:var(--sheet);border-radius:6px;padding:2px 6px;font-size:1rem;cursor:pointer}.qtb:disabled{opacity:.4;cursor:not-allowed}
 .tooldock{position:fixed;right:0;top:136px;z-index:40;display:flex;flex-direction:column;gap:6px}.tbtn{border:1.5px solid var(--line);border-right:0;background:var(--sheet);border-radius:10px 0 0 10px;padding:8px 10px;font-size:1.1rem;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:-2px 2px 8px rgba(0,0,0,.12);cursor:pointer}.tbtn span{font-size:.65rem;font-weight:700;color:var(--muted)}.tbtn.on{border-color:var(--accent);background:var(--accent-soft)}.tbtn:disabled{opacity:.45;cursor:not-allowed}
 .toolwin{position:fixed;z-index:45;background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden}.toolwin .th{display:flex;align-items:center;gap:8px;padding:8px 10px;background:color-mix(in srgb,var(--ink) 6%,var(--sheet));cursor:move;font-weight:700;user-select:none}.toolwin .tctl{margin-left:auto;display:flex;gap:6px;align-items:center}.iconbtn.sm{padding:3px 8px;font-size:.8rem}
@@ -253,7 +254,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v45</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v46</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1551,8 +1552,10 @@ function drawFolder(r,folders){
 }
 
 /* ---- weak-spots store (snapshots of missed questions) ---- */
-function addWeak(item){const w=jload(WEAK,[]);w.push({q:item.q,code:item.code,opts:item.opts,a:item.a,w:item.w||null,areaCNT:item.areaCNT,folder:item.folder,sub:item.sub});jsave(WEAK,w.slice(-60))}
+function addWeak(item){const w=jload(WEAK,[]);const key=(item.q+"|"+(item.code||"")).toLowerCase();if(w.some(x=>(x.q+"|"+(x.code||"")).toLowerCase()===key))return;w.push({q:item.q,code:item.code,opts:item.opts,a:item.a,w:item.w||null,areaCNT:item.areaCNT,folder:item.folder,sub:item.sub,source:item.source||"stat"});jsave(WEAK,w)}
 function weakList(){return jload(WEAK,[])}
+function removeWeak(item){const key=(item.q+"|"+(item.code||"")).toLowerCase();jsave(WEAK,jload(WEAK,[]).filter(x=>(x.q+"|"+(x.code||"")).toLowerCase()!==key));const X=gameLoad();const k=stemKey(item);if(X.miss[k]){delete X.miss[k];gameSave(X)}}
+function isWeak(item){const key=(item.q+"|"+(item.code||"")).toLowerCase();return jload(WEAK,[]).some(x=>(x.q+"|"+(x.code||"")).toLowerCase()===key)}
 
 /* ---- explanation rendering (works for both sources) ---- */
 function explainHTML(item,picked){
@@ -1621,8 +1624,8 @@ function nextSession(){
 function renderSession(){
   const el=S.el;
   if(!S.cur){ // pool exhausted (weak spots)
-    el.innerHTML=`<div class="sheet"><p style="margin:0"><b>Done.</b> You cleared this review set — ${S.run.ok}/${S.run.t} correct.</p></div><div class="row" style="margin-top:14px"><button class="btn" id="again">Restart</button></div>`;
-    el.querySelector("#again").onclick=()=>{S.idx=0;S.run={ok:0,t:0};nextSession();renderSession()};return;
+    const left=weakList().length;el.innerHTML=`<div class="sheet"><p style="margin:0"><b>Done.</b> You went through this review set — ${S.run.ok}/${S.run.t} correct. ${left?`${left} weak spot${left===1?"":"s"} still on the list.`:"Your weak-spot list is empty."}</p></div><div class="row" style="margin-top:14px">${left?`<button class="btn" id="again">Go again (${left})</button>`:""}<button class="btn ghost" id="backg">Back</button></div>`;
+    const ag=el.querySelector("#again");if(ag)ag.onclick=()=>{S.pool=weakList().map(x=>x);S.idx=0;S.run={ok:0,t:0};nextSession();renderSession()};el.querySelector("#backg").onclick=()=>endSession();return;
   }
   const it=S.cur;
   if(S.mode==="flash"){
@@ -1642,13 +1645,14 @@ function renderSession(){
   <p class="qtext">${qHTML(it.q)}</p>${it.code?`<pre>${esc(it.code)}</pre>`:""}
   <div class="choices" id="ch">${it.opts.map((o,k)=>{let c="choice";const gone=S.elim&&k===S.elimIdx&&!answered;if(answered){if(k===it.a)c+=" correct";else if(k===S.picked)c+=" wrong"}if(gone)c+=" gone";return `<button class="${c}" data-k="${k}" ${answered||gone?"disabled":""}><span class="b">${L8[k]}</span><span>${esc(o.t)}</span></button>`}).join("")}</div>
   ${S.hinted&&!answered?`<div class="callout small"><b>Reveal:</b> ${esc(hintFor(it))}</div>`:""}
-  <div id="fb">${answered?explainHTML(it,S.picked):""}</div>
+  <div id="fb">${answered?explainHTML(it,S.picked)+(isWeak(it)?`<div class="weakrow"><span class="small muted">This is in your weak spots${S.picked===it.a?" — got it this time.":"."}</span><button class="btn sm ghost" id="unweak">Remove from weak spots</button></div>`:""):""}</div>
   ${!answered?aidsBarHTML(["elim","reveal"],S.used):""}
   <div class="qnav">${answered?`<button class="btn" id="next">Next question <span class="kbd">Enter</span></button>`:`<span class="note">Pick an answer — keys <span class="kbd">A</span>–<span class="kbd">D</span></span>`}</div>
   <p class="note"><button class="link" id="end">End practice</button></p>`;
   if(!answered){el.querySelectorAll("#ch [data-k]").forEach(b=>{if(!b.disabled)b.onclick=()=>pickSession(+b.dataset.k)});armShimmer()}else disarmShimmer();
   el.querySelectorAll("[data-aid]").forEach(b=>b.onclick=()=>{const k=b.dataset.aid;if(!useAid(k))return;S.used[k]=true;if(k==="elim")elimOne();else{S.hinted=true;renderSession()}});bindPowers(el);
   el.querySelectorAll("[data-goview]").forEach(b=>b.onclick=()=>show(b.dataset.goview));
+  {const uw=el.querySelector("#unweak");if(uw)uw.onclick=()=>{removeWeak(it);sfx("click");uw.closest(".weakrow").innerHTML=`<span class="small muted">Removed from weak spots.</span>`;const wb=document.querySelector("#weak .pill");if(wb)wb.textContent=weakList().length}}
   if(answered) el.querySelector("#next").onclick=()=>{S.idx++;if(S.mode==="practice"&&!S.pool&&maybeBoss(S.r,S.back||"guide")){BOSS.resume=S;S=null;renderBoss(BOSS.resume.el);window.scrollTo(0,0);return}nextSession();renderSession();window.scrollTo(0,0)};
   el.querySelector("#end").onclick=()=>endSession();
 }
@@ -1856,7 +1860,7 @@ function importProgress(file,box){
     askInline(box,`Import ${n} attempt${n===1?"":"s"} and ${(d.xp&&d.xp.xp)||0} XP? ${cur.length?"This merges with what is already saved here (duplicates are skipped).":""}`,"Import",()=>{
       const seen=new Set(cur.map(a=>a.date+"|"+a.mode+"|"+a.ok+"|"+a.total));const merged=cur.concat(d.hist.filter(a=>a&&a.date&&!seen.has(a.date+"|"+a.mode+"|"+a.ok+"|"+a.total))).sort((a,b)=>a.date<b.date?-1:1);
       jsave(HIST,merged.slice(-200));
-      const w=jload(WEAK,[]);const wk=new Set(w.map(x=>x.q));jsave(WEAK,w.concat((d.weak||[]).filter(x=>x&&x.q&&!wk.has(x.q))).slice(-60));
+      const w=jload(WEAK,[]);const wk=new Set(w.map(x=>x.q));jsave(WEAK,w.concat((d.weak||[]).filter(x=>x&&x.q&&!wk.has(x.q))));
       const X=xpLoad();const Y=d.xp||{};X.xp=Math.max(X.xp,Y.xp||0);for(const k in (Y.steps||{})){const a=X.steps[k]||{best:0,passes:0},b=Y.steps[k];X.steps[k]={best:Math.max(a.best,b.best||0),passes:Math.max(a.passes,b.passes||0)}}
       for(const k in (Y.mstats||{})){const a=X.mstats[k]||{ok:0,t:0,secs:0},b=Y.mstats[k];X.mstats[k]={ok:a.ok+(b.ok||0),t:a.t+(b.t||0),secs:a.secs+(b.secs||0)}}
       if(Y.gated!==undefined)X.gated=Y.gated;X.gold=Math.max(X.gold||0,Y.gold||0);X.bag=X.bag||{};for(const k in (Y.bag||{}))X.bag[k]=Math.max(X.bag[k]||0,Y.bag[k]);X.miss=X.miss||{};for(const k in (Y.miss||{})){const a=X.miss[k];X.miss[k]=a&&a.n>=Y.miss[k].n?a:Y.miss[k]}X.badges=[...new Set((X.badges||[]).concat(Y.badges||[]))];X.bossWins=Math.max(X.bossWins||0,Y.bossWins||0);if(Y.cos){X.cos=X.cos||{themes:["default"],buddies:["none"],theme:"default",buddy:"none"};X.cos.themes=[...new Set(X.cos.themes.concat(Y.cos.themes||[]))];X.cos.buddies=[...new Set(X.cos.buddies.concat(Y.cos.buddies||[]))];X.cos.theme=Y.cos.theme||X.cos.theme;X.cos.buddy=Y.cos.buddy||X.cos.buddy}
@@ -1902,7 +1906,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v45. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v46. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -3916,7 +3920,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v45";
+const APP_VERSION="v46";
 window.__filter="all";
 window.__booted=true;
 (function(){
