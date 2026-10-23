@@ -270,7 +270,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v53</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v54</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -2038,7 +2038,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v53. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v54. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div id="pcui"></div>
@@ -2647,7 +2647,7 @@ function renderContact(){const el=document.getElementById("view-contact");const 
   <div class="sheet ccard"><div class="small" style="letter-spacing:.14em;font-weight:800;color:var(--accent)">POINT OF CONTACT</div>
    <div class="cname">SPC Rozell, Kelton</div>
    <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:10px"><a class="btn" href="mailto:kelton.l.rozell.mil@army.mil?subject=CNAB%20Study%20Lab">✉ kelton.l.rozell.mil@army.mil</a><button class="btn ghost" id="c-copy">Copy email</button></div>
-   <p class="small muted" style="margin:12px 0 0">If you're reporting a question, include the question text and which sub-topic it came from — the Progress → Profile code (weak spots only) is a quick way to send the exact items.</p></div>
+</div>
   <div class="sheet" style="margin-top:14px;text-align:center"><div class="thanks">Thank you for studying!</div><p class="muted small" style="margin:6px 0 0">Built for soldiers prepping for the CNAB / CNT. Good luck on test day.</p></div></div>`;
   el.querySelector("#c-copy").onclick=async()=>{const b=el.querySelector("#c-copy");try{await navigator.clipboard.writeText("kelton.l.rozell.mil@army.mil");b.textContent="Copied ✓";sfx("click")}catch(e){b.textContent="kelton.l.rozell.mil@army.mil"}}}
 /* ================= CHEAT SHEET ================= */
@@ -4100,7 +4100,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v53";
+const APP_VERSION="v54";
 window.__filter="all";
 window.__booted=true;
 (function(){
