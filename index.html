@@ -158,6 +158,10 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .casehost{position:relative;margin-top:-170px;transform:scale(1.15);opacity:0;transform:scale(.9);transition:opacity .4s,transform .4s;z-index:3}.casehost.show{opacity:1;transform:scale(1.15)}.casehost .casewrap{background:#121820;border-color:#2a3542}.casehost .lootcard{background:#121820;color:#fff}
 .mline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.82rem;margin:-4px 0 10px;color:var(--ink)}
 .retrytag{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 8px;font-weight:700;font-size:.8rem}
+.flagcard{position:relative;padding:12px 14px 6px 44px;border-radius:12px;border:1px solid rgba(60,130,255,.45);box-shadow:0 0 0 3px rgba(60,130,255,.14),0 0 24px rgba(60,130,255,.35);animation:flagaura 2.6s ease-in-out infinite;margin-bottom:10px}
+@keyframes flagaura{0%,100%{box-shadow:0 0 0 3px rgba(60,130,255,.12),0 0 18px rgba(60,130,255,.25)}50%{box-shadow:0 0 0 3px rgba(60,130,255,.22),0 0 34px rgba(60,130,255,.5)}}
+.flagico{position:absolute;left:12px;top:10px;font-size:1.3rem}
+.weakrow.flagged{border-color:rgba(60,130,255,.6);border-style:solid;box-shadow:0 0 12px rgba(60,130,255,.3)}
 .weakrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px}
 .qcount{display:inline-flex;align-items:center;gap:8px}.qstreak{background:#ffe9c7;color:#b8500b;border-radius:999px;padding:2px 8px;font-weight:800;animation:flick 1.4s ease-in-out infinite}html[data-theme=dark] .qstreak{background:#3a2208;color:#ffb067}.qtools{display:inline-flex;gap:4px}.qtb{border:1px solid var(--line);background:var(--sheet);border-radius:6px;padding:2px 6px;font-size:1rem;cursor:pointer}.qtb:disabled{opacity:.4;cursor:not-allowed}
 .tooldock{position:fixed;right:0;top:136px;z-index:40;display:flex;flex-direction:column;gap:6px}
@@ -259,7 +263,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v48</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v49</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1558,7 +1562,8 @@ function drawFolder(r,folders){
 }
 
 /* ---- weak-spots store (snapshots of missed questions) ---- */
-function addWeak(item){const w=jload(WEAK,[]);const key=(item.q+"|"+(item.code||"")).toLowerCase();if(w.some(x=>(x.q+"|"+(x.code||"")).toLowerCase()===key))return;w.push({q:item.q,code:item.code,opts:item.opts,a:item.a,w:item.w||null,areaCNT:item.areaCNT,folder:item.folder,sub:item.sub,source:item.source||"stat"});jsave(WEAK,w)}
+function addWeak(item,flag){const w=jload(WEAK,[]);const key=(item.q+"|"+(item.code||"")).toLowerCase();const ex=w.find(x=>(x.q+"|"+(x.code||"")).toLowerCase()===key);if(ex){if(flag&&!ex.flag){ex.flag=true;jsave(WEAK,w)}return}w.push({q:item.q,code:item.code,opts:item.opts,a:item.a,w:item.w||null,areaCNT:item.areaCNT,folder:item.folder,sub:item.sub,source:item.source||"stat",flag:!!flag});jsave(WEAK,w)}
+function isFlagged(item){const key=(item.q+"|"+(item.code||"")).toLowerCase();const x=jload(WEAK,[]).find(x=>(x.q+"|"+(x.code||"")).toLowerCase()===key);return !!(x&&x.flag)}
 function weakList(){return jload(WEAK,[])}
 function removeWeak(item){const key=(item.q+"|"+(item.code||"")).toLowerCase();jsave(WEAK,jload(WEAK,[]).filter(x=>(x.q+"|"+(x.code||"")).toLowerCase()!==key));const X=gameLoad();const k=stemKey(item);if(X.miss[k]){delete X.miss[k];gameSave(X)}}
 function isWeak(item){const key=(item.q+"|"+(item.code||"")).toLowerCase();return jload(WEAK,[]).some(x=>(x.q+"|"+(x.code||"")).toLowerCase()===key)}
@@ -1654,17 +1659,18 @@ function renderSession(){
   // practice mode (instant feedback)
   const answered=S.picked!==null;
   el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${subLabel(it)?" · "+esc(subLabel(it)):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span class="qcount">${it.retry?`<span class="retrytag" title="You missed this one earlier in this run — second look">↻ second look</span>`:""}${S.streak>=3?`<span class="qstreak" title="Answer streak: +${Math.round((streakMult(S.streak)-1)*100)}% XP and gold">🔥 ${S.streak}</span>`:""}${S.run.ok} ✓ of ${S.run.t} answered${toolIcons()}</span></div>${masteryLineHTML(it)}
-  <p class="qtext">${qHTML(it.q)}</p>${it.code?`<pre>${esc(it.code)}</pre>`:""}
+  ${isFlagged(it)?`<div class="flagcard"><span class="flagico" title="You flagged this question for review">🚩</span>`:""}<p class="qtext">${qHTML(it.q)}</p>${it.code?`<pre>${esc(it.code)}</pre>`:""}${isFlagged(it)?`</div>`:""}
   <div class="choices" id="ch">${it.opts.map((o,k)=>{let c="choice";const gone=S.elim&&k===S.elimIdx&&!answered;if(answered){if(k===it.a)c+=" correct";else if(k===S.picked)c+=" wrong"}if(gone)c+=" gone";return `<button class="${c}" data-k="${k}" ${answered||gone?"disabled":""}><span class="b">${L8[k]}</span><span>${esc(o.t)}</span></button>`}).join("")}</div>
   ${S.hinted&&!answered?`<div class="callout small"><b>Reveal:</b> ${esc(hintFor(it))}</div>`:""}
-  <div id="fb">${answered?explainHTML(it,S.picked)+(isWeak(it)?`<div class="weakrow"><span class="small muted">This is in your weak spots${S.picked===it.a?" — got it this time.":"."}</span><button class="btn sm ghost" id="unweak">Remove from weak spots</button></div>`:""):""}</div>
+  <div id="fb">${answered?explainHTML(it,S.picked)+(isWeak(it)?`<div class="weakrow ${isFlagged(it)?"flagged":""}"><span class="small muted">${isFlagged(it)?"🚩 Flagged — ":""}This is in your weak spots${S.picked===it.a?" — got it this time.":"."}</span><button class="btn sm ghost" id="unweak">Remove from weak spots</button></div>`:`<div class="weakrow"><span class="small muted">Want to see this one again, even though you ${S.picked===it.a?"got it":"missed it"}?</span><button class="btn sm ghost" id="flagq" title="Adds it to your weak spots with a flag">🚩 Flag for review</button></div>`):""}</div>
   ${!answered?aidsBarHTML(["elim","reveal"],S.used):""}
   <div class="qnav">${answered?`<button class="btn" id="next">Next question <span class="kbd">Enter</span></button>`:`<span class="note">Pick an answer — keys <span class="kbd">A</span>–<span class="kbd">D</span></span>`}</div>
   <p class="note"><button class="link" id="end">End practice</button></p>`;
   if(!answered){el.querySelectorAll("#ch [data-k]").forEach(b=>{if(!b.disabled)b.onclick=()=>pickSession(+b.dataset.k)});armShimmer()}else disarmShimmer();
   el.querySelectorAll("[data-aid]").forEach(b=>b.onclick=()=>{const k=b.dataset.aid;if(!useAid(k))return;S.used[k]=true;if(k==="elim")elimOne();else{S.hinted=true;renderSession()}});bindPowers(el);
   el.querySelectorAll("[data-goview]").forEach(b=>b.onclick=()=>show(b.dataset.goview));
-  {const uw=el.querySelector("#unweak");if(uw)uw.onclick=()=>{removeWeak(it);sfx("click");uw.closest(".weakrow").innerHTML=`<span class="small muted">Removed from weak spots.</span>`;const wb=document.querySelector("#weak .pill");if(wb)wb.textContent=weakList().length}}
+  {const uw=el.querySelector("#unweak");if(uw)uw.onclick=()=>{removeWeak(it);sfx("click");uw.closest(".weakrow").innerHTML=`<span class="small muted">Removed from weak spots.</span>`;const wb=document.querySelector("#weak .pill");if(wb)wb.textContent=weakList().length};
+   const fq=el.querySelector("#flagq");if(fq)fq.onclick=()=>{addWeak(it,true);sfx("unlock");fq.closest(".weakrow").classList.add("flagged");fq.closest(".weakrow").innerHTML=`<span class="small muted">🚩 Flagged — it'll come up in your weak-spot reviews until you remove it.</span>`;const wb=document.querySelector("#weak .pill");if(wb)wb.textContent=weakList().length}}
   if(answered) el.querySelector("#next").onclick=()=>{S.idx++;if(S.mode==="practice"&&!S.pool&&maybeBoss(S.r,S.back||"guide")){BOSS.resume=S;S=null;renderBoss(BOSS.resume.el);window.scrollTo(0,0);return}nextSession();renderSession();window.scrollTo(0,0)};
   el.querySelector("#end").onclick=()=>endSession();
 }
@@ -1917,7 +1923,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v48. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v49. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -3968,7 +3974,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v48";
+const APP_VERSION="v49";
 window.__filter="all";
 window.__booted=true;
 (function(){
