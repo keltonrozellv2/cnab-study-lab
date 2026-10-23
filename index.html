@@ -136,6 +136,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:10px;display:flex;gap:10px;align-items:center;z-index:70;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:.92rem;max-width:calc(100% - 32px)}.updbar .link{color:var(--paper);opacity:.8}
 
 .shake{animation:shake .4s}@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}.confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:cfall linear forwards}@keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:.6}}
 .sndctl{display:inline-flex;align-items:center;gap:4px}.sndctl input[type=range]{width:70px;accent-color:var(--accent)}@media(max-width:600px){.sndctl input[type=range]{width:50px}}
 .blurred{filter:blur(6px);pointer-events:none;user-select:none}
 .pauseov{position:fixed;inset:0;z-index:80;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,16,24,.45)}.pausecard{text-align:center;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}.pauseicon{font-size:4rem;line-height:1}.pausetxt{font-size:2.4rem;font-weight:800;letter-spacing:.06em}.pausebar{position:fixed;left:0;right:0;bottom:0;padding:18px;display:flex;justify-content:center;background:linear-gradient(transparent,rgba(0,0,0,.55))}.pausebar .btn{font-size:1.1rem;padding:14px 28px}
@@ -166,7 +167,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v24</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v25</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
     <button class="iconbtn" id="focusbtn" aria-pressed="false" title="Focus mode">◎</button>
@@ -1408,7 +1409,7 @@ const FOLDERGEN={
    item = {source, q, code, opts:[{t,why?}], a, w?, areaCNT, folder, sub, diff} */
 function statItem(q){return{source:"stat",q:q.q,code:q.code||null,opts:q.o.map(t=>({t})),a:q.c,w:q.w,areaCNT:mapArea(q.a),folder:q.f,sub:q.s,diff:q.d}}
 function genItem(r,engineCat){const it=genFor(r,engineCat);return{source:"gen",q:it.q,code:it.code||null,opts:it.opts,a:it.a,areaCNT:mapGenCat(it.cat),folder:"Generated drill",sub:it.cat,diff:2}}
-function genFrom(r,fnList){const it=fnList[Math.floor(r()*fnList.length)](r);return{source:"gen",q:it.q,code:it.code||null,opts:it.opts,a:it.a,areaCNT:mapGenCat(it.cat),folder:"Generated drill",sub:it.cat,diff:2}}
+function genFrom(r,fnList){const it=fnList[Math.floor(r()*fnList.length)](r);return{source:"gen",q:it.q,code:it.code||null,opts:it.opts,a:it.a,w:it.w,areaCNT:mapGenCat(it.cat),folder:it.folder||"Generated drill",sub:it.sub||it.cat,diff:2}}
 
 /* shuffle an item's option order, keeping the correct index accurate */
 function shuffleItem(r,item){
@@ -1483,7 +1484,7 @@ applyZoom();applyTheme();
 let S=null;
 function startSession(cfg){ // cfg:{title,mode:'practice'|'flash',dealer:fn(r)->dealer|null,pool:[]|null,el}
   S=Object.assign({r:mulberry32((Date.now()^Math.floor(Math.random()*1e9))>>>0),run:{ok:0,t:0},cur:null,picked:null,idx:0,revealed:false,used:{}},cfg);
-  if(S.mkDealer&&!S.pool)S.dealer=S.mkDealer(S.r);
+  if(S.mkDealer&&!S.pool){S.dealer=S.mkDealer(S.r);S.dealer.onWiden=()=>{S.widened=true}}
   nextSession();renderSession();
 }
 function nextSession(){
@@ -1500,7 +1501,7 @@ function renderSession(){
   }
   const it=S.cur;
   if(S.mode==="flash"){
-    el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}</span><span>${S.run.t} seen</span></div>
+    el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span>${S.run.t} seen</span></div>
     <div class="flash"><div class="q">${esc(it.q)}${it.code?`<pre style="text-align:left">${esc(it.code)}</pre>`:""}</div>
     ${S.revealed?`<div class="ans">${L8[it.a]}. ${esc(it.opts[it.a].t)}</div><div class="fb correct" style="text-align:left;margin-top:12px">${it.source==="gen"?esc(it.opts[it.a].why):esc(it.w)}</div>`:`<p class="muted" style="margin-top:14px">Think it through, then reveal.</p>`}</div>
     <div class="qnav">${S.revealed?`<button class="btn" id="next">Next card</button>`:`<button class="btn" id="reveal">Reveal answer</button>`}</div>
@@ -1512,7 +1513,7 @@ function renderSession(){
   }
   // practice mode (instant feedback)
   const answered=S.picked!==null;
-  el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}</span><span>${S.run.ok}/${S.run.t} this run</span></div>
+  el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span>${S.run.ok}/${S.run.t} this run</span></div>
   <p class="qtext">${esc(it.q)}</p>${it.code?`<pre>${esc(it.code)}</pre>`:""}
   <div class="choices" id="ch">${it.opts.map((o,k)=>{let c="choice";const gone=S.elim&&k===S.elimIdx&&!answered;if(answered){if(k===it.a)c+=" correct";else if(k===S.picked)c+=" wrong"}if(gone)c+=" gone";return `<button class="${c}" data-k="${k}" ${answered||gone?"disabled":""}><span class="b">${L8[k]}</span><span>${esc(o.t)}</span></button>`}).join("")}</div>
   ${S.hinted&&!answered?`<div class="callout small"><b>Reveal:</b> ${esc(hintFor(it))}</div>`:""}
@@ -1565,8 +1566,8 @@ function renderGuide(){
 function pickSub(areaKey){
   const el=document.getElementById("view-guide");const a=AREAS.find(x=>x.k===areaKey);
   const cl=CLUSTERS[areaKey];
-  el.innerHTML=`<h1>${esc(SHORT[areaKey])} — pick a sub-topic</h1><p class="muted small">Each drill deals every question once before any repeat; topics marked ∞ also generate fresh problems endlessly.</p>
-  <div class="chips">${cl.map(c=>{const n=clusterStatics(areaKey,c).length;return `<button class="chip" data-s="${esc(c.n)}" ${n===0&&!c.gens.length?"disabled":""}>${esc(c.n)} <span class="muted">(${n}${c.gens.length?" ∞":""})</span></button>`}).join("")}</div>
+  el.innerHTML=`<h1>${esc(SHORT[areaKey])} — pick a sub-topic</h1><p class="muted small">Every drill is endless. Topics marked ∞ generate fresh problems; the rest deal their written questions once, then widen to the whole area.</p>
+  <div class="chips">${cl.map(c=>{const n=clusterStatics(areaKey,c).length;return `<button class="chip" data-s="${esc(c.n)}" ${n===0&&!c.gens.length?"disabled":""}>${esc(c.n)} <span class="muted">${c.gens.length?"∞":n+" then widen"}</span></button>`}).join("")}</div>
   <div class="row"><button class="btn ghost" id="back">Back</button></div>`;
   el.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>startSession({host:"guide",back:"guide",title:SHORT[areaKey]+" · "+b.dataset.s,mode:"practice",el,mkDealer:r=>sessionDealer(areaKey,b.dataset.s,r)}));
   el.querySelector("#back").onclick=()=>renderGuide();
@@ -1600,7 +1601,7 @@ let WEIGHTS=WEIGHTS_FIELD, BLUEPRINT="field";
 let T=null;
 function fmt(s){const m=Math.floor(s/60),x=s%60;return m+":"+String(x).padStart(2,"0")}
 setInterval(()=>{if(PAUSE)return;const el=document.getElementById("clock");if(el&&T&&T.timed)el.textContent=fmt(Math.floor((Date.now()-T.start)/1000))},1000);
-function stemKey(it){return (it.q+"|"+(it.code||"")).trim().toLowerCase()}
+function stemKey(it){const o=it.opts?it.opts.map(x=>typeof x==="string"?x:x.t).slice().sort().join("~"):"";return (it.q+"|"+(it.code||"")+"|"+o).trim().toLowerCase()}
 function drawUnique(drawFn,r,used,tries){
   tries=tries||60;
   for(let i=0;i<tries;i++){const it=drawFn(r);const k=stemKey(it);if(!used.has(k)){used.add(k);return it}}
@@ -1748,7 +1749,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v24. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v25. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -1869,6 +1870,7 @@ function renderSoundCtl(){const el=document.getElementById("sndctl");if(!el)retu
   el.querySelector("#sndmute").onclick=()=>{SND.on=!SND.on;sndSave();renderSoundCtl();if(SND.on)sfx("click")};
   const v=el.querySelector("#sndvol");v.oninput=()=>{SND.vol=+v.value/100;if(!SND.on&&SND.vol>0){SND.on=true}sndSave();el.querySelector("#sndmute").textContent=SND.on&&SND.vol>0?"🔊":"🔇"};v.onchange=()=>sfx("coin")}
 
+function confetti(n,color){if(focusOn())return;const w=document.createElement("div");w.className="confetti";document.body.appendChild(w);const cols=[color,"#fff","#f5c044","#378ADD","#9b5de5","#4ade80"];for(let i=0;i<n;i++){const p=document.createElement("i");p.style.left=(Math.random()*100)+"vw";p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.animationDelay=(Math.random()*0.8)+"s";p.style.animationDuration=(2+Math.random()*1.5)+"s";p.style.transform=`rotate(${Math.random()*360}deg)`;w.appendChild(p)}setTimeout(()=>w.remove(),4000)}
 /* ================= PAUSE ================= */
 let PAUSE=null;
 function pauseNow(){
@@ -1973,7 +1975,7 @@ function renderChestSpin(el,onDone){
   const D=5200;const t0=performance.now();let lastIdx=-1;
   const ease=x=>1-Math.pow(1-x,4);
   const step=now=>{const p=Math.min(1,(now-t0)/D);const x=ease(p)*target;reelEl.style.transform=`translateX(${-x}px)`;const idx=Math.floor((x+el.querySelector(".casewrap").clientWidth/2)/TW);if(idx!==lastIdx){lastIdx=idx;sfx("tick")}
-    if(p<1)requestAnimationFrame(step);else{sfx("spinstop");{const tp=el.querySelector("#casetip");if(tp)tp.textContent=""}setTimeout(()=>{const tile=reelEl.children[LAND];tile.classList.add("won");sfx(result.r==="legendary"?"legendary":result.r==="epic"?"epic":result.r==="rare"?"rare":"coin");if(result.r==="legendary")document.body.classList.add("legend-flash");setTimeout(()=>document.body.classList.remove("legend-flash"),1600);grantLoot(result);onDone(result)},250)}};
+    if(p<1)requestAnimationFrame(step);else{sfx("spinstop");{const tp=el.querySelector("#casetip");if(tp)tp.textContent=""}setTimeout(()=>{const tile=reelEl.children[LAND];tile.classList.add("won");sfx(result.r==="legendary"?"legendary":result.r==="epic"?"epic":result.r==="rare"?"rare":"coin");if(result.r==="legendary")document.body.classList.add("legend-flash");if(result.r==="epic"||result.r==="legendary")confetti(result.r==="legendary"?160:80,RARITY[result.r].c);setTimeout(()=>document.body.classList.remove("legend-flash"),1600);grantLoot(result);onDone(result)},250)}};
   requestAnimationFrame(step);
 }
 
@@ -2075,6 +2077,348 @@ function renderHome(){
   el.querySelector("#homego").onclick=()=>open(next);
 }
 
+/* ================= FACT-TABLE GENERATORS: endless original questions for conceptual sub-topics ================= */
+/* Each table: topic, T = true statements [text, why], F = false statements [text, why it's wrong].
+   gFactsFor(table) builds "which is TRUE" (1T+3F) or "which is FALSE" (3T+1F) items; combinations give hundreds of distinct stems per topic. */
+const FACTS={
+ hwkernel:{area:"fund",cat:"Kernel, hardware, virtualization",topic:"kernels, hardware and virtualization",
+  T:[["The kernel runs in a privileged CPU mode (ring 0) and user programs run in ring 3.","Ring 0 can touch hardware and all memory; ring 3 must ask the kernel via system calls."],
+     ["A system call is how a user-mode program asks the kernel to do privileged work such as opening a file.","Syscalls are the controlled doorway from user space into kernel space."],
+     ["A type-1 hypervisor runs directly on the hardware; a type-2 hypervisor runs on top of a host OS.","ESXi / Hyper-V are type-1; VirtualBox and VMware Workstation are type-2."],
+     ["Firmware (BIOS/UEFI) runs before the operating system and hands control to a bootloader.","POST → firmware → bootloader → kernel → init/services."],
+     ["RAM is volatile: its contents are lost when power is removed.","That is why memory forensics must be captured from a running system."],
+     ["The HAL (hal.dll) lets the Windows kernel run on different hardware without changes.","Hardware Abstraction Layer sits between the kernel and the chipset/drivers."],
+     ["A virtual machine has its own guest kernel; a container shares the host kernel.","Containers isolate processes with namespaces/cgroups, not a separate OS."],
+     ["Device drivers usually run in kernel mode, so a buggy driver can crash the whole system.","A kernel-mode fault is a BSOD / kernel panic; a user-mode crash kills one process."],
+     ["The CPU executes machine code; a compiler or interpreter has to turn source code into it first.","CPUs understand opcodes, not Python or C."],
+     ["UEFI Secure Boot checks the signature of the bootloader before running it.","It blocks unsigned/tampered bootloaders such as bootkits."],
+     ["A guest VM's 'hardware' (NIC, disk) is emulated or paravirtualized by the hypervisor.","The guest sees a virtual device; the hypervisor maps it to real hardware."],
+     ["Interrupts let hardware signal the CPU that it needs attention, pausing the current instruction stream.","The kernel's interrupt handler services the device, then execution resumes."]],
+  F:[["User-mode programs can write directly to hardware registers without the kernel.","Only ring 0 (the kernel and drivers) can touch hardware; user mode must use system calls."],
+     ["A type-2 hypervisor runs directly on bare metal with no host OS.","That describes type-1. Type-2 (VirtualBox, Workstation) runs as an application on a host OS."],
+     ["RAM keeps its contents after the machine is powered off.","RAM is volatile; disks and flash are non-volatile."],
+     ["The operating system runs before the firmware during boot.","Firmware runs first, then the bootloader loads the OS kernel."],
+     ["Containers each run their own separate kernel.","Containers share the host kernel; VMs have their own guest kernel."],
+     ["A crash in a user-mode application takes down the whole operating system.","User-mode faults are isolated to that process; kernel-mode faults crash the system."],
+     ["The CPU can execute Python source code directly.","Source must be compiled or interpreted into machine instructions first."],
+     ["The HAL is a user-mode program that draws the Windows desktop.","hal.dll is a kernel component abstracting hardware; explorer.exe draws the desktop."],
+     ["Secure Boot encrypts the hard drive.","Secure Boot verifies bootloader signatures; BitLocker encrypts the drive."],
+     ["A hypervisor is a type of antivirus engine.","A hypervisor creates and runs virtual machines."],
+     ["Interrupts are instructions written by the programmer inside the application.","Interrupts are hardware/kernel signals, not application code."],
+     ["Hardware is anything you can modify with a text editor.","Hardware is the physical components; software is the instructions that run on them."]]},
+ tcp:{area:"net",cat:"TCP / handshake / flags",topic:"TCP, the handshake and header flags",
+  T:[["The three-way handshake is SYN, SYN-ACK, ACK.","Client sends SYN, server replies SYN-ACK, client completes with ACK."],
+     ["A SYN packet is the first packet of a new TCP connection.","It carries the client's initial sequence number."],
+     ["RST aborts a connection immediately without the normal FIN exchange.","A closed port on a live host replies to a SYN with RST."],
+     ["FIN starts the orderly close of one direction of a TCP connection.","A full close needs a FIN/ACK from each side (four segments)."],
+     ["Sequence and acknowledgement numbers let TCP detect lost or reordered segments.","ACK = next byte expected; a gap triggers retransmission."],
+     ["The TCP window size tells the sender how many bytes it may send before waiting for an ACK.","It is the receiver's flow-control signal."],
+     ["UDP has no handshake, no sequence numbers and no retransmission.","That is why DNS, DHCP, VoIP and streaming use it: low overhead."],
+     ["A TCP segment's source and destination ports are 16-bit fields, so ports range 0–65535.","Two bytes each, at the very start of the header."],
+     ["The PSH flag asks the receiver to hand data to the application immediately instead of buffering it.","Common on interactive traffic like SSH keystrokes."],
+     ["The URG flag marks data that should be processed before the rest, using the urgent pointer.","Rarely used in practice; often a sign of crafted packets in scans."],
+     ["A half-open connection is one where the SYN-ACK was sent but the final ACK never arrived.","SYN floods exhaust servers by creating many half-open connections."],
+     ["An ESTABLISHED socket has completed the handshake and can carry data in both directions.","netstat/ss show it; LISTEN means waiting for a SYN."]],
+  F:[["The three-way handshake is SYN, ACK, FIN.","It is SYN, SYN-ACK, ACK. FIN is for closing."],
+     ["UDP performs a three-way handshake before sending data.","UDP is connectionless; it just sends."],
+     ["RST is used to politely close a connection after all data is sent.","RST is the abrupt abort; FIN is the orderly close."],
+     ["TCP port numbers are 8-bit values from 0 to 255.","Ports are 16 bits: 0–65535."],
+     ["The window size is the number of packets the receiver has dropped.","It is how many bytes the sender may have in flight unacknowledged."],
+     ["A closed TCP port silently ignores incoming SYNs.","A closed port on a live host normally answers with RST; a firewall may drop silently."],
+     ["Sequence numbers are only present in UDP, not TCP.","Sequence numbers are a TCP feature; UDP has none."],
+     ["The ACK flag is only set in the very first packet of a connection.","The first packet (SYN) has no ACK; nearly every later segment carries ACK."],
+     ["A SYN flood works by sending many FIN packets to a server.","It sends many SYNs and never completes the handshake, leaving half-open connections."],
+     ["LISTEN state means the connection is actively transferring data.","LISTEN means a server socket is waiting for a SYN; ESTABLISHED carries data."],
+     ["TCP guarantees delivery by sending every segment twice.","It uses ACKs and retransmits only what was lost."],
+     ["The PSH flag tells the receiver to reset the connection.","PSH means push data to the application now; RST resets."]]},
+ switching:{area:"net",cat:"Switching & VLANs",topic:"switching and VLANs",
+  T:[["A switch forwards frames based on destination MAC addresses it has learned in its CAM table.","It learns source MACs on ingress and floods unknown destinations."],
+     ["A VLAN is a separate broadcast domain on the same physical switch.","Hosts in different VLANs need a router (or L3 switch) to talk."],
+     ["802.1Q trunking tags frames with a 4-byte VLAN header between switches.","The tag carries the 12-bit VLAN ID (1–4094)."],
+     ["Traffic on the native VLAN crosses a trunk untagged.","Mismatched native VLANs between switches are a classic misconfiguration and attack vector."],
+     ["Port security can limit which MAC addresses may use a switch port.","Violations can shut the port down or drop frames."],
+     ["A switch floods a frame out all ports in the VLAN when it has no CAM entry for the destination.","That is how unknown unicast and broadcast frames propagate."],
+     ["A router or Layer-3 switch is needed to route traffic between VLANs.","Called inter-VLAN routing, often 'router-on-a-stick'."],
+     ["MAC flooding fills the CAM table so the switch starts flooding frames like a hub.","An attacker can then sniff traffic for other hosts."],
+     ["Spanning Tree Protocol prevents Layer-2 loops by blocking redundant links.","Without it, broadcast storms loop forever."],
+     ["Each switch port is its own collision domain.","Unlike a hub, where every port shares one collision domain."],
+     ["A hub repeats every frame out of every port; it does not learn addresses.","Hubs are Layer-1 devices."],
+     ["Access ports carry a single VLAN untagged to an end device.","Trunk ports carry many VLANs tagged."]],
+  F:[["A switch forwards frames based on destination IP addresses.","Switches use MAC addresses (Layer 2); routers use IPs."],
+     ["Two hosts in different VLANs on the same switch can talk without a router.","VLANs are separate broadcast domains; routing is required between them."],
+     ["802.1Q tags are added to the IP header.","The tag is inserted in the Ethernet frame header, after the source MAC."],
+     ["The native VLAN is always tagged on a trunk.","Native VLAN frames are sent untagged."],
+     ["A hub learns MAC addresses and forwards selectively.","Hubs repeat everything; only switches learn MACs."],
+     ["Spanning Tree Protocol speeds up links by using all redundant paths at once.","STP blocks redundant paths to prevent loops."],
+     ["A VLAN ID can be any value up to 65535.","VLAN IDs are 12 bits: 1–4094 usable."],
+     ["MAC flooding causes a switch to drop all traffic.","It overflows the CAM table so the switch floods traffic, enabling sniffing."],
+     ["All ports on a switch share one collision domain.","That describes a hub; each switch port is its own collision domain."],
+     ["Port security restricts which IP addresses may use a port.","Port security works with MAC addresses."],
+     ["An access port carries multiple tagged VLANs.","Access ports carry one VLAN untagged; trunks carry many tagged."],
+     ["A switch never floods frames; it drops anything it does not recognise.","Unknown destinations are flooded within the VLAN."]]},
+ tunnels:{area:"net",cat:"Tunnels & crypto on the wire",topic:"tunnels and encryption on the wire",
+  T:[["GRE encapsulates one packet inside another but provides no encryption.","GRE is often paired with IPsec for confidentiality."],
+     ["IPsec ESP provides encryption and integrity; AH provides integrity only.","AH does not encrypt the payload."],
+     ["IPsec tunnel mode encrypts the entire original IP packet and adds a new IP header.","Transport mode only protects the payload and keeps the original header."],
+     ["TLS runs above TCP and secures protocols such as HTTPS, SMTPS and LDAPS.","HTTPS is HTTP inside TLS on port 443."],
+     ["A TLS handshake uses asymmetric crypto to agree a key, then symmetric crypto for the data.","Asymmetric is slow; symmetric (AES) is fast for bulk data."],
+     ["A VPN creates an encrypted tunnel so traffic across an untrusted network stays confidential.","Site-to-site and remote-access are the two common forms."],
+     ["IKE negotiates the IPsec security associations and keys.","IKE uses UDP port 500 (4500 with NAT-T)."],
+     ["A hash function produces a fixed-length digest and cannot be reversed to get the input.","Used for integrity checks and password storage."],
+     ["An HMAC combines a secret key with a hash to prove both integrity and authenticity.","Without the key an attacker cannot forge a valid tag."],
+     ["Encapsulation adds a header around the original packet; decapsulation removes it at the far end.","The tunnel endpoints see the outer header; the inside is carried as payload."],
+     ["SSH tunnels (port forwarding) can carry arbitrary TCP traffic inside an encrypted SSH session.","ssh -L / -R / -D set up local, remote and dynamic forwards."],
+     ["Certificates bind a public key to an identity and are signed by a certificate authority.","Browsers trust the CA, so they trust the server's key."]],
+  F:[["GRE encrypts the packets it carries.","GRE only encapsulates; add IPsec for encryption."],
+     ["IPsec AH encrypts the payload.","AH provides integrity/authentication only; ESP encrypts."],
+     ["IPsec transport mode hides the original IP header.","Transport mode keeps the original header; tunnel mode wraps the whole packet."],
+     ["TLS runs below IP in the protocol stack.","TLS sits between the application and TCP."],
+     ["TLS uses asymmetric encryption for all the bulk data.","Asymmetric is used for key exchange; data uses a fast symmetric cipher."],
+     ["A hash can be decrypted back to the original message with the right key.","Hashes are one-way; there is no key and no reversal."],
+     ["IKE is the protocol that carries the encrypted user data in IPsec.","IKE negotiates keys; ESP carries the protected data."],
+     ["A VPN makes traffic faster by compressing it.","A VPN's purpose is confidentiality and integrity across untrusted networks."],
+     ["An HMAC needs no key; it is just a hash of the message.","The secret key is what lets the receiver verify authenticity."],
+     ["Decapsulation happens at the sender before the packet enters the tunnel.","The sender encapsulates; the receiver decapsulates."],
+     ["SSH port forwarding can only carry HTTP traffic.","It carries any TCP stream."],
+     ["A certificate contains the server's private key so clients can decrypt traffic.","Certificates carry the public key; the private key never leaves the server."]]},
+ wireless:{area:"net",cat:"Wireless",topic:"wireless networking",
+  T:[["WPA2 uses AES-CCMP; WEP uses RC4 and is trivially cracked.","WEP keys can be recovered in minutes from captured IVs."],
+     ["The WPA2 four-way handshake derives the session keys from the pre-shared key.","Capturing it lets an attacker brute-force the passphrase offline."],
+     ["A deauthentication frame can be spoofed to kick a client off a network.","Attackers use it to force a reconnect and capture the handshake."],
+     ["Monitor mode lets a wireless card capture all 802.11 frames, not just those addressed to it.","Needed for tools like airodump-ng."],
+     ["2.4 GHz has longer range but fewer non-overlapping channels than 5 GHz.","Channels 1, 6 and 11 are the non-overlapping set on 2.4 GHz."],
+     ["The SSID is the network's name; hiding it does not make the network secure.","Probe requests and beacons still leak it."],
+     ["802.11 uses CSMA/CA because radios cannot detect collisions while transmitting.","Wired Ethernet uses CSMA/CD."],
+     ["WPA3 adds SAE, which protects against offline dictionary attacks on the passphrase.","Simultaneous Authentication of Equals replaces the PSK handshake."],
+     ["An evil twin is a rogue access point that imitates a legitimate SSID.","Clients connect to it and the attacker intercepts traffic."],
+     ["MAC filtering is weak because client MAC addresses can be sniffed and spoofed.","It is a nuisance to attackers, not a security control."],
+     ["Beacon frames are sent by access points to advertise the network.","They carry the SSID, supported rates and security capabilities."],
+     ["Enterprise WPA2 uses 802.1X with a RADIUS server instead of a shared passphrase.","Each user authenticates with their own credentials or certificate."]],
+  F:[["WEP is considered secure as long as a long key is used.","WEP's RC4/IV design is broken regardless of key length."],
+     ["Hiding the SSID prevents attackers from discovering the network.","Probes and association frames still reveal it."],
+     ["Monitor mode only captures frames addressed to the capturing card.","That is normal managed mode; monitor mode captures everything."],
+     ["5 GHz travels further through walls than 2.4 GHz.","Higher frequencies attenuate faster; 2.4 GHz has the longer range."],
+     ["Wireless uses CSMA/CD just like wired Ethernet.","Wireless uses CSMA/CA; radios cannot detect collisions."],
+     ["A deauth frame can only be sent by the legitimate access point.","Management frames are unauthenticated in WPA2 by default, so anyone can spoof them."],
+     ["MAC filtering stops any device not on the list from ever connecting.","An attacker can spoof an allowed MAC."],
+     ["WPA2-Enterprise uses one shared passphrase for all users.","Enterprise uses 802.1X per-user authentication; Personal uses a PSK."],
+     ["Capturing the WPA2 handshake gives the attacker the plaintext passphrase directly.","It gives material for an offline brute-force, not the passphrase itself."],
+     ["2.4 GHz channels 1, 2 and 3 do not overlap.","Non-overlapping 2.4 GHz channels are 1, 6 and 11."],
+     ["An evil twin attack requires physical access to the real access point.","It just needs a rogue AP broadcasting the same SSID."],
+     ["WPA3 removed encryption to improve speed.","WPA3 strengthens security with SAE and forward secrecy."]]},
+ auth:{area:"os",cat:"Authentication",topic:"authentication, hashing and signing",
+  T:[["Windows stores local password hashes in the SAM database, protected by the SYSTEM hive key.","Dumping SAM + SYSTEM yields NTLM hashes."],
+     ["NTLM hashes can be used in pass-the-hash attacks without knowing the password.","That is why password hashes are treated as secrets."],
+     ["Kerberos issues tickets from a Key Distribution Center so clients can prove identity to services.","TGT first, then service tickets; the KDC runs on domain controllers."],
+     ["A salt makes identical passwords hash to different values.","It defeats precomputed rainbow tables."],
+     ["Multi-factor authentication combines something you know, have, or are.","A password plus a hardware token is two factors; two passwords is one."],
+     ["Code signing lets the OS verify that an executable has not been modified since the publisher signed it.","Authenticode on Windows; the signature covers a hash of the file."],
+     ["Hashing is one-way; encryption is reversible with the key.","Passwords are hashed, data is encrypted."],
+     ["Logon type 3 in Windows security logs is a network logon, such as accessing a share.","Type 2 is interactive, type 10 is RemoteInteractive (RDP)."],
+     ["An expired or revoked certificate should fail signature validation.","Revocation is checked via CRL or OCSP."],
+     ["Local accounts have a RID of 500 for the built-in Administrator.","The RID is the last part of the SID; 500 = Administrator, 501 = Guest."],
+     ["Account lockout policies limit brute-force attempts against passwords.","After N failures the account is locked for a period."],
+     ["Single sign-on lets one authentication grant access to multiple services.","Kerberos in a domain is a classic SSO system."]],
+  F:[["Windows stores local passwords in plaintext in the registry.","It stores hashes in the SAM, not plaintext."],
+     ["An attacker needs the plaintext password to perform pass-the-hash.","The hash itself is sufficient — that is the point of the attack."],
+     ["A salt is a secret key used to encrypt the password hash.","A salt is random public data mixed in before hashing to defeat precomputation."],
+     ["Two different passwords count as multi-factor authentication.","Both are 'something you know' — one factor."],
+     ["Code signing encrypts the executable so it cannot be read.","Signing proves origin and integrity; it does not encrypt."],
+     ["Hashing can be reversed with the correct key.","Hashing has no key and is one-way; encryption is reversible."],
+     ["Kerberos sends the user's password to every service in the clear.","Kerberos uses tickets; the password never travels to services."],
+     ["Logon type 2 means a network logon to a file share.","Type 2 is interactive (console); type 3 is network."],
+     ["The built-in Administrator account always has RID 1000.","Administrator is RID 500; 1000+ are normal user accounts."],
+     ["A revoked certificate remains valid until its expiry date.","Revocation invalidates it immediately once checked via CRL/OCSP."],
+     ["Account lockout prevents pass-the-hash attacks.","Lockout limits password guessing; it does nothing against a stolen hash."],
+     ["Single sign-on means every service has its own separate password.","SSO is one login for many services."]]},
+ av:{area:"os",cat:"Antivirus & integrity",topic:"antivirus and file integrity",
+  T:[["Signature-based antivirus matches known patterns and misses brand-new malware.","Zero-days have no signature yet."],
+     ["Heuristic and behavioural detection look at what a program does rather than what it looks like.","They can catch unknown variants at the cost of false positives."],
+     ["A file hash (SHA-256) changes completely if even one byte of the file changes.","That is why hashes are used for integrity checks and IOC matching."],
+     ["Packing or obfuscating malware changes its hash and can evade signature scans.","The unpacked payload in memory is still detectable by behaviour."],
+     ["File integrity monitoring alerts when protected system files change unexpectedly.","Tripwire-style tools baseline hashes and compare."],
+     ["Windows Defender can be queried and configured from PowerShell (Get-MpComputerStatus).","Useful on servers with no GUI."],
+     ["Quarantine moves a suspicious file to an isolated store instead of deleting it.","Analysts can restore or submit it."],
+     ["A false positive is a benign file flagged as malicious; a false negative is malware missed.","Tuning trades one against the other."],
+     ["Two files with the same SHA-256 hash are, for practical purposes, identical.","Collisions in SHA-256 are computationally infeasible."],
+     ["Antivirus signature databases must be updated regularly to stay effective.","Stale signatures miss recent campaigns."],
+     ["Sandboxing runs a suspicious file in an isolated environment to observe its behaviour.","Malware often checks for sandboxes and stays dormant."],
+     ["MD5 is still used for file identification but is unsuitable for security because collisions are easy.","Use SHA-256 for anything security-relevant."]],
+  F:[["Signature-based antivirus reliably detects brand-new malware.","New malware has no signature; heuristics are needed."],
+     ["Changing one byte of a file leaves its hash unchanged.","Any change produces a completely different digest."],
+     ["Packing malware makes it easier for signature scanners to detect.","Packing hides the payload and changes the hash, evading signatures."],
+     ["A false negative is a clean file wrongly flagged as malware.","That is a false positive; a false negative is malware that was missed."],
+     ["Quarantine permanently deletes the file.","Quarantine isolates it; deletion is a separate action."],
+     ["Antivirus signatures never need updating once installed.","Databases are updated constantly."],
+     ["Two different files can never have the same MD5 hash.","MD5 collisions are practical today; that is why it is deprecated for security."],
+     ["Behavioural detection only works on malware already in the signature database.","Behavioural detection is exactly for unknown samples."],
+     ["File integrity monitoring blocks all file changes on the system.","It detects and alerts on changes; it does not block them."],
+     ["Sandboxing runs malware directly on the production host to see what it does.","Sandboxes are isolated environments."],
+     ["SHA-256 is considered broken and should be replaced by MD5.","It is the reverse: MD5 is broken, SHA-256 is current practice."],
+     ["Windows Defender cannot be managed from the command line.","PowerShell's Defender cmdlets manage it fully."]]},
+ cloud:{area:"os",cat:"Cloud & mobile",topic:"cloud, containers and mobile",
+  T:[["IaaS gives you virtual machines and networks; you manage the OS and everything above it.","Example: EC2, Azure VMs."],
+     ["PaaS provides a managed runtime; you deploy code and the provider manages the OS and middleware.","Example: App Engine, Azure App Service."],
+     ["SaaS is a complete application delivered over the internet.","Example: Microsoft 365, Gmail."],
+     ["A private cloud is dedicated to one organisation; a public cloud is shared infrastructure.","Hybrid combines both."],
+     ["Containers share the host kernel and start in seconds; VMs boot a full OS.","Docker images are layers on top of a base image."],
+     ["Container images should be scanned for vulnerable packages before deployment.","A vulnerable base image is inherited by everything built on it."],
+     ["Full-disk encryption on a mobile device protects data at rest if the device is lost.","The key is derived from the passcode and hardware-backed keystore."],
+     ["Mobile device management (MDM) lets an organisation enforce policy and wipe lost devices.","Remote wipe, passcode rules, app allow-lists."],
+     ["Sideloading apps from outside the official store increases malware risk.","Store review and signing checks are bypassed."],
+     ["Hypervisor logs should be collected centrally because a compromised VM cannot be trusted to log itself.","Log forwarding to a SIEM preserves evidence."],
+     ["In the shared-responsibility model the provider secures the infrastructure; the customer secures their data and configuration.","Misconfigured storage buckets are a customer-side failure."],
+     ["Jailbreaking or rooting a phone removes OS security controls and sandboxing.","Apps can then access data they should not."]],
+  F:[["With IaaS the provider patches your guest operating system for you.","In IaaS you manage the OS; the provider manages the physical hosts."],
+     ["SaaS requires you to install and maintain the application server yourself.","SaaS is fully managed; you just use the application."],
+     ["Containers each boot their own full operating system kernel.","Containers share the host kernel; VMs have their own."],
+     ["A public cloud is infrastructure dedicated to a single organisation.","That is a private cloud."],
+     ["Full-disk encryption protects data while it is being transmitted over Wi-Fi.","It protects data at rest; TLS/VPN protect data in transit."],
+     ["Sideloading apps is safer than using the official store.","Sideloading skips store review and is a major malware vector."],
+     ["In the shared-responsibility model the cloud provider is responsible for your data's permissions.","Customers own their data, identities and configuration."],
+     ["Rooting a phone improves its security by giving the user more control.","Rooting removes sandboxing and OS protections."],
+     ["MDM can only be used to install apps, not to wipe a device.","Remote wipe is a core MDM capability."],
+     ["Logs from a compromised VM are fully trustworthy if read from inside the VM.","Attackers can alter local logs; forward them centrally."],
+     ["PaaS means you must manage the hypervisor and physical servers.","The provider manages those; you deploy code."],
+     ["Scanning container images is unnecessary because containers are isolated.","Vulnerable packages in the image are still exploitable."]]},
+ malware:{area:"sec",cat:"Malware & rootkits",topic:"malware classes and rootkits",
+  T:[["A virus needs a host file and user action to spread; a worm spreads on its own across the network.","Worms exploit services (e.g., SMB) without user help."],
+     ["A trojan disguises itself as legitimate software to get the user to run it.","It does not self-replicate."],
+     ["A rootkit hides its presence by hooking or modifying the OS, often in kernel mode.","Hidden processes, files and network connections are classic signs."],
+     ["Ransomware encrypts files and demands payment for the key.","Offline backups are the main defence."],
+     ["A botnet is a group of compromised machines controlled through a command-and-control channel.","C2 often uses HTTP, DNS or IRC to blend in."],
+     ["A NOP sled is a run of no-op instructions that lets an exploit jump imprecisely and still reach the shellcode.","0x90 on x86."],
+     ["Shellcode is the small machine-code payload an exploit runs after taking control.","Often spawns a shell, hence the name."],
+     ["Spyware collects information such as keystrokes or browsing without consent.","Keyloggers are a subclass."],
+     ["A logic bomb lies dormant until a trigger condition such as a date or event.","Often planted by insiders."],
+     ["Fileless malware runs in memory using legitimate tools such as PowerShell or WMI.","Little or nothing lands on disk, so file-based AV misses it."],
+     ["A bootkit infects the boot process so it loads before the operating system's defences.","Secure Boot is the main counter."],
+     ["Polymorphic malware changes its code each infection to evade signature detection.","The behaviour stays the same; the bytes change."]],
+  F:[["A worm requires the user to open an infected file to spread.","Worms spread autonomously; viruses need a host and user action."],
+     ["A trojan replicates itself across the network without user action.","Trojans rely on deception; they do not self-replicate."],
+     ["A rootkit is any program that runs with the root password.","A rootkit's defining feature is hiding its presence by modifying the OS."],
+     ["Ransomware steals passwords and sends them to the attacker.","Ransomware encrypts data for ransom; password theft is spyware/infostealers."],
+     ["A botnet is a network of honeypots used by defenders.","A botnet is attacker-controlled compromised machines."],
+     ["A NOP sled is the encrypted part of the payload.","It is a pad of do-nothing instructions leading to the shellcode."],
+     ["Shellcode is a Bash script that automates installs.","Shellcode is raw machine code injected by an exploit."],
+     ["A logic bomb activates immediately on installation.","It waits for a trigger condition."],
+     ["Fileless malware is easy to catch with file-hash scanning.","It runs in memory; there may be no file to hash."],
+     ["Polymorphic malware keeps identical bytes on every infection.","It mutates its code to evade signatures."],
+     ["A bootkit runs only after the user logs in.","It runs during boot, before the OS and its defences load."],
+     ["Spyware is a tool that encrypts the disk for the user's protection.","Spyware secretly collects information."]]},
+ pki:{area:"sec",cat:"Crypto & PKI",topic:"cryptography and PKI",
+  T:[["Symmetric encryption uses one shared key; asymmetric uses a public/private key pair.","AES is symmetric; RSA and ECC are asymmetric."],
+     ["Data encrypted with a public key can only be decrypted with the matching private key.","That gives confidentiality to the key owner."],
+     ["A digital signature is created with the private key and verified with the public key.","It proves origin and integrity."],
+     ["A certificate authority signs certificates so others can trust the public key inside.","Trust chains up to a root CA in the trust store."],
+     ["A CRL or OCSP responder is used to check whether a certificate has been revoked.","Revocation matters when a private key is compromised."],
+     ["Hashing provides integrity, encryption provides confidentiality, signatures provide authenticity and non-repudiation.","The CIA-plus-non-repudiation mapping."],
+     ["AES-256 is a symmetric block cipher widely used for data at rest and in transit.","Fast and hardware-accelerated."],
+     ["Diffie-Hellman lets two parties agree a shared secret over an untrusted channel.","Neither side ever transmits the secret itself."],
+     ["Perfect forward secrecy means a compromised long-term key does not expose past session keys.","Ephemeral DH (DHE/ECDHE) provides it."],
+     ["Secure email with S/MIME or PGP signs and/or encrypts the message using certificates or key pairs.","The recipient's public key encrypts; the sender's private key signs."],
+     ["MFA with a hardware token resists phishing better than SMS codes.","SMS can be intercepted or SIM-swapped."],
+     ["Key length in bits is a rough measure of brute-force resistance; asymmetric keys must be much longer than symmetric keys for similar strength.","RSA-2048 ≈ AES-112 security; ECC achieves similar strength with shorter keys."]],
+  F:[["Asymmetric encryption uses one shared secret key for both directions.","That is symmetric; asymmetric uses a key pair."],
+     ["Data encrypted with a public key is decrypted with the same public key.","It is decrypted with the private key."],
+     ["A digital signature is created with the public key.","Signing uses the private key; verification uses the public key."],
+     ["A certificate authority keeps a copy of every user's private key.","CAs sign public keys; private keys stay with the owner."],
+     ["A revoked certificate stays valid until it expires.","Revocation takes effect once published and checked."],
+     ["Encryption guarantees integrity and hashing guarantees confidentiality.","Reversed: encryption → confidentiality, hashing → integrity."],
+     ["AES is an asymmetric algorithm.","AES is symmetric; RSA/ECC are asymmetric."],
+     ["Diffie-Hellman transmits the shared secret in the clear so both sides have it.","The secret is derived; it is never sent."],
+     ["Perfect forward secrecy means the same session key is reused forever.","It means each session uses an ephemeral key, protecting past sessions."],
+     ["To send someone an encrypted email you encrypt it with your own private key.","You encrypt with the recipient's public key."],
+     ["SMS one-time codes are the strongest form of MFA.","Hardware tokens and passkeys resist phishing and SIM-swap; SMS does not."],
+     ["A 256-bit RSA key is as strong as 256-bit AES.","Asymmetric keys need to be far longer; RSA-256 would be broken instantly."]]},
+ netattacks:{area:"sec",cat:"Network attacks",topic:"network attacks and defence in depth",
+  T:[["ARP spoofing lets an attacker on the LAN become a man-in-the-middle by poisoning ARP caches.","Victims send traffic to the attacker's MAC."],
+     ["DNS spoofing or cache poisoning sends users to an attacker's server by returning false records.","DNSSEC and validating resolvers mitigate it."],
+     ["VLAN hopping via double tagging abuses the native VLAN to reach another VLAN.","Fix: use an unused native VLAN and tag it."],
+     ["Phishing is social engineering that tricks users into giving credentials or running malware.","Spear phishing targets specific people."],
+     ["Defence in depth layers controls so that one failure does not compromise everything.","Firewall + segmentation + EDR + MFA + backups."],
+     ["IoT devices often ship with default credentials and rarely get patched, making them botnet targets.","Mirai scanned for default telnet logins."],
+     ["A DDoS overwhelms a service with traffic from many sources.","Volumetric, protocol and application-layer variants."],
+     ["Network segmentation limits how far an attacker can move laterally after a breach.","Put IoT and guests on separate VLANs."],
+     ["SSL stripping downgrades HTTPS to HTTP so a MITM can read the traffic.","HSTS prevents it."],
+     ["Pretexting is inventing a scenario to convince a target to share information.","'I'm from IT, I need your password to fix your account.'"],
+     ["A rogue DHCP server can hand out a malicious default gateway or DNS server.","DHCP snooping on switches blocks it."],
+     ["Least privilege means accounts and services get only the rights they need.","Limits blast radius when one is compromised."]],
+  F:[["ARP spoofing works across the internet against any host.","ARP is a LAN protocol; the attacker must be on the local segment."],
+     ["DNSSEC encrypts DNS queries so attackers cannot see them.","DNSSEC signs records for authenticity; it does not encrypt (DoH/DoT do)."],
+     ["Double-tagging VLAN hopping works regardless of native VLAN configuration.","It depends on the attacker's access VLAN being the trunk's native VLAN."],
+     ["Phishing is a technical exploit against a web server.","It is social engineering against people."],
+     ["Defence in depth means relying on one very strong firewall.","It means multiple independent layers."],
+     ["IoT devices are low-risk because they have little processing power.","They are prime botnet recruits due to default credentials and no patching."],
+     ["A DDoS attack steals data from the target.","DDoS denies availability; it does not exfiltrate."],
+     ["Network segmentation makes lateral movement easier for defenders to miss.","Segmentation restricts lateral movement and makes it more visible."],
+     ["SSL stripping upgrades HTTP connections to HTTPS.","It downgrades HTTPS to HTTP."],
+     ["Pretexting is a type of denial-of-service attack.","It is social engineering with an invented story."],
+     ["A rogue DHCP server can only cause IP address conflicts.","It can set the gateway/DNS to attacker-controlled hosts for MITM."],
+     ["Least privilege means giving every user administrator rights to avoid support tickets.","It is the opposite: minimum necessary rights."]]},
+ procboot:{area:"os",cat:"Processes & boot",topic:"Windows processes and boot",
+  T:[["smss.exe (Session Manager) starts csrss.exe and winlogon.exe during boot.","It is the first user-mode process."],
+     ["lsass.exe handles authentication and holds credential material, which is why attackers dump it.","Credential Guard protects it."],
+     ["services.exe is the Service Control Manager and is the parent of most service host processes.","svchost.exe instances hang off it."],
+     ["Multiple svchost.exe processes are normal; each hosts a group of services.","Suspicious if the parent is not services.exe or the path is not System32."],
+     ["explorer.exe is the desktop shell and is launched by userinit.exe after logon.","Winlogon → userinit → explorer."],
+     ["The System process (PID 4) runs kernel threads.","It has no normal executable path."],
+     ["Task Manager and tasklist show processes; tasklist /svc maps services to their svchost.","Useful for spotting rogue svchost instances."],
+     ["A process's parent is a key forensic clue: a cmd.exe spawned by winword.exe is suspicious.","Macro-based attacks show exactly that tree."],
+     ["Windows services can start automatically, manually, or be disabled, set via services.msc or sc.","sc query shows state; sc config changes start type."],
+     ["Autoruns and the Run/RunOnce registry keys list programs started at logon.","Common persistence locations."],
+     ["wininit.exe launches services.exe, lsass.exe and lsm during boot.","Session 0 initialisation."],
+     ["The bootloader (bootmgr/winload.exe) loads the kernel (ntoskrnl.exe) and HAL into memory.","Then the kernel starts smss.exe."]],
+  F:[["explorer.exe is the first process started after the kernel loads.","smss.exe is first; explorer.exe is the shell started after logon."],
+     ["lsass.exe draws the Start menu and taskbar.","That is explorer.exe; lsass handles authentication."],
+     ["Only one svchost.exe should ever be running; more than one indicates malware.","Many instances are normal; check parent and path instead."],
+     ["The System process has PID 1.","System is PID 4; PID 1 is Linux init/systemd."],
+     ["services.exe is launched by explorer.exe.","services.exe is launched by wininit.exe during boot."],
+     ["A cmd.exe spawned by winword.exe is normal behaviour.","It is a classic sign of a malicious macro."],
+     ["Windows services always start automatically and cannot be disabled.","Start type can be automatic, manual or disabled."],
+     ["The Run registry key lists programs that run once at install time only.","Run executes at every logon; RunOnce runs once."],
+     ["ntoskrnl.exe is the Windows bootloader.","ntoskrnl.exe is the kernel; bootmgr/winload are the bootloader."],
+     ["tasklist /svc shows open network connections.","It maps services to processes; netstat shows connections."],
+     ["csrss.exe is an optional process that can safely be killed.","Killing csrss.exe crashes the system."],
+     ["userinit.exe runs the kernel's scheduler.","userinit runs logon scripts and starts the shell."]]},
+ registry:{area:"os",cat:"Registry & persistence",topic:"the registry and persistence",
+  T:[["HKLM\\...\\CurrentVersion\\Run starts programs for every user at logon; HKCU\\...\\Run is per user.","Both are top persistence locations."],
+     ["The registry hives live on disk as files such as SYSTEM, SOFTWARE, SAM and NTUSER.DAT.","NTUSER.DAT is each user's HKCU."],
+     ["Scheduled tasks are a common persistence method that survives reboots.","schtasks /query lists them; look for odd paths and triggers."],
+     ["The hosts file (System32\\drivers\\etc\\hosts) overrides DNS and can redirect sites.","Malware edits it to block AV updates or redirect banking sites."],
+     ["Group Policy can push registry settings and scripts to many machines at once.","GPO abuse is a domain-wide persistence vector."],
+     ["Services with an unquoted path containing spaces can be hijacked by placing a binary earlier in the path.","C:\\Program Files\\App\\svc.exe → C:\\Program.exe."],
+     ["Image File Execution Options (IFEO) Debugger keys can make Windows launch a different binary in place of a program.","Classic sticky-keys style backdoor."],
+     ["reg query reads keys from the command line; reg add writes them.","Scriptable alternative to regedit."],
+     ["WMI event subscriptions can run code when a trigger fires and persist with no file on disk.","Fileless persistence; list with Get-WMIObject in the root\\subscription namespace."],
+     ["The Winlogon Userinit and Shell values can be altered to launch malware at logon.","They should point to userinit.exe and explorer.exe only."],
+     ["Forensic timelines rely on registry key last-write timestamps.","They show when persistence was installed."],
+     ["HKEY_CURRENT_USER is a view of the logged-on user's hive under HKEY_USERS.","HKU\\<SID> is the same data."]],
+  F:[["HKCU\\...\\Run applies to every user on the machine.","HKCU is per user; HKLM\\...\\Run is machine-wide."],
+     ["The registry exists only in memory and is rebuilt from scratch at each boot.","Hives are persisted as files on disk."],
+     ["Scheduled tasks are cleared on every reboot so they cannot persist.","Tasks persist until deleted."],
+     ["The hosts file is consulted only after DNS fails.","hosts is checked before DNS."],
+     ["Unquoted service paths are harmless because Windows always finds the right executable.","Windows tries each space-split prefix, enabling hijacks."],
+     ["IFEO keys are used to store printer settings.","IFEO can redirect program launches via the Debugger value."],
+     ["WMI persistence always drops an executable in System32.","WMI event subscriptions can be entirely fileless."],
+     ["The Winlogon Shell value should point to cmd.exe on a healthy system.","It should be explorer.exe."],
+     ["reg add deletes a registry key.","reg add creates/sets; reg delete removes."],
+     ["Group Policy can only change desktop wallpaper.","GPOs push security settings, scripts, registry values and software."],
+     ["Registry keys have no timestamps.","Each key records a last-write time."],
+     ["NTUSER.DAT holds the machine-wide SYSTEM hive.","NTUSER.DAT is the per-user HKCU hive."]]}
+};
+function gFactsFor(tbl){return function(r){
+  const pick=(arr,n)=>shuffle(r,arr.slice()).slice(0,n);
+  const trueQ=r()<0.6;
+  let opts,ans,why,q;
+  if(trueQ){const t=pick(tbl.T,1)[0],f=pick(tbl.F,3);opts=[t,...f];q=`Which statement about ${tbl.topic} is TRUE?`;ans=0;why=t[1]}
+  else{const f=pick(tbl.F,1)[0],t=pick(tbl.T,3);opts=[f,...t];q=`Which statement about ${tbl.topic} is FALSE?`;ans=0;why="That one is false: "+f[1]}
+  // shuffle options, track answer
+  const idx=shuffle(r,[0,1,2,3]);const o=idx.map(i=>{const st=opts[i];const isTrue=tbl.T.includes(st);return{t:st[0],why:(trueQ?(isTrue?st[1]:"that statement is false — "+st[1]):(isTrue?"that statement is actually true — "+st[1]:st[1]))}});const a=idx.indexOf(ans);
+  return{q,opts:o,a,cat:tbl.area,sub:tbl.cat,w:why,folder:"Concept check"};
+}}
+const FACTGEN={};for(const k in FACTS)FACTGEN[k]=gFactsFor(FACTS[k]);
+
 /* ================= QUESTION ENGINE v2: reachable sub-topics, generator mapping, no-repeat dealing ================= */
 /* Sub-topic clusters: group the bank's fine-grained tags into readable drills. Each cluster = {n:name, tags:[bank tags], gens:[generator fns]} */
 const CLUSTERS={
@@ -2084,58 +2428,58 @@ const CLUSTERS={
   {n:"Memory offsets",tags:["Memory offset & length"],gens:[gOffset]},
   {n:"Boolean logic",tags:["Boolean logic"],gens:[gBool]},
   {n:"Bitwise ops",tags:["Bitwise"],gens:[gBitwise]},
-  {n:"Kernel, hardware, virtualization",tags:["Kernel vs user space","Virtualization","Hardware vs software","Boot process"],gens:[]}
+  {n:"Kernel, hardware, virtualization",tags:["Kernel vs user space","Virtualization","Hardware vs software","Boot process"],gens:[FACTGEN.hwkernel]}
  ],
  net:[
   {n:"Subnetting / VLSM",tags:["Subnetting/VLSM","Private ranges","IPv6"],gens:[gSubnet,gSubnet]},
   {n:"OSI & packet transit",tags:["OSI model","Packet transit","NAT","VoIP/QoS"],gens:[gOSI]},
-  {n:"TCP / handshake / flags",tags:["TCP handshake","TCP flags","TCP header","IPv4 header","ICMP","ARP"],gens:[]},
+  {n:"TCP / handshake / flags",tags:["TCP handshake","TCP flags","TCP header","IPv4 header","ICMP","ARP"],gens:[FACTGEN.tcp]},
   {n:"Routing & admin distance",tags:["Routing","Admin distance","OSPF","BGP","Route summarization","ACL","Wildcard masks"],gens:[gAD]},
-  {n:"Switching & VLANs",tags:["VLAN","VLAN trunking","Switch security","802.11 media access"],gens:[]},
+  {n:"Switching & VLANs",tags:["VLAN","VLAN trunking","Switch security","802.11 media access"],gens:[FACTGEN.switching]},
   {n:"Ports & services",tags:["Ports & services","Ports","FTP","DNS","DHCP","SNMP","LDAP","Telnet","Netcat","Proxies"],gens:[gPort,gHexPort]},
-  {n:"Tunnels & crypto on the wire",tags:["Crypto","GRE/tunneling","IPsec","TLS/SSL","Symmetric vs asymmetric","Hashing"],gens:[]},
-  {n:"Wireless",tags:["802.11 encryption","Frequencies","SSID","Monitor mode","WPA2 handshake","Deauth"],gens:[]}
+  {n:"Tunnels & crypto on the wire",tags:["Crypto","GRE/tunneling","IPsec","TLS/SSL","Symmetric vs asymmetric","Hashing"],gens:[FACTGEN.tunnels]},
+  {n:"Wireless",tags:["802.11 encryption","Frequencies","SSID","Monitor mode","WPA2 handshake","Deauth"],gens:[FACTGEN.wireless]}
  ],
  os:[
   {n:"Windows commands",tags:["Commands","Networking commands","PowerShell"],gens:[gNetstatPid]},
   {n:"Event logs & logon types",tags:["Event logs","Logon types","Logs"],gens:[gWinLogon,gEventID,gWinLogon]},
   {n:"SIDs, ACLs & ADS",tags:["SIDs","ACLs","Alternate data streams","UNC paths"],gens:[gSIDRID]},
-  {n:"Processes & boot",tags:["Processes","Boot process","Services","Executables"],gens:[]},
-  {n:"Registry & persistence",tags:["Registry","Registry persistence","Hosts file","Group Policy","Forensics"],gens:[]},
-  {n:"Authentication",tags:["Authentication","Hashing vs encryption","Code signing"],gens:[]},
+  {n:"Processes & boot",tags:["Processes","Boot process","Services","Executables"],gens:[FACTGEN.procboot]},
+  {n:"Registry & persistence",tags:["Registry","Registry persistence","Hosts file","Group Policy","Forensics"],gens:[FACTGEN.registry]},
+  {n:"Authentication",tags:["Authentication","Hashing vs encryption","Code signing"],gens:[FACTGEN.auth]},
   {n:"Linux basics",tags:["Permissions","Redirection","Pipes","Filesystem","Filesystem layout","File locations","cron","Init / services","System calls","Shells","File system"],gens:[gChmod]},
-  {n:"Antivirus & integrity",tags:["Antivirus","File integrity"],gens:[]},
-  {n:"Cloud & mobile",tags:["Containers","Cloud service models","Cloud deployment","Mobile security","Mobile encryption","VM logging"],gens:[]}
+  {n:"Antivirus & integrity",tags:["Antivirus","File integrity"],gens:[FACTGEN.av]},
+  {n:"Cloud & mobile",tags:["Containers","Cloud service models","Cloud deployment","Mobile security","Mobile encryption","VM logging","Virtualization"],gens:[FACTGEN.cloud]}
  ],
  prog:[
   {n:"Python traces",tags:["Python","Loops","Slicing","Integer division","Syntax","Functions","Dictionaries","Booleans","Data structures","Search algorithms"],gens:[gPyFor,gPyWhile,gSlice,gIntDiv]},
   {n:"C traces",tags:[],gens:[gCFor,gCFor]},
-  {n:"Bash",tags:["Bash","Special variables","Quoting","Pipes","Subshells","Command substitution","Test/conditionals","Globbing"],gens:[gBash]},
+  {n:"Bash",tags:["Bash","Special variables","Quoting","Pipes","Redirection","Subshells","Command substitution","Test/conditionals","Globbing"],gens:[gBash]},
   {n:"PowerShell",tags:["Cmdlets","Pipeline","Aliases","Filtering","Execution policy","Logging"],gens:[]},
   {n:"Bitwise in code",tags:["Bitwise"],gens:[gBitwise]}
  ],
  sec:[
-  {n:"Malware & rootkits",tags:["Malware classes","Rootkits","Botnets/C2","Ransomware","Shellcode/NOP sled","Attacks"],gens:[]},
+  {n:"Malware & rootkits",tags:["Malware classes","Rootkits","Botnets/C2","Ransomware","Shellcode/NOP sled","Attacks"],gens:[FACTGEN.malware]},
   {n:"Log analysis",tags:["Log analysis"],gens:[gSSHLog,gSSHLog]},
   {n:"Firewalls & packet filtering",tags:["Firewalls","Packet filtering","IDS vs IPS","Defenses"],gens:[gIptables,gIptables]},
-  {n:"Packet capture",tags:["Packet capture","Network monitoring","Signatures","Vulnerability scanning"],gens:[gTcpdump,gTcpdump]},
-  {n:"Crypto & PKI",tags:["Crypto","PKI","Secure email","MFA"],gens:[]},
-  {n:"Network attacks",tags:["MITM","VLAN attacks","Social engineering","IoT","Built-in security","Defense in depth"],gens:[]}
+  {n:"Packet capture",tags:["Packet capture","Network monitoring","Signatures","Vulnerability scanning","TCP flags","TCP header","IPv4 header"],gens:[gTcpdump,gTcpdump]},
+  {n:"Crypto & PKI",tags:["Crypto","PKI","Secure email","MFA","Authentication","Hashing","Symmetric vs asymmetric"],gens:[FACTGEN.pki]},
+  {n:"Network attacks",tags:["MITM","VLAN attacks","Social engineering","IoT","Built-in security","Defense in depth"],gens:[FACTGEN.netattacks]}
  ]
 };
 /* ---- no-repeat dealer: one per session. Deals statics from a shuffled deck (reshuffles only when exhausted); generated items are rejected if their stem was seen this session. ---- */
 function makeDealer(r,statics,gens,opts){
   opts=opts||{};const seen=new Set();let deck=shuffle(r,statics.slice());const genShare=opts.genShare==null?(gens.length?0.5:0):opts.genShare;
-  const nextStatic=()=>{if(!deck.length){if(!statics.length)return null;deck=shuffle(r,statics.slice());seen.clear()}const q=deck.pop();seen.add(stemKey({q:q.q,code:q.code}));return shuffleItem(r,statItem(q))};
+  const nextStatic=()=>{if(!deck.length){if(!statics.length)return null;deck=shuffle(r,statics.slice());seen.clear()}const q=deck.pop();seen.add(stemKey({q:q.q,code:q.code,opts:q.o}));return shuffleItem(r,statItem(q))};
   const nextGen=()=>{for(let t=0;t<30;t++){const it=genFrom(r,gens);const k=stemKey(it);if(!seen.has(k)){seen.add(k);return shuffleItem(r,it)}}return null};
-  return{next(){const exhausted=!deck.length;const wantGen=gens.length&&(statics.length===0||exhausted||r()<genShare);let it=wantGen?nextGen():null;if(!it)it=nextStatic();if(!it)it=nextGen();return it},remaining(){return deck.length},seen};
+  let widened=false;return{next(){const exhausted=!deck.length;if(exhausted&&!gens.length&&opts.fallback){if(!widened){widened=true;if(this.onWiden)this.onWiden()}return opts.fallback.next()}const wantGen=gens.length&&(statics.length===0||exhausted||r()<genShare);let it=wantGen?nextGen():null;if(!it)it=nextStatic();if(!it)it=nextGen();return it},remaining(){return deck.length},seen,get widened(){return widened}};
 }
 function clusterStatics(areaKey,cluster){const tags=new Set(cluster.tags);return BANK.filter(q=>mapArea(q.a)===areaKey&&tags.has(q.s))}
 function areaStatics(areaKey){return BANK.filter(q=>mapArea(q.a)===areaKey)}
 function areaGens(areaKey){const a=AREAS.find(x=>x.k===areaKey);const out=[];for(const c of a.gen)out.push(...GENS[c]);return out}
 /* drawArea now dealer-backed: the session owns the dealer so repeats can't happen within it */
 function sessionDealer(areaKey,clusterName,r){
-  if(clusterName){const c=CLUSTERS[areaKey].find(x=>x.n===clusterName);const st=clusterStatics(areaKey,c);return makeDealer(r,st,c.gens,{genShare:c.gens.length?(st.length<6?0.75:0.5):0})}
+  if(clusterName){const c=CLUSTERS[areaKey].find(x=>x.n===clusterName);const st=clusterStatics(areaKey,c);const fb=c.gens.length?null:makeDealer(r,areaStatics(areaKey).filter(q=>!st.includes(q)),areaGens(areaKey),{genShare:0.5});return makeDealer(r,st,c.gens,{genShare:c.gens.length?(st.length<6?0.75:st.length<20?0.6:0.5):0,fallback:fb})}
   const st=areaStatics(areaKey),g=areaGens(areaKey);
   return makeDealer(r,st,g,{genShare:g.length?(st.length<20?0.8:st.length<40?0.6:0.5):0});
 }
@@ -2161,7 +2505,7 @@ function bossPool(r){
 function maybeBoss(r,back){
   const X=gameLoad();if(BOSS)return false;if(focusOn())return false;
   const forced=X.pw.magnet>0;
-  if(!forced){if(S&&S.run.t<3)return false;if(r()>=0.15)return false} // 15% per question after the first few
+  if(!forced){if(S&&S.run.t<3)return false;if((X.bossCool||0)>0){X.bossCool--;gameSave(X);return false}if(r()>=0.15)return false} // 15% per question after the first few
   const pool=bossPool(r);if(pool.length<5){if(forced){/* keep the magnet — tell the player why */}return false}
   if(forced){X.pw.magnet--;if(X.pw.magnet<=0)delete X.pw.magnet;gameSave(X)}
   const names=["The Subnet Wraith","Null Pointer","The Packet Reaper","Rootkit Lich","The Broadcast Storm","Kerberos, Hound of 88","The Off-By-One"];
@@ -2185,7 +2529,7 @@ function renderBoss(el){
   el.querySelector("#flee").onclick=()=>{BOSS=null;show(B.back)};
 }
 function renderBossEnd(el){
-  const B=BOSS;const win=B.hp<=0;
+  const B=BOSS;const win=B.hp<=0;{const X0=gameLoad();X0.bossCool=8;gameSave(X0)}
   if(!win){el.innerHTML=`<div class="sheet failed"><div class="score">${B.ok} / 5</div><p style="margin:0"><b>${esc(B.name)}</b> survives with ${B.hp} HP. You needed 4 hits. Those questions are in your weak spots — study them and it'll be back.</p></div><div class="row" style="margin-top:16px"><button class="btn" id="back">Continue studying</button></div>`;el.querySelector("#back").onclick=()=>{BOSS=null;show(B.back)};return}
   const X=gameLoad();X.bossWins++;if(X.bossWins===1&&!X.badges.includes("First boss kill"))X.badges.push("First boss kill");if(B.ok===5&&!X.badges.includes("Flawless kill"))X.badges.push("Flawless kill");gameSave(X);
   el.innerHTML=`<div class="sheet passed" style="text-align:center"><div class="score">${esc(B.name)} defeated</div><p style="margin:0">${B.ok}/5 strikes landed. A chest drops — one reward inside.</p></div>
@@ -2369,7 +2713,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v24";
+const APP_VERSION="v25";
 window.__filter="all";
 window.__booted=true;
 (function(){
