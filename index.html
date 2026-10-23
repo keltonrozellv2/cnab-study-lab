@@ -162,6 +162,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 @keyframes flagaura{0%,100%{box-shadow:0 0 0 3px rgba(60,130,255,.12),0 0 18px rgba(60,130,255,.25)}50%{box-shadow:0 0 0 3px rgba(60,130,255,.22),0 0 34px rgba(60,130,255,.5)}}
 .flagico{position:absolute;left:12px;top:10px;font-size:1.3rem}
 .weakrow.flagged{border-color:rgba(60,130,255,.6);border-style:solid;box-shadow:0 0 12px rgba(60,130,255,.3)}
+.contact{max-width:640px}.ccard{border-color:var(--accent)}.cname{font-size:1.5rem;font-weight:800;margin-top:4px}.thanks{font-size:1.6rem;font-weight:800;letter-spacing:.02em}
 .pccard{text-align:left!important;max-width:560px;width:calc(100vw - 32px);max-height:88vh;overflow:auto}
 .pclist{display:flex;flex-direction:column;gap:4px}
 .pcrow{display:flex;gap:10px;align-items:flex-start;padding:6px 8px;border-radius:8px;cursor:pointer}.pcrow:hover{background:rgba(127,127,127,.08)}.pcrow input{margin-top:4px}.pcrow span span{display:block}.pcrow.off{opacity:.45}
@@ -269,7 +270,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v52</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v53</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -287,6 +288,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
     <button role="tab" data-tab="cheat" aria-selected="false">Cheat Sheet</button>
     <button role="tab" data-tab="progress" aria-selected="false">Progress</button>
     <button role="tab" data-tab="shop" aria-selected="false">Shop</button>
+    <button role="tab" data-tab="contact" aria-selected="false">Contact</button>
   </nav>
 </div>
 <main class="wrap" id="app">
@@ -298,6 +300,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <section id="view-progress" hidden></section>
 <section id="view-cheat" hidden></section>
 <section id="view-shop" hidden></section>
+<section id="view-contact" hidden></section>
 </main>
 <script>
 
@@ -1590,7 +1593,7 @@ function explainHTML(item,picked){
 }
 
 /* ================= tabs / shell ================= */
-const VIEWS={home:"view-home",guide:"view-guide",phase1:"view-phase1",test:"view-test",matrix:"view-matrix",cheat:"view-cheat",progress:"view-progress",shop:"view-shop"};
+const VIEWS={home:"view-home",guide:"view-guide",phase1:"view-phase1",test:"view-test",matrix:"view-matrix",cheat:"view-cheat",progress:"view-progress",shop:"view-shop",contact:"view-contact"};
 /* Close any live session when the user leaves it: count only what was answered. */
 function abandonSessions(){
   if(typeof PAUSE!=="undefined"&&PAUSE)resumeNow();
@@ -1610,7 +1613,7 @@ function show(tab){
   abandonSessions();document.getElementById("app").classList.toggle("wide",tab==="home");
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab?"true":"false"));
   for(const k in VIEWS) document.getElementById(VIEWS[k]).hidden=(k!==tab);
-  ({home:renderHome,guide:renderGuide,phase1:renderPhase1,test:renderTestSetup,matrix:renderMatrix,cheat:renderCheat,progress:renderProgress,shop:renderShop})[tab]();if(typeof toolsRefresh==="function")toolsRefresh();
+  ({home:renderHome,guide:renderGuide,phase1:renderPhase1,test:renderTestSetup,matrix:renderMatrix,cheat:renderCheat,progress:renderProgress,shop:renderShop,contact:renderContact})[tab]();if(typeof toolsRefresh==="function")toolsRefresh();
   if(!/^(guide|phase1|matrix|test)$/.test(tab)){if(typeof toggleCalc==="function")toggleCalc(false);if(typeof toggleNote==="function")toggleNote(false)}document.body.classList.toggle("qtab",/^(guide|phase1|matrix|test)$/.test(tab));
   window.scrollTo(0,0);
 }
@@ -2035,7 +2038,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v52. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v53. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div id="pcui"></div>
@@ -2638,6 +2641,15 @@ function toggleCalc(force){const c=document.getElementById("calc");if(!c)return;
 window.addEventListener("resize",()=>{clampWin(document.getElementById("notepad"));clampWin(document.getElementById("calc"))});
 function toolsRefresh(){const inTest=typeof T!=="undefined"&&!!T;const tb=document.getElementById("tb-calc");if(tb){tb.disabled=inTest;tb.title=inTest?"No calculator during the Practice Test":"Calculator (C)"}if(inTest){const c=document.getElementById("calc");if(c)c.hidden=true;const t=document.getElementById("tb-calc");if(t)t.classList.remove("on")}}
 
+/* ================= CONTACT ================= */
+function renderContact(){const el=document.getElementById("view-contact");const v=(document.querySelector(".ver")||{}).textContent||"";
+  el.innerHTML=`<div class="contact"><h1 style="margin:0 0 6px">Contact</h1><p class="muted" style="margin:0 0 18px">Questions, bugs, wrong answers, ideas — send them my way.</p>
+  <div class="sheet ccard"><div class="small" style="letter-spacing:.14em;font-weight:800;color:var(--accent)">POINT OF CONTACT</div>
+   <div class="cname">SPC Rozell, Kelton</div>
+   <div class="row" style="gap:10px;flex-wrap:wrap;margin-top:10px"><a class="btn" href="mailto:kelton.l.rozell.mil@army.mil?subject=CNAB%20Study%20Lab">✉ kelton.l.rozell.mil@army.mil</a><button class="btn ghost" id="c-copy">Copy email</button></div>
+   <p class="small muted" style="margin:12px 0 0">If you're reporting a question, include the question text and which sub-topic it came from — the Progress → Profile code (weak spots only) is a quick way to send the exact items.</p></div>
+  <div class="sheet" style="margin-top:14px;text-align:center"><div class="thanks">Thank you for studying!</div><p class="muted small" style="margin:6px 0 0">Built for soldiers prepping for the CNAB / CNT. Good luck on test day.</p></div></div>`;
+  el.querySelector("#c-copy").onclick=async()=>{const b=el.querySelector("#c-copy");try{await navigator.clipboard.writeText("kelton.l.rozell.mil@army.mil");b.textContent="Copied ✓";sfx("click")}catch(e){b.textContent="kelton.l.rozell.mil@army.mil"}}}
 /* ================= CHEAT SHEET ================= */
 function renderCheat(){
   const el=document.getElementById("view-cheat");
@@ -4088,7 +4100,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v52";
+const APP_VERSION="v53";
 window.__filter="all";
 window.__booted=true;
 (function(){
