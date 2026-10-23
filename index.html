@@ -162,6 +162,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 @keyframes flagaura{0%,100%{box-shadow:0 0 0 3px rgba(60,130,255,.12),0 0 18px rgba(60,130,255,.25)}50%{box-shadow:0 0 0 3px rgba(60,130,255,.22),0 0 34px rgba(60,130,255,.5)}}
 .flagico{position:absolute;left:12px;top:10px;font-size:1.3rem}
 .weakrow.flagged{border-color:rgba(60,130,255,.6);border-style:solid;box-shadow:0 0 12px rgba(60,130,255,.3)}
+.pccode{width:100%;min-height:120px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72rem;word-break:break-all;line-height:1.35;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--ink);resize:vertical}
 .weakrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px}
 .qcount{display:inline-flex;align-items:center;gap:8px}.qstreak{background:#ffe9c7;color:#b8500b;border-radius:999px;padding:2px 8px;font-weight:800;animation:flick 1.4s ease-in-out infinite}html[data-theme=dark] .qstreak{background:#3a2208;color:#ffb067}.qtools{display:inline-flex;gap:4px}.qtb{border:1px solid var(--line);background:var(--sheet);border-radius:6px;padding:2px 6px;font-size:1rem;cursor:pointer}.qtb:disabled{opacity:.4;cursor:not-allowed}
 .tooldock{position:fixed;right:0;top:136px;z-index:40;display:flex;flex-direction:column;gap:6px}
@@ -263,7 +264,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v49</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v50</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1874,23 +1875,48 @@ function exportProgress(){
 }
 function importProgress(file,box){
   const rd=new FileReader();rd.onload=()=>{let d;try{d=JSON.parse(rd.result)}catch(e){box.innerHTML=`<div class="fb wrong"><span class="mk">Couldn't read that file.</span> It isn't a progress export from this app.</div>`;return}
-    if(!d||d.app!=="cnab-lab-pro"||!Array.isArray(d.hist)){box.innerHTML=`<div class="fb wrong"><span class="mk">Not a valid progress file.</span></div>`;return}
-    const cur=jload(HIST,[]);const n=d.hist.length;
-    askInline(box,`Import ${n} attempt${n===1?"":"s"} and ${(d.xp&&d.xp.xp)||0} XP? ${cur.length?"Attempt history and weak spots merge (duplicates skipped). Gold, items, quests, map and badge progress are RESTORED from the file and replace what is here.":""}`,"Import",()=>{
+    importData(d,box,"file")};rd.readAsText(file);
+}
+function profileSummary(xp,hist,when){const L=levelFor((xp&&xp.xp)||0);return `Lv ${L.lvl} · ${(xp&&xp.gold)||0} gold · ${hist.length} attempt${hist.length===1?"":"s"}${when?" · saved "+new Date(when).toLocaleString():""}`}
+function importData(d,box,kind){
+    if(!d||d.app!=="cnab-lab-pro"||!Array.isArray(d.hist)){box.innerHTML=`<div class="fb wrong"><span class="mk">Not a valid progress ${kind==="code"?"code":"file"}.</span></div>`;return}
+    const cur=jload(HIST,[]);const n=d.hist.length;const localX=gameLoad();const codeT=d.exported?Date.parse(d.exported):0;const older=codeT&&localX.savedAt&&localX.savedAt>codeT+60000&&cur.length>0;
+    askInline(box,`Load this ${kind==="code"?"profile code":"file"}? It holds: ${profileSummary(d.xp,d.hist,d.exported)}. This device: ${profileSummary(localX,cur,localX.savedAt)}.${older?" ⚠ This device has NEWER progress than the "+(kind==="code"?"code":"file")+" — loading will roll gold, items and map progress back to the older state.":""} ${cur.length?"Attempt history and weak spots merge (duplicates skipped); everything else is restored from the "+(kind==="code"?"code":"file")+".":""}`,older?"Load anyway":"Load",()=>{
       const seen=new Set(cur.map(a=>a.date+"|"+a.mode+"|"+a.ok+"|"+a.total));const merged=cur.concat(d.hist.filter(a=>a&&a.date&&!seen.has(a.date+"|"+a.mode+"|"+a.ok+"|"+a.total))).sort((a,b)=>a.date<b.date?-1:1);
       jsave(HIST,merged.slice(-200));
       const w=jload(WEAK,[]);const wk=new Set(w.map(x=>x.q));jsave(WEAK,w.concat((d.weak||[]).filter(x=>x&&x.q&&!wk.has(x.q))));
       // Restore, don't merge: a merge-with-max let people spend gold, re-import and get it back.
       const X=xpLoad();const Y=d.xp||{};if(Y&&typeof Y==="object"&&Y.xp!==undefined){const keep={};for(const k of ["cos"])keep[k]=X[k];const Z=JSON.parse(JSON.stringify(Y));if(!Z.cos&&keep.cos)Z.cos=keep.cos;for(const k in X)if(Z[k]===undefined)Z[k]=X[k];for(const k in Z)X[k]=Z[k]}
-      xpSave(X);applyCosmetics();renderXPBar();renderProgress();if(typeof renderBadges==="function")renderBadges();
+      xpSave(X);applyCosmetics();renderXPBar();renderProgress();if(typeof renderBadges==="function")renderBadges();if(typeof toastMsg==="function")toastMsg("Profile loaded — "+profileSummary(X,jload(HIST,[])));
     });
-  };rd.readAsText(file);
 }
+/* ================= PROFILE CODE: offline device-to-device transfer (deflate + base64url + CRC32) ================= */
+const PC_PREFIX="CNAB1";
+const CRC_T=(()=>{const t=new Uint32Array(256);for(let i=0;i<256;i++){let c=i;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[i]=c>>>0}return t})();
+function crc32(str){let c=0xFFFFFFFF;for(let i=0;i<str.length;i++)c=CRC_T[(c^str.charCodeAt(i))&255]^(c>>>8);return (c^0xFFFFFFFF)>>>0}
+function b64uEnc(bytes){let s="";for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+function b64uDec(str){str=str.replace(/-/g,"+").replace(/_/g,"/");while(str.length%4)str+="=";const bin=atob(str);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out}
+function exportObject(compact){const hist=jload(HIST,[]);const weak=jload(WEAK,[]);return{app:"cnab-lab-pro",v:1,exported:new Date().toISOString(),hist:compact?hist.slice(-120):hist,weak:compact?weak.map(w=>({q:w.q,code:w.code||null,opts:(w.opts||[]).map(o=>({t:o.t,why:o.why||undefined})),a:w.a,w:w.w||null,areaCNT:w.areaCNT,folder:w.folder,sub:w.sub,source:w.source,flag:w.flag||undefined})):weak,xp:xpLoad(),pref:jload(PREF,{zoom:100,theme:null})}}
+async function makeProfileCode(){const json=JSON.stringify(exportObject(true));let bytes=new TextEncoder().encode(json);let mode="R";
+  if(typeof CompressionStream!=="undefined"){try{const cs=new CompressionStream("deflate-raw");const w=cs.writable.getWriter();w.write(bytes);w.close();bytes=new Uint8Array(await new Response(cs.readable).arrayBuffer());mode="D"}catch(e){}}
+  const body=b64uEnc(bytes);return PC_PREFIX+mode+"."+body+"."+crc32(body).toString(36)}
+async function parseProfileCode(code){const c=String(code||"").replace(/\s+/g,"");const m=c.match(/^CNAB1([DR])\.([A-Za-z0-9_-]+)\.([0-9a-z]+)$/);if(!m)throw new Error("That doesn't look like a profile code (it should start with CNAB1).");
+  if(crc32(m[2]).toString(36)!==m[3])throw new Error("The code is damaged — a character is missing or changed. Copy it again from the other device.");
+  let bytes=b64uDec(m[2]);if(m[1]==="D"){if(typeof DecompressionStream==="undefined")throw new Error("This browser can't unpack compressed codes — update it, or use a progress file instead.");const ds=new DecompressionStream("deflate-raw");const w=ds.writable.getWriter();w.write(bytes);w.close();bytes=new Uint8Array(await new Response(ds.readable).arrayBuffer())}
+  return JSON.parse(new TextDecoder().decode(bytes))}
+function renderProfileCodeUI(host){host.innerHTML=`<h3 style="margin:18px 0 6px">Profile code — move between devices</h3><p class="small muted" style="margin:0 0 8px">No account, nothing online. The code is your whole profile (gold, items, map, badges, weak spots, recent history) packed into text with a checksum. Generate it here, paste it on the other device, keep studying. Generate a fresh one each time you switch — the newest code wins.</p>
+  <div class="row"><button class="btn sm" id="pc-gen">Generate my profile code</button><button class="btn sm ghost" id="pc-load">Load a profile code</button></div><div id="pc-box" style="margin-top:10px"></div>`;
+  const box=host.querySelector("#pc-box");
+  host.querySelector("#pc-gen").onclick=async()=>{box.innerHTML=`<p class="small muted">Packing…</p>`;try{const code=await makeProfileCode();box.innerHTML=`<textarea id="pc-out" class="pccode" readonly spellcheck="false"></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="pc-copy">Copy code</button><span class="small muted" id="pc-len">${code.length.toLocaleString()} characters · ${profileSummary(xpLoad(),jload(HIST,[]))}</span></div><p class="small muted" style="margin:8px 0 0">Paste it anywhere that reaches your other device — a note, an email to yourself, a message. Then open the app there → Progress → Load a profile code.</p>`;
+      const ta=box.querySelector("#pc-out");ta.value=code;ta.onclick=()=>ta.select();box.querySelector("#pc-copy").onclick=async()=>{ta.select();let ok=false;try{await navigator.clipboard.writeText(code);ok=true}catch(e){try{ok=document.execCommand("copy")}catch(x){}}box.querySelector("#pc-copy").textContent=ok?"Copied ✓":"Select all and copy";if(ok)sfx("click")}}catch(e){box.innerHTML=`<div class="fb wrong"><span class="mk">Couldn't build the code.</span> ${esc(e.message||String(e))}</div>`}};
+  host.querySelector("#pc-load").onclick=()=>{box.innerHTML=`<textarea id="pc-in" class="pccode" placeholder="Paste a profile code here (starts with CNAB1)" spellcheck="false"></textarea><div class="row" style="margin-top:8px"><button class="btn sm" id="pc-go">Check &amp; load</button><button class="btn sm ghost" id="pc-paste">Paste from clipboard</button></div><div id="pc-msg"></div>`;
+    const ta=box.querySelector("#pc-in");box.querySelector("#pc-paste").onclick=async()=>{try{ta.value=await navigator.clipboard.readText()}catch(e){ta.focus()}};
+    box.querySelector("#pc-go").onclick=async()=>{const msg=box.querySelector("#pc-msg");try{const d=await parseProfileCode(ta.value);importData(d,msg,"code")}catch(e){msg.innerHTML=`<div class="fb wrong"><span class="mk">Can't load that.</span> ${esc(e.message||String(e))}</div>`}}}}
 function logAttempt(a){const h=jload(HIST,[]);h.push(Object.assign({date:new Date().toISOString()},a));jsave(HIST,h.slice(-200))}
 function dayKey(iso){return new Date(iso).toISOString().slice(0,10)}
 function renderProgress(){
   const el=document.getElementById("view-progress");const h=jload(HIST,[]);
-  if(!h.length){el.innerHTML=`<h1>Progress</h1><p>No attempts yet. Take a practice test or run a study-guide drill and your scores, trends, streaks and weak areas will show up here — saved in this browser across days.</p><div class="row"><button class="btn" data-goview="test">Start a test</button><button class="btn ghost" data-goview="guide">Study guide</button><label class="btn ghost" for="impf0" style="cursor:pointer">Import a progress file</label><input type="file" id="impf0" accept="application/json,.json" hidden></div><div id="pbox"></div>`;el.querySelectorAll("[data-goview]").forEach(b=>b.onclick=()=>show(b.dataset.goview));el.querySelector("#impf0").onchange=e=>{const f=e.target.files[0];if(f)importProgress(f,el.querySelector("#pbox"))};return}
+  if(!h.length){el.innerHTML=`<h1>Progress</h1><p>No attempts yet. Take a practice test or run a study-guide drill and your scores, trends, streaks and weak areas will show up here — saved in this browser across days.</p><div class="row"><button class="btn" data-goview="test">Start a test</button><button class="btn ghost" data-goview="guide">Study guide</button><label class="btn ghost" for="impf0" style="cursor:pointer">Import a progress file</label><input type="file" id="impf0" accept="application/json,.json" hidden></div><div id="pcui"></div><div id="pbox"></div>`;renderProfileCodeUI(el.querySelector("#pcui"));el.querySelectorAll("[data-goview]").forEach(b=>b.onclick=()=>show(b.dataset.goview));el.querySelector("#impf0").onchange=e=>{const f=e.target.files[0];if(f)importProgress(f,el.querySelector("#pbox"))};return}
   const tests=h.filter(a=>a.mode&&a.mode.startsWith("Test"));
   const days=[...new Set(h.map(a=>dayKey(a.date)))].sort();
   // streak up to today
@@ -1923,10 +1949,12 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v49. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v50. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
+  <div id="pcui"></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
+  renderProfileCodeUI(el.querySelector("#pcui"));
   el.querySelector("#exp").onclick=exportProgress;
   el.querySelector("#impf").onchange=e=>{const f=e.target.files[0];if(f)importProgress(f,el.querySelector("#pbox"))};
   el.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{show("guide");startSession({host:"guide",back:"guide",title:SHORT[b.dataset.go]+" practice",mode:"practice",el:document.getElementById("view-guide"),mkDealer:r=>sessionDealer(b.dataset.go,null,r)})});
@@ -1964,7 +1992,7 @@ function powersHTML(ctx){const X=gameLoad();const keys=ctx==="boss"?["shield"]:[
 function bindPowers(el){el.querySelectorAll("[data-pw]").forEach(b=>b.onclick=()=>{if(usePower(b.dataset.pw)){const bar=el.querySelector("#aidsbar");if(bar){const p=bar.querySelector(".pwwrap");if(p)p.innerHTML=powersHTML(bar.dataset.ctx);bindPowers(el)}}})}
 function renderAids(el,ctx){const old=el.querySelector("#aidsbar");if(old)old.remove();const d=document.createElement("div");d.innerHTML=`<div class="aidsbar" id="aidsbar" data-ctx="${ctx}"><span class="pwwrap">${powersHTML(ctx)}</span></div>`;const fb=el.querySelector("#fb");(fb||el).insertAdjacentElement(fb?"afterend":"beforeend",d.firstChild);bindPowers(el)}
 function gameLoad(){const X=xpLoad();X.gold=X.gold||0;X.bag=X.bag||{elim:3,reveal:2,time:2};X.pw=X.pw||{};X.miss=X.miss||{};X.badges=X.badges||[];X.bossWins=X.bossWins||0;return pwMigrate(X)}
-function gameSave(X){xpSave(X)}
+function gameSave(X){X.savedAt=Date.now();xpSave(X)}
 function bagCount(X){X=X||gameLoad();return Object.values(X.bag).reduce((a,b)=>a+b,0)+["shield","lucky","magnet","freeze"].reduce((a,k)=>a+(X.pw[k]||0),0)}
 function hasAid(k){return (gameLoad().bag[k]||0)>0}
 function useAid(k){const X=gameLoad();if((X.bag[k]||0)<=0)return false;X.bag[k]--;gameSave(X);renderXPBar();return true}
@@ -3974,7 +4002,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v49";
+const APP_VERSION="v50";
 window.__filter="all";
 window.__booted=true;
 (function(){
