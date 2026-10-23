@@ -111,6 +111,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .bossbar{background:var(--sheet);border:2px solid var(--bad);border-radius:10px;padding:12px 14px;margin-bottom:12px}.bosshead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.bossname{font-weight:800;font-size:1.1rem;color:var(--bad)}
 .hp{position:relative;height:18px;background:var(--line);border-radius:9px;overflow:hidden}.hp i{display:block;height:100%;background:var(--bad);transition:width .7s cubic-bezier(.2,1.3,.4,1)}.hp .hpn{position:absolute;inset:0;text-align:center;font-size:.75rem;font-weight:700;line-height:18px;color:var(--ink)}
 .bossbar.updbar{animation:updglow 3s ease-in-out infinite}@keyframes updglow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 35%,transparent),0 0 24px color-mix(in srgb,var(--accent) 45%,transparent)}}.upddot{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;animation:dotpulse 2s ease-in-out infinite}@keyframes dotpulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:1}}
+.golden{border-color:#d4a72c;background:linear-gradient(110deg,var(--sheet) 0%,var(--sheet) 40%,color-mix(in srgb,#f5c044 18%,var(--sheet)) 50%,var(--sheet) 60%,var(--sheet) 100%);background-size:250% 100%;animation:gshine 6s ease-in-out infinite}@keyframes gshine{0%{background-position:100% 0}100%{background-position:-50% 0}}.golden.won{box-shadow:0 0 0 2px #f5c044,0 0 18px rgba(245,192,68,.35)}.gqhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.gqtag{font-weight:800;color:#b8860b;letter-spacing:.04em}
 .shake{animation:shake .4s}.bossbar.miss{animation:dim .4s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes dim{50%{opacity:.5}}
 .chestwrap{text-align:center;margin:24px 0}.chest{position:relative;width:150px;height:120px;margin:0 auto;cursor:pointer;user-select:none}.chest .body{position:absolute;left:10px;right:10px;bottom:0;height:70px;background:#8a5a2b;border:3px solid #4a2d12;border-radius:6px 6px 10px 10px}.chest .body::after{content:"";position:absolute;left:50%;top:-6px;width:22px;height:26px;margin-left:-11px;background:#e2b549;border:3px solid #4a2d12;border-radius:4px}.chest .lid{position:absolute;left:10px;right:10px;top:22px;height:44px;background:#a86c35;border:3px solid #4a2d12;border-radius:40px 40px 4px 4px;transform-origin:50% 100%;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}.chest .glow{position:absolute;left:20px;right:20px;top:36px;height:40px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,225,120,.9),rgba(255,225,120,0) 70%);opacity:0;transition:opacity .5s}
 .chest.stage1 .lid{transform:rotateX(0) translateY(-6px) rotate(-6deg)}.chest.stage2 .lid{transform:translateY(-14px) rotate(-16deg);animation:jiggle .5s 2}.chest.stage2 .glow{opacity:.5}.chest.stage3 .lid{transform:translateY(-40px) rotate(-70deg)}.chest.stage3 .glow{opacity:1;animation:pulseglow 1.2s infinite alternate}.chest.stage3{animation:pop .5s}
@@ -136,7 +137,6 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .chip.done .body{stroke:#4ade80}
 .updbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:10px;display:flex;gap:10px;align-items:center;z-index:70;box-shadow:0 6px 24px rgba(0,0,0,.35);font-size:.92rem;max-width:calc(100% - 32px)}.updbar .link{color:var(--paper);opacity:.8}
 
-.shake{animation:shake .4s}@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .confetti{position:fixed;inset:0;pointer-events:none;z-index:95;overflow:hidden}.confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:cfall linear forwards}@keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:.6}}
 .sndctl{display:inline-flex;align-items:center;gap:4px}.sndctl input[type=range]{width:70px;accent-color:var(--accent)}@media(max-width:600px){.sndctl input[type=range]{width:50px}}
 .blurred{filter:blur(6px);pointer-events:none;user-select:none}
@@ -168,7 +168,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v26</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v27</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
     <button class="iconbtn" id="focusbtn" aria-pressed="false" title="Focus mode">◎</button>
@@ -1489,11 +1489,12 @@ document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener("click",
 
 /* zoom + theme */
 const pref=jload(PREF,{zoom:100,theme:null});
-function applyZoom(){document.getElementById("app").style.zoom=(pref.zoom/100);document.getElementById("zval").textContent=pref.zoom+"%";jsave(PREF,pref)}
+function savePref(){const cur=jload(PREF,{});cur.zoom=pref.zoom;cur.theme=pref.theme;jsave(PREF,cur)}
+function applyZoom(){document.getElementById("app").style.zoom=(pref.zoom/100);document.getElementById("zval").textContent=pref.zoom+"%";savePref()}
 document.getElementById("zin").onclick=()=>{pref.zoom=Math.min(200,pref.zoom+15);applyZoom()};
 document.getElementById("zout").onclick=()=>{pref.zoom=Math.max(75,pref.zoom-15);applyZoom()};
 document.getElementById("zreset").onclick=()=>{pref.zoom=100;applyZoom()};
-function applyTheme(){if(pref.theme)document.documentElement.setAttribute("data-theme",pref.theme);else document.documentElement.removeAttribute("data-theme");jsave(PREF,pref);if(window.__booted)applyCosmetics()}
+function applyTheme(){if(pref.theme)document.documentElement.setAttribute("data-theme",pref.theme);else document.documentElement.removeAttribute("data-theme");savePref();if(window.__booted)applyCosmetics()}
 document.getElementById("theme").onclick=()=>{const cur=pref.theme|| (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");pref.theme=cur==="dark"?"light":"dark";applyTheme()};
 applyZoom();applyTheme();
 
@@ -1541,7 +1542,7 @@ function renderSession(){
   if(!answered){el.querySelectorAll("#ch [data-k]").forEach(b=>{if(!b.disabled)b.onclick=()=>pickSession(+b.dataset.k)});armShimmer()}else disarmShimmer();
   el.querySelectorAll("[data-aid]").forEach(b=>b.onclick=()=>{const k=b.dataset.aid;if(!useAid(k))return;S.used[k]=true;if(k==="elim")elimOne();else{S.hinted=true;renderSession()}});
   el.querySelectorAll("[data-goview]").forEach(b=>b.onclick=()=>show(b.dataset.goview));
-  if(answered) el.querySelector("#next").onclick=()=>{S.idx++;if(S.mode==="practice"&&!S.pool&&maybeBoss(S.r,S.back||"guide")){const el2=S.el;S=null;renderBoss(el2);window.scrollTo(0,0);return}nextSession();renderSession();window.scrollTo(0,0)};
+  if(answered) el.querySelector("#next").onclick=()=>{S.idx++;if(S.mode==="practice"&&!S.pool&&maybeBoss(S.r,S.back||"guide")){BOSS.resume=S;S=null;renderBoss(BOSS.resume.el);window.scrollTo(0,0);return}nextSession();renderSession();window.scrollTo(0,0)};
   el.querySelector("#end").onclick=()=>endSession();
 }
 function pickSession(k){
@@ -1773,7 +1774,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v26. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v27. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -1915,7 +1916,7 @@ function pauseAvailable(){return (typeof MX!=="undefined"&&MX)||(typeof T!=="und
 
 /* ================= FOCUS MODE ================= */
 function focusOn(){return !!(jload(PREF,{}).focus)}
-function setFocus(v){const p=jload(PREF,{});p.focus=!!v;jsave(PREF,p);applyFocus()}
+function setFocus(v){const p=jload(PREF,{});p.focus=!!v;jsave(PREF,p);applyCosmetics();const h=document.getElementById("view-home");if(h&&!h.hidden)renderHome()}
 function applyFocus(){document.documentElement.classList.toggle("focus",focusOn());const b=document.getElementById("focusbtn");if(b){b.setAttribute("aria-pressed",focusOn());b.title=focusOn()?"Focus mode on — click for the full experience":"Focus mode: hide XP, gold, companion, bosses and animations"}
   const bd=document.getElementById("buddy");if(bd){const c=cosLoad().cos;bd.hidden=focusOn()||!(c.buddy&&c.buddy!=="none")}}
 
@@ -1932,14 +1933,14 @@ const THEMES={
  aurora:{n:"Aurora (legendary)",price:0,legendary:true,light:{"--paper":"#e6f3f4","--sheet":"#f6fdfd","--ink":"#0d2630","--muted":"#3f6b74","--line":"#bfdde0","--accent":"#0d9488","--accent-soft":"#ccf3ee","--accent-ink":"#fff","--mx":"#0d2630","--mx-bg":"#fff"},dark:{"--paper":"#06111a","--sheet":"#0c1c27","--ink":"#dff7ff","--muted":"#86b7c6","--line":"#17303d","--accent":"#4df0d6","--accent-soft":"#0e3a3a","--accent-ink":"#02110f","--mx":"#7af7e0","--mx-bg":"#04101a"},aurora:true}
 };
 function applyCosmetics(){
-  const X=cosLoad();const t=THEMES[X.cos.theme]||THEMES.default;const root=document.documentElement;
+  const X=cosLoad();const F=focusOn();const t=F?THEMES.default:(THEMES[X.cos.theme]||THEMES.default);const root=document.documentElement;
   const dark=root.getAttribute("data-theme")==="dark"||(!root.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme:dark)").matches);
   for(const k of ["--paper","--sheet","--ink","--muted","--line","--accent","--accent-soft","--accent-ink","--mx","--mx-bg"])root.style.removeProperty(k);
   root.style.removeProperty("--font");document.body.style.fontFamily="";
   const vars=dark?t.dark:t.light;for(const k in vars)root.style.setProperty(k,vars[k]);
   if(t.font)document.body.style.fontFamily=t.font;
   document.body.classList.toggle("aurora",!!t.aurora);
-  const b=BUDDIES[X.cos.buddy]||BUDDIES.none;let el=document.getElementById("buddy");
+  const b=F?BUDDIES.none:(BUDDIES[X.cos.buddy]||BUDDIES.none);let el=document.getElementById("buddy");
   if(!el){el=document.createElement("div");el.id="buddy";el.className="buddy";document.body.appendChild(el)}
   el.innerHTML=b.sprite?`<div class="buddyfig ${SPRITES[b.sprite].type}" data-sprite="${b.sprite}" data-key="${X.cos.buddy}" title="${esc(b.n)}">${spriteImg(b.sprite,"idle")}<div class="fx" id="buddyfx"></div></div>`:"";el.hidden=!b.sprite;
   startBuddyIdle();applyFocus();
@@ -1951,7 +1952,8 @@ const LEGEND_PET={key:"phoenix",n:"Null Phoenix",sprite:"phoenix"};
 function lootTable(X){
   const t=[];
   // common: gold / single aids
-  [["gold",30],["gold",45],["aid","elim"],["aid","reveal"],["aid","time"]].forEach(([k,v])=>t.push({r:"common",k,v}));
+  [["gold",20],["gold",35],["gold",50],["gold",65],["aid","elim"],["aid","reveal"],["aid","time"]].forEach(([k,v])=>t.push({r:"common",k,v}));
+  [["aids","elim",2],["aids","reveal",2],["aids","time",2]].forEach(a=>t.push({r:"common",k:a[0],v:a[1],n:a[2]}));
   // rare: bigger gold, 3× aids, power-ups
   [["gold",90],["aids","elim",3],["aids","reveal",3],["pw","shield"],["pw","lucky"]].forEach(a=>t.push({r:"rare",k:a[0],v:a[1],n:a[2]}));
   // epic: shop items not yet owned (themes / companions), else magnet or 200 gold
@@ -1968,8 +1970,10 @@ function lootTable(X){
 function rollLoot(X){
   const t=lootTable(X);const byR={};for(const it of t)(byR[it.r]||(byR[it.r]=[])).push(it);
   const rs=Object.keys(RARITY).filter(r=>byR[r]);const tot=rs.reduce((a,r)=>a+RARITY[r].w,0);let x=Math.random()*tot;let r=rs[rs.length-1];for(const k of rs){x-=RARITY[k].w;if(x<=0){r=k;break}}
-  const pool=byR[r];return pool[Math.floor(Math.random()*pool.length)];
+  const last=X.lastLoot||"";let pool=byR[r].filter(it=>lootId(it)!==last);if(!pool.length)pool=byR[r];
+  return pool[Math.floor(Math.random()*pool.length)];
 }
+function lootId(it){return it.r+":"+it.k+":"+it.v+":"+(it.n||1)}
 function lootLabel(it){
   if(it.k==="gold")return {t:`🪙 ${it.v} gold`,i:"🪙"};
   if(it.k==="aid")return {t:`${AIDS[it.v].icon} ${AIDS[it.v].n}`,i:AIDS[it.v].icon};
@@ -1987,7 +1991,7 @@ function grantLoot(it){
   else if(it.k==="pw"){X.pw[it.v]=(X.pw[it.v]||0)+(it.v==="lucky"?20:1)}
   else if(it.k==="theme"){if(!X.cos.themes.includes(it.v))X.cos.themes.push(it.v);X.cos.theme=it.v}
   else if(it.k==="buddy"){if(!X.cos.buddies.includes(it.v))X.cos.buddies.push(it.v);X.cos.buddy=it.v}
-  gameSave(X);renderXPBar();if(it.k==="theme"||it.k==="buddy")applyCosmetics();
+  X.lastLoot=lootId(it);gameSave(X);renderXPBar();if(it.k==="theme"||it.k==="buddy")applyCosmetics();
 }
 /* Build a reel of ~40 tiles, land on index 34 (the result), decelerate with easing, tick as tiles pass. */
 function renderChestSpin(el,onDone){
@@ -2014,7 +2018,7 @@ const ABIL={
  phoenix:{fx:"blaze",snd:"legendary",emote:""}
 };
 function buddyAbility(){
-  const el=document.querySelector("#buddy .buddyfig");if(!el)return;const key=el.dataset.key;const ab=ABIL[key];if(!ab)return;
+  if(focusOn())return;const el=document.querySelector("#buddy .buddyfig");if(!el)return;const key=el.dataset.key;const ab=ABIL[key];if(!ab)return;
   const fx=el.querySelector("#buddyfx");if(!fx)return;fx.innerHTML="";
   if(ab.fx==="fire"||ab.fx==="blaze"){const n=ab.fx==="blaze"?22:14;fx.innerHTML=Array.from({length:n},(_,i)=>`<i class="flame" style="--d:${(i*37)%300}ms;--x:${-10+(i*13)%60}px;--s:${0.6+((i*7)%5)/8}"></i>`).join("");fx.className="fx fire"+(ab.fx==="blaze"?" blaze":"")}
   else if(ab.fx==="howl"){fx.innerHTML=`<span class="note">♪</span><span class="note n2">♫</span><span class="note n3">♪</span><i class="ring"></i><i class="ring r2"></i>`;fx.className="fx howl"}
@@ -2030,7 +2034,7 @@ let BUDDY_T=null,BUDDY_BUSY=false;
 function setPose(el,pose){const k=el.dataset.sprite;const S=SPRITES[k];if(!S||S.type!=="poses")return;const img=el.querySelector("img");if(img&&S.frames[pose])img.src=S.frames[pose]}
 function startBuddyIdle(){if(BUDDY_T)clearInterval(BUDDY_T);BUDDY_T=setInterval(()=>{const el=document.querySelector("#buddy .buddyfig");if(!el||BUDDY_BUSY)return;if(el.classList.contains("poses")&&Math.random()<0.25){setPose(el,"think");setTimeout(()=>{if(!BUDDY_BUSY)setPose(el,"idle")},900)}},4000)}
 function buddyReact(kind){
-  const el=document.querySelector("#buddy .buddyfig");if(!el)return;
+  if(focusOn())return;const el=document.querySelector("#buddy .buddyfig");if(!el)return;
   el.classList.remove("hop","sad");void el.offsetWidth;el.classList.add(kind==="ok"?"hop":"sad");
   if(kind==="ok")setTimeout(buddyAbility,250);
   if(el.classList.contains("poses")){BUDDY_BUSY=true;
@@ -2078,7 +2082,10 @@ function chipSVG(n,st){
 }
 function tracePath(a,b){const mx=(a.x+b.x)/2;return `M${a.x},${a.y} L${mx},${a.y} L${mx},${b.y} L${b.x},${b.y}`}
 function renderHome(){
-  const el=document.getElementById("view-home");const X=gameLoad();const R=rankFor(X);const L=levelFor(X.xp);const nodes=roadState();
+  const el=document.getElementById("view-home");
+  if(focusOn()){el.innerHTML=`<h1 style="margin:0 0 6px">Study Lab</h1><div class="sheet"><b>Focus mode is on.</b> XP, gold, companions, bosses, themes and animations are hidden — just the questions. Toggle ◎ in the top bar to switch back.</div>
+   <div class="row" style="margin-top:14px"><button class="btn" data-goview="guide">Study guide</button><button class="btn ghost" data-goview="phase1">Topic review</button><button class="btn ghost" data-goview="test">Practice test</button><button class="btn ghost" data-goview="matrix">Matrix test</button><button class="btn ghost" data-goview="progress">Progress</button></div>`;
+   el.querySelectorAll("[data-goview]").forEach(b=>b.onclick=()=>show(b.dataset.goview));return}const X=gameLoad();const R=rankFor(X);const L=levelFor(X.xp);const nodes=roadState();
   const next=nodes.find(n=>n.st==="open")||nodes[nodes.length-1];const doneN=nodes.filter(n=>n.st==="done"&&n.id!=="oc").length;
   const traces=[];for(let i=0;i<nodes.length-1;i++){const a=nodes[i],b=nodes[i+1];if(b.id==="oc"){traces.push({d:tracePath(nodes[6],b),lit:nodes[6].st==="done"});continue}traces.push({d:tracePath(a,b),lit:a.st==="done"})}
   // decorative capacitors / vias
@@ -2086,7 +2093,6 @@ function renderHome(){
   el.innerHTML=`<div class="hero"><div><h1 style="margin:0">Welcome back${R.n!=="Recruit"?", "+esc(R.n):""}.</h1><p class="muted" style="margin:6px 0 0">Level ${L.lvl} · ${doneN} of 7 stages complete · ${X.gold||0} gold</p></div>
    <button class="btn" id="homego">${next.st==="done"?"Take the practice test":"Continue: "+esc(next.label)}</button></div>
   <p class="small muted">Follow the traces. Each stage unlocks the next and ends at the CPU — the full CNAB practice test. Click any lit component to jump in.</p>
-  <div class="focusnote sheet"><b>Focus mode is on.</b> XP, gold, companions, bosses and animations are hidden — just the questions. Toggle ◎ in the top bar to switch back.</div>
   <div class="board"><svg viewBox="0 150 1100 480" role="img" aria-label="Roadmap drawn as a motherboard">
     <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="currentColor" stroke-opacity=".06"/></pattern></defs>
     <rect x="0" y="150" width="1100" height="480" rx="18" class="pcb"/><rect x="0" y="150" width="1100" height="480" rx="18" fill="url(#grid)"/>
@@ -2530,7 +2536,8 @@ function maybeBoss(r,back){
   const X=gameLoad();if(BOSS)return false;if(focusOn())return false;
   const forced=X.pw.magnet>0;
   if(!forced){if(S&&S.run.t<3)return false;if((X.bossCool||0)>0){X.bossCool--;gameSave(X);return false}if(r()>=0.15)return false} // 15% per question after the first few
-  const pool=bossPool(r);if(pool.length<5){if(forced){/* keep the magnet — tell the player why */}return false}
+  {const un=Object.entries(X.miss).filter(([k,m])=>m.item&&!(X.beaten||[]).includes(k));const tot=un.reduce((a,[,m])=>a+m.n,0);if(un.length<5||tot<5)return false}
+  const pool=bossPool(r);if(pool.length<5)return false;
   if(forced){X.pw.magnet--;if(X.pw.magnet<=0)delete X.pw.magnet;gameSave(X)}
   const names=["The Subnet Wraith","Null Pointer","The Packet Reaper","Rootkit Lich","The Broadcast Storm","Kerberos, Hound of 88","The Off-By-One"];
   BOSS={name:names[Math.floor(r()*names.length)],hp:100,items:pool.map(it=>shuffleItem(r,it)),idx:0,ok:0,picked:null,back:back||"guide",shield:X.pw.shield>0,log:[]};
@@ -2552,17 +2559,30 @@ function renderBoss(el){
   else el.querySelector("#next").onclick=()=>{B.idx++;B.picked=null;renderBoss(el);window.scrollTo(0,0)};
   el.querySelector("#flee").onclick=()=>{BOSS=null;show(B.back)};
 }
+function bossReturn(B){BOSS=null;if(B.resume){S=B.resume;nextSession();renderSession();window.scrollTo(0,0)}else show(B.back)}
 function renderBossEnd(el){
   const B=BOSS;const win=B.hp<=0;{const X0=gameLoad();X0.bossCool=8;gameSave(X0)}
-  if(!win){el.innerHTML=`<div class="sheet failed"><div class="score">${B.ok} / 5</div><p style="margin:0"><b>${esc(B.name)}</b> survives with ${B.hp} HP. You needed 4 hits. Those questions are in your weak spots — study them and it'll be back.</p></div><div class="row" style="margin-top:16px"><button class="btn" id="back">Continue studying</button></div>`;el.querySelector("#back").onclick=()=>{BOSS=null;show(B.back)};return}
+  if(!win){el.innerHTML=`<div class="sheet failed"><div class="score">${B.ok} / 5</div><p style="margin:0"><b>${esc(B.name)}</b> survives with ${B.hp} HP. You needed 4 hits. Those questions are in your weak spots — study them and it'll be back.</p></div><div class="row" style="margin-top:16px"><button class="btn" id="back">Continue studying</button></div>`;el.querySelector("#back").onclick=()=>bossReturn(B);return}
   const X=gameLoad();X.bossWins++;if(X.bossWins===1&&!X.badges.includes("First boss kill"))X.badges.push("First boss kill");if(B.ok===5&&!X.badges.includes("Flawless kill"))X.badges.push("Flawless kill");gameSave(X);
-  el.innerHTML=`<div class="sheet passed" style="text-align:center"><div class="score">${esc(B.name)} defeated</div><p style="margin:0">${B.ok}/5 strikes landed. A chest drops — one reward inside.</p></div>
-  <div class="chestwrap"><div class="chest stage0" id="chest" role="button" tabindex="0" aria-label="Open the chest"><div class="lid"></div><div class="body"></div><div class="glow"></div></div><p class="muted small" id="chesttip">Click the chest to open it.</p></div>
+  // Golden Question: one bonus question for +25 gold, then the chest
+  const r=mulberry32((Date.now()^0x9e37)>>>0);const missK=new Set(Object.keys(X.miss||{}));
+  let gq=null;for(let t=0;t<40;t++){const q=BANK[Math.floor(r()*BANK.length)];const it=shuffleItem(r,statItem(q));if(!missK.has(stemKey(it))){gq=it;break}}
+  if(!gq)gq=shuffleItem(r,statItem(BANK[0]));
+  el.innerHTML=`<div class="sheet passed" style="text-align:center"><div class="score">${esc(B.name)} defeated</div><p style="margin:0">${B.ok}/5 strikes landed.</p></div>
+  <div class="sheet golden" id="gq"><div class="gqhead"><span class="gqtag">✦ Golden Question</span><span class="small">Answer right for <b>+25 gold</b>. No penalty for a miss.</span></div>
+   <div class="q" style="margin-top:8px">${esc(gq.q)}${gq.code?`<pre>${esc(gq.code)}</pre>`:""}</div>
+   <div class="choices" id="gqch">${gq.opts.map((o,i)=>`<button class="choice" data-g="${i}"><span class="letter">${L8[i]}</span><span>${esc(o.t)}</span></button>`).join("")}</div>
+   <div id="gqfb"></div></div>
+  <div class="chestwrap" hidden><div class="chest stage0" id="chest" role="button" tabindex="0" aria-label="Open the chest"><div class="lid"></div><div class="body"></div><div class="glow"></div></div><p class="muted small" id="chesttip">Click the chest to open it.</p></div>
   <div id="case"></div><div id="lootres"></div>
   <div class="row" style="justify-content:center;margin-top:12px"><button class="btn" id="back" hidden>Continue studying</button></div>`;
   const chest=el.querySelector("#chest"),tip=el.querySelector("#chesttip");
+  el.querySelectorAll("#gqch [data-g]").forEach(b=>b.onclick=()=>{const i=+b.dataset.g;const ok=i===gq.a;el.querySelectorAll("#gqch [data-g]").forEach(x=>{x.disabled=true;const j=+x.dataset.g;if(j===gq.a)x.classList.add("correct");else if(j===i)x.classList.add("wrong")});
+    if(ok){sfx("coin");awardGold(25,"Golden Question");el.querySelector("#gq").classList.add("won")}else sfx("bad");
+    el.querySelector("#gqfb").innerHTML=explainHTML(gq,i)+`<p class="small muted" style="margin:8px 0 0">${ok?"Gold banked. ":""}Your chest is ready below.</p>`;
+    const cw=el.querySelector(".chestwrap");cw.hidden=false;cw.scrollIntoView({behavior:"smooth",block:"center"});});
   const open=()=>{chest.onclick=null;chest.className="chest stage3";tip.textContent="";sfx("unlock");LVL_HOLD=true;
-    setTimeout(()=>{renderChestSpin(el.querySelector("#case"),res=>{const L=lootLabel(res);el.querySelector("#lootres").innerHTML=`<div class="lootcard r-${res.r}" style="--rc:${RARITY[res.r].c}"><div class="lr">${RARITY[res.r].n.toUpperCase()}</div><div class="li">${L.sprite?spriteImg(L.sprite,"idle"):L.i}</div><div class="lt">${esc(L.t)}</div>${res.k==="theme"||res.k==="buddy"?`<div class="small muted">Equipped automatically — change it in the Shop.</div>`:""}</div>`;awardXP(40+Math.floor(Math.random()*31),"boss loot");el.querySelector("#back").hidden=false;el.querySelector("#back").onclick=()=>{BOSS=null;show(B.back)};setTimeout(releaseLevelUp,1800)})},500)};
+    setTimeout(()=>{renderChestSpin(el.querySelector("#case"),res=>{const L=lootLabel(res);el.querySelector("#lootres").innerHTML=`<div class="lootcard r-${res.r}" style="--rc:${RARITY[res.r].c}"><div class="lr">${RARITY[res.r].n.toUpperCase()}</div><div class="li">${L.sprite?spriteImg(L.sprite,"idle"):L.i}</div><div class="lt">${esc(L.t)}</div>${res.k==="theme"||res.k==="buddy"?`<div class="small muted">Equipped automatically — change it in the Shop.</div>`:""}</div>`;awardXP(40+Math.floor(Math.random()*31),"boss loot");el.querySelector("#back").hidden=false;el.querySelector("#back").onclick=()=>bossReturn(B);setTimeout(releaseLevelUp,1800)})},500)};
   chest.onclick=open;chest.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open()}};
 }
 
@@ -2729,7 +2749,8 @@ document.addEventListener("keydown",e=>{
     if(S&&S.cur&&S.mode==="practice"&&S.picked===null){pickSession(i);e.preventDefault();return}
     if(T){const btn=document.querySelector(`#view-test #ch [data-k="${i}"]`);if(btn){btn.click();e.preventDefault();return}}
   }
-  if(e.key==="Enter"){
+  if(e.key==="Enter"||e.key===" "){
+    if(e.key===" "&&e.target&&(e.target.id==="next"||e.target.id==="finish"))return; // that button handles its own space
     const n=document.querySelector("#next")||document.querySelector("#finish");
     if(n){n.click();e.preventDefault()}
     else if(S&&S.mode==="flash"){const rv=document.querySelector("#reveal");if(rv){rv.click();e.preventDefault()}}
@@ -2737,7 +2758,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v26";
+const APP_VERSION="v27";
 window.__filter="all";
 window.__booted=true;
 (function(){
