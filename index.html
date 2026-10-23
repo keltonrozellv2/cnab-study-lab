@@ -175,7 +175,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v28</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v29</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
     <button class="iconbtn" id="focusbtn" aria-pressed="false" title="Focus mode">◎</button>
@@ -1586,13 +1586,12 @@ function renderGuide(){
     <button class="btn ${weak?"":"ghost"}" id="weak" title="Replay questions you've missed">Weak spots <span class="pill">${weak}</span></button></div>
   <div class="agrid">${AREAS.map(a=>{const n=BANK.filter(q=>mapArea(q.a)===a.k).length;const gen=a.gen.length||CLUSTERS[a.k].some(c=>c.gens.length);const p=areaProgress(a.k);const need=NEED[a.k]||15;const pct=p.t?Math.round(p.ok/p.t*100):0;const done=p.t>=need&&pct>=70;const fill=Math.min(100,Math.round(p.t/need*100));
     return `<section class="acard ${done?"done":""}" data-area="${a.k}">
-     <div class="ahead"><div class="aicon">${ICON[a.k]}</div><div style="flex:1;min-width:0"><h3>${esc(SHORT[a.k])}</h3><div class="small muted">${n} written${gen?" · ∞ generated":""}</div></div>${done?'<span class="tag ok">✓ 70%+</span>':""}</div>
+     <div class="ahead"><div class="aicon">${ICON[a.k]}</div><div style="flex:1;min-width:0"><h3>${esc(SHORT[a.k])}</h3><div class="small muted">${CLUSTERS[a.k].length} sub-topics · endless questions</div></div>${done?'<span class="tag ok">✓ 70%+</span>':""}</div>
      <p class="ablurb">${esc(SHORTBLURB[a.k]||a.blurb)}</p>
      <div class="aprog"><div class="bar"><i style="width:${fill}%"></i></div><div class="small muted">${p.t?`${p.ok}/${p.t} correct (${pct}%)`:"Not started"} · goal ${need} at 70%+</div></div>
      <div class="chips sub">${CLUSTERS[a.k].map(c=>`<button class="chip" data-a="${a.k}" data-m="sub1" data-s="${esc(c.n)}" title="Drill just this sub-topic">${esc(c.n)}</button>`).join("")}</div>
      <div class="row abtn"><button class="btn" data-a="${a.k}" data-m="practice">Practice</button><button class="btn ghost" data-a="${a.k}" data-m="flash">Flashcards</button><details class="more"><summary class="link">What's covered</summary><p class="small muted">${esc(a.blurb)}</p></details></div>
-    </section>`}).join("")}</div>
-  <div class="callout small" style="margin-top:14px">No penalty for wrong answers on the real test — always answer. Scores aren't shown to you; a recruiter follows up if you pass.</div>`;
+    </section>`}).join("")}</div>`;
   el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
     const a=b.dataset.a,m=b.dataset.m;
     if(m==="sub"){pickSub(a);return}
@@ -1795,7 +1794,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v28. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v29. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2779,7 +2778,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v28";
+const APP_VERSION="v29";
 window.__filter="all";
 window.__booted=true;
 (function(){
