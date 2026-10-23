@@ -111,6 +111,13 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .bossbar{background:var(--sheet);border:2px solid var(--bad);border-radius:10px;padding:12px 14px;margin-bottom:12px}.bosshead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.bossname{font-weight:800;font-size:1.1rem;color:var(--bad)}
 .hp{position:relative;height:18px;background:var(--line);border-radius:9px;overflow:hidden}.hp i{display:block;height:100%;background:var(--bad);transition:width .7s cubic-bezier(.2,1.3,.4,1)}.hp .hpn{position:absolute;inset:0;text-align:center;font-size:.75rem;font-weight:700;line-height:18px;color:var(--ink)}
 .bossbar.updbar{animation:updglow 3s ease-in-out infinite}@keyframes updglow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 35%,transparent),0 0 24px color-mix(in srgb,var(--accent) 45%,transparent)}}.upddot{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;animation:dotpulse 2s ease-in-out infinite}@keyframes dotpulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:1}}
+.ghead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}.ghead>div{flex:1 1 320px}.pill{display:inline-block;min-width:1.4em;padding:0 6px;border-radius:999px;background:var(--accent-ink);color:var(--accent);font-weight:800;font-size:.85em;text-align:center;margin-left:4px}.btn.ghost .pill{background:var(--accent);color:var(--accent-ink)}
+.agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.acard{background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:transform .15s,box-shadow .15s}.acard:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}.acard.done{border-color:color-mix(in srgb,#2e9e5b 60%,var(--line))}
+.ahead{display:flex;align-items:center;gap:12px}.ahead h3{margin:0;font-size:1.1rem}.aicon{width:48px;height:48px;flex:0 0 48px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center}.aicon svg{width:30px;height:30px;fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}.aicon svg .f{fill:var(--accent);stroke:none}.aicon svg .t{stroke-width:3}
+.ablurb{margin:0;font-size:.95rem;line-height:1.45}.aprog .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.aprog .bar i{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .4s}.aprog .small{margin-top:4px}
+.chips.sub{margin:0}.chips.sub .chip{font-size:.8rem;padding:4px 10px;cursor:pointer}.chips.sub .chip:hover{border-color:var(--accent);color:var(--accent)}
+.abtn{margin-top:auto;align-items:center;gap:8px}.more{flex-basis:100%}.more summary{cursor:pointer;list-style:none;font-size:.9rem}.more summary::-webkit-details-marker{display:none}.more summary::before{content:"▸ ";}.more[open] summary::before{content:"▾ "}.more p{margin:6px 0 0}
+@media(max-width:640px){.agrid{grid-template-columns:1fr}}
 .golden{border-color:#d4a72c;background:linear-gradient(110deg,var(--sheet) 0%,var(--sheet) 40%,color-mix(in srgb,#f5c044 18%,var(--sheet)) 50%,var(--sheet) 60%,var(--sheet) 100%);background-size:250% 100%;animation:gshine 6s ease-in-out infinite}@keyframes gshine{0%{background-position:100% 0}100%{background-position:-50% 0}}.golden.won{box-shadow:0 0 0 2px #f5c044,0 0 18px rgba(245,192,68,.35)}.gqhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.gqtag{font-weight:800;color:#b8860b;letter-spacing:.04em}
 .shake{animation:shake .4s}.bossbar.miss{animation:dim .4s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes dim{50%{opacity:.5}}
 .chestwrap{text-align:center;margin:24px 0}.chest{position:relative;width:150px;height:120px;margin:0 auto;cursor:pointer;user-select:none}.chest .body{position:absolute;left:10px;right:10px;bottom:0;height:70px;background:#8a5a2b;border:3px solid #4a2d12;border-radius:6px 6px 10px 10px}.chest .body::after{content:"";position:absolute;left:50%;top:-6px;width:22px;height:26px;margin-left:-11px;background:#e2b549;border:3px solid #4a2d12;border-radius:4px}.chest .lid{position:absolute;left:10px;right:10px;top:22px;height:44px;background:#a86c35;border:3px solid #4a2d12;border-radius:40px 40px 4px 4px;transform-origin:50% 100%;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}.chest .glow{position:absolute;left:20px;right:20px;top:36px;height:40px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,225,120,.9),rgba(255,225,120,0) 70%);opacity:0;transition:opacity .5s}
@@ -168,7 +175,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v27</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v28</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
     <button class="iconbtn" id="focusbtn" aria-pressed="false" title="Focus mode">◎</button>
@@ -1566,16 +1573,30 @@ function renderGuide(){
   const el=document.getElementById("view-guide");
   if(BOSS&&BOSS.back==="guide"){renderBoss(el);return}
   if(S&&S.host==="guide"){S.el=el;renderSession();return}
-  el.innerHTML=`<h1>CNT Study Guide</h1>
-  <p>The five official Computer Networking Test content areas. Open one to read the explainer and drill it — <b>Practice</b> gives instant feedback with a full explanation on every choice, <b>Flashcards</b> flips question to answer, and <b>Weak spots</b> replays questions you've missed. Fundamentals, Networking, OS and Programming mix in freshly-generated numeric questions so repeats aren't memorizable.</p>
-  <div class="callout small">No penalty for wrong answers on the real test — always answer. Scores aren't shown to you; a recruiter follows up if you pass.</div>
-  ${AREAS.map(a=>{const n=BANK.filter(q=>mapArea(q.a)===a.k).length;const gen=a.gen.length?" + generated":"";return `<div class="sheet" style="margin-top:12px"><h3 style="margin-top:0">${esc(a.name)}</h3><p class="small">${esc(a.blurb)}</p>
-    <p class="small muted">${n} grounded question${n===1?"":"s"}${gen} · sub-topics: ${CLUSTERS[a.k].map(c=>esc(c.n)).join(", ")}</p>
-    <div class="row"><button class="btn sm" data-a="${a.k}" data-m="practice">Practice</button><button class="btn sm ghost" data-a="${a.k}" data-m="flash">Flashcards</button><button class="btn sm ghost" data-a="${a.k}" data-m="sub">By sub-topic</button></div></div>`}).join("")}
-  <div class="row" style="margin-top:16px"><button class="btn ghost" id="weak">Review my weak spots (${weakList().length})</button></div>`;
+  const weak=weakList().length;const X=gameLoad();
+  const ICON={
+   fund:'<svg viewBox="0 0 48 48"><rect x="12" y="12" width="24" height="24" rx="4"/><rect x="19" y="19" width="10" height="10" rx="1.5" class="f"/><path d="M18 6v6M24 6v6M30 6v6M18 36v6M24 36v6M30 36v6M6 18h6M6 24h6M6 30h6M36 18h6M36 24h6M36 30h6"/></svg>',
+   net:'<svg viewBox="0 0 48 48"><circle cx="24" cy="10" r="5"/><circle cx="9" cy="36" r="5"/><circle cx="39" cy="36" r="5"/><circle cx="24" cy="30" r="4" class="f"/><path d="M24 15v11M13 33l8-5M35 33l-8-5"/></svg>',
+   os:'<svg viewBox="0 0 48 48"><rect x="6" y="8" width="36" height="30" rx="3"/><path d="M6 16h36M12 12h2M17 12h2"/><path d="M13 23l5 4-5 4M22 31h10" class="t"/></svg>',
+   prog:'<svg viewBox="0 0 48 48"><path d="M16 14l-9 10 9 10M32 14l9 10-9 10M28 10l-8 28"/></svg>',
+   sec:'<svg viewBox="0 0 48 48"><path d="M24 5l15 6v12c0 9-6 16-15 20C15 39 9 32 9 23V11z"/><path d="M17 24l5 5 9-10" class="t"/></svg>'};
+  const SHORTBLURB={fund:"Binary, hex, two's complement, offsets, boolean and bitwise logic, kernel vs user space.",net:"Subnetting, OSI, TCP handshake and flags, routing, VLANs, ports and services, tunnels, wireless.",os:"Windows commands and event logs, SIDs and ACLs, processes and boot, registry persistence, Linux basics.",prog:"Trace Python, C, Bash and PowerShell by hand — loops, slicing, integer division, bitwise.",sec:"Malware classes, log reading, firewall rules, packet capture, crypto and PKI, network attacks."};
+  const NEED={fund:15,net:20,os:20,prog:15,sec:15};
+  el.innerHTML=`<div class="ghead"><div><h1 style="margin:0">CNT Study Guide</h1><p class="muted" style="margin:4px 0 0">Five content areas. Pick one and drill it — every question comes with a full explanation.</p></div>
+    <button class="btn ${weak?"":"ghost"}" id="weak" title="Replay questions you've missed">Weak spots <span class="pill">${weak}</span></button></div>
+  <div class="agrid">${AREAS.map(a=>{const n=BANK.filter(q=>mapArea(q.a)===a.k).length;const gen=a.gen.length||CLUSTERS[a.k].some(c=>c.gens.length);const p=areaProgress(a.k);const need=NEED[a.k]||15;const pct=p.t?Math.round(p.ok/p.t*100):0;const done=p.t>=need&&pct>=70;const fill=Math.min(100,Math.round(p.t/need*100));
+    return `<section class="acard ${done?"done":""}" data-area="${a.k}">
+     <div class="ahead"><div class="aicon">${ICON[a.k]}</div><div style="flex:1;min-width:0"><h3>${esc(SHORT[a.k])}</h3><div class="small muted">${n} written${gen?" · ∞ generated":""}</div></div>${done?'<span class="tag ok">✓ 70%+</span>':""}</div>
+     <p class="ablurb">${esc(SHORTBLURB[a.k]||a.blurb)}</p>
+     <div class="aprog"><div class="bar"><i style="width:${fill}%"></i></div><div class="small muted">${p.t?`${p.ok}/${p.t} correct (${pct}%)`:"Not started"} · goal ${need} at 70%+</div></div>
+     <div class="chips sub">${CLUSTERS[a.k].map(c=>`<button class="chip" data-a="${a.k}" data-m="sub1" data-s="${esc(c.n)}" title="Drill just this sub-topic">${esc(c.n)}</button>`).join("")}</div>
+     <div class="row abtn"><button class="btn" data-a="${a.k}" data-m="practice">Practice</button><button class="btn ghost" data-a="${a.k}" data-m="flash">Flashcards</button><details class="more"><summary class="link">What's covered</summary><p class="small muted">${esc(a.blurb)}</p></details></div>
+    </section>`}).join("")}</div>
+  <div class="callout small" style="margin-top:14px">No penalty for wrong answers on the real test — always answer. Scores aren't shown to you; a recruiter follows up if you pass.</div>`;
   el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
     const a=b.dataset.a,m=b.dataset.m;
     if(m==="sub"){pickSub(a);return}
+    if(m==="sub1"){startSession({host:"guide",back:"guide",title:SHORT[a]+" · "+b.dataset.s,mode:"practice",el,mkDealer:r=>sessionDealer(a,b.dataset.s,r)});return}
     startSession({host:"guide",back:"guide",title:SHORT[a]+" practice",mode:m,el,mkDealer:r=>sessionDealer(a,null,r)});
   });
   el.querySelector("#weak").onclick=()=>{const w=weakList();if(!w.length){alert("No missed questions yet — they'll collect here as you practice.");return}
@@ -1774,7 +1795,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v27. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v28. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2758,7 +2779,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v27";
+const APP_VERSION="v28";
 window.__filter="all";
 window.__booted=true;
 (function(){
