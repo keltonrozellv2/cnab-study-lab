@@ -1,5 +1,5 @@
 /* CNAB Study Lab service worker — offline cache + silent background update */
-const VERSION = "v43";
+const VERSION = "v44";
 const CACHE = "cnab-" + VERSION;
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", e => {
