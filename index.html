@@ -156,6 +156,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .chest2.stage3 .clid{transform:translateY(-60px) rotate(-75deg)}.chest2.stage3 .inner{height:100%;opacity:1}.chest2.stage3 .rays{width:520px;height:520px;opacity:.9}.chest2.stage3 .cbody{box-shadow:0 0 40px 10px rgba(255,210,80,.6)}.chesttip{color:#fff;font-weight:700;margin-top:18px;text-shadow:0 2px 8px rgba(0,0,0,.6)}
 .chestscene .chest .beam{position:absolute;left:50%;top:20px;width:40px;height:0;margin-left:-20px;background:linear-gradient(to top,rgba(255,225,120,.9),rgba(255,225,120,0));filter:blur(6px);transition:height .5s}.chest.stage2 .beam{height:70px;top:-40px}.chest.stage2{animation:slowshake 1.6s ease-in-out infinite}@keyframes slowshake{0%,100%{rotate:-1.5deg}50%{rotate:1.5deg}}.chest.stage3 .beam{height:160px;top:-130px;opacity:.8}
 .casehost{position:relative;margin-top:-170px;transform:scale(1.15);opacity:0;transform:scale(.9);transition:opacity .4s,transform .4s;z-index:3}.casehost.show{opacity:1;transform:scale(1.15)}.casehost .casewrap{background:#121820;border-color:#2a3542}.casehost .lootcard{background:#121820;color:#fff}
+.mline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.82rem;margin:-4px 0 10px;color:var(--ink)}
 .qcount{display:inline-flex;align-items:center;gap:8px}.qstreak{background:#ffe9c7;color:#b8500b;border-radius:999px;padding:2px 8px;font-weight:800;animation:flick 1.4s ease-in-out infinite}html[data-theme=dark] .qstreak{background:#3a2208;color:#ffb067}.qtools{display:inline-flex;gap:4px}.qtb{border:1px solid var(--line);background:var(--sheet);border-radius:6px;padding:2px 6px;font-size:1rem;cursor:pointer}.qtb:disabled{opacity:.4;cursor:not-allowed}
 .tooldock{position:fixed;right:0;top:136px;z-index:40;display:flex;flex-direction:column;gap:6px}.tbtn{border:1.5px solid var(--line);border-right:0;background:var(--sheet);border-radius:10px 0 0 10px;padding:8px 10px;font-size:1.1rem;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:-2px 2px 8px rgba(0,0,0,.12);cursor:pointer}.tbtn span{font-size:.65rem;font-weight:700;color:var(--muted)}.tbtn.on{border-color:var(--accent);background:var(--accent-soft)}.tbtn:disabled{opacity:.45;cursor:not-allowed}
 .toolwin{position:fixed;z-index:45;background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden}.toolwin .th{display:flex;align-items:center;gap:8px;padding:8px 10px;background:color-mix(in srgb,var(--ink) 6%,var(--sheet));cursor:move;font-weight:700;user-select:none}.toolwin .tctl{margin-left:auto;display:flex;gap:6px;align-items:center}.iconbtn.sm{padding:3px 8px;font-size:.8rem}
@@ -245,7 +246,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v38</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v39</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1630,7 +1631,7 @@ function renderSession(){
   }
   // practice mode (instant feedback)
   const answered=S.picked!==null;
-  el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span class="qcount">${S.streak>=3?`<span class="qstreak" title="Answer streak: +${Math.round((streakMult(S.streak)-1)*100)}% XP and gold">🔥 ${S.streak}</span>`:""}${S.run.ok} ✓ of ${S.run.t} answered${toolIcons()}</span></div>
+  el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span class="qcount">${S.streak>=3?`<span class="qstreak" title="Answer streak: +${Math.round((streakMult(S.streak)-1)*100)}% XP and gold">🔥 ${S.streak}</span>`:""}${S.run.ok} ✓ of ${S.run.t} answered${toolIcons()}</span></div>${masteryLineHTML(it)}
   <p class="qtext">${qHTML(it.q)}</p>${it.code?`<pre>${esc(it.code)}</pre>`:""}
   <div class="choices" id="ch">${it.opts.map((o,k)=>{let c="choice";const gone=S.elim&&k===S.elimIdx&&!answered;if(answered){if(k===it.a)c+=" correct";else if(k===S.picked)c+=" wrong"}if(gone)c+=" gone";return `<button class="${c}" data-k="${k}" ${answered||gone?"disabled":""}><span class="b">${L8[k]}</span><span>${esc(o.t)}</span></button>`}).join("")}</div>
   ${S.hinted&&!answered?`<div class="callout small"><b>Reveal:</b> ${esc(hintFor(it))}</div>`:""}
@@ -1891,7 +1892,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v38. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v39. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2940,6 +2941,10 @@ const LABS={
  fund:{title:"Order these values smallest → largest",intro:"Drag the quantities into order from smallest to largest.",done:"A nibble < a byte < a kilobyte < a megabyte.",steps:["4 bits (one nibble)","8 bits (one byte)","2^10 bytes (one kilobyte)","2^20 bytes (one megabyte)"]},
  sec:{title:"Order the incident-response steps",intro:"Drag the response phases into the order a team works through them.",done:"Prepare, identify, contain, eradicate, recover, learn.",steps:["Preparation — tooling, backups and a plan in place beforehand","Identification — detect and confirm the incident","Containment — isolate affected hosts to stop the spread","Eradication — remove the malware/foothold","Recovery — restore clean systems from backup","Lessons learned — document and improve"]}
 };
+function toMastery(t){if(t.mastered)return 0;const k1=Math.max(0,MASTER_N-t.t);const k2=Math.max(0,Math.ceil((MASTER_P*t.t-t.ok)/(1-MASTER_P)-1e-9));return Math.max(1,k1,k2)}
+function masteryLineHTML(it){if(!S||S.mode!=="practice"||S.pool)return "";const area=it.areaCNT;if(!CLUSTERS[area])return "";const X=gameLoad();const am=areaMastery(X,area);const cl=S.cluster||it.subFocus||null;let left="";
+  if(cl){const t=topicStat(X,area,cl);const n=toMastery(t);left=t.mastered?`<b>${esc(cl)}</b> ✓ mastered`:`<b>${esc(cl)}</b>: ${n} more correct to master <span class="muted">(${t.ok}/${t.t} so far)</span>`}
+  return `<div class="mline"><span>${left}</span><span class="muted">${esc(SHORT[area])}: ${am.done}/${am.total} sub-topics mastered${am.done===am.total?" · sector complete":""}</span></div>`}
 function masteredPopup(area,cl){const X=gameLoad();X.masteredSeen=X.masteredSeen||[];const k=area+"|"+cl;if(X.masteredSeen.includes(k))return;X.masteredSeen.push(k);gameSave(X);
   if(!focusOn()){sfx("epic");confetti(90,"#2e9e5b");if(typeof buddyCheer==="function")buddyCheer()}awardGold(50,"mastered: "+cl);awardXP(60,"mastery");checkAchievements();
   const o=document.createElement("div");o.className="lvlup mastered";o.innerHTML=`<div class="card"><div class="small" style="letter-spacing:.14em;color:#2e9e5b;font-weight:800">SUB-TOPIC MASTERED</div><div class="big" style="color:#2e9e5b">${esc(cl)}</div><div class="sub">${esc(SHORT[area])} · 8+ answered at 70% or better. It's cleared on the map and pays +50 gold.</div><div class="row" style="justify-content:center;gap:10px;margin-top:14px"><button class="btn" id="mp-home">Back to the map</button><button class="btn ghost" id="mp-stay">Keep drilling this</button></div></div>`;
@@ -3644,7 +3649,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v38";
+const APP_VERSION="v39";
 window.__filter="all";
 window.__booted=true;
 (function(){
