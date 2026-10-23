@@ -171,6 +171,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .learn p{font-size:1rem;line-height:1.55;margin:8px 0}.learn code{background:color-mix(in srgb,var(--ink) 8%,var(--sheet));padding:1px 5px;border-radius:4px;font-size:.9em}.lex{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;background:color-mix(in srgb,var(--accent) 5%,var(--sheet))}.lex-h{font-weight:800;color:var(--accent);font-size:.85rem;letter-spacing:.04em;margin-bottom:6px}.lex-e{font-size:.98rem;margin:5px 0;line-height:1.5}.ltip{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:.95rem}
 .provebar{margin-top:14px}.provebar .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.provebar .bar i{display:block;height:100%;background:var(--accent);transition:width .4s}
 .dragl{list-style:none;padding:0;margin:14px 0;display:flex;flex-direction:column;gap:8px}.dragl li{display:flex;align-items:center;gap:10px;background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:12px 12px;cursor:grab;transition:border-color .15s,transform .1s}.dragl li.dragging{opacity:.5}.dragl li.over{border-color:var(--accent);transform:scale(1.01)}.dragl li.locked{cursor:default;border-color:#2e9e5b}.dragl .dh{color:var(--muted);cursor:grab;font-size:1.1rem}.dragl .dn{width:24px;height:24px;flex:0 0 24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center;font-size:.85rem}.dragl .dt{flex:1;font-size:.95rem;line-height:1.4}
+.lvlup.mastered .card{border:2px solid #2e9e5b}
 .golden{border-color:#d4a72c;background:linear-gradient(110deg,var(--sheet) 0%,var(--sheet) 40%,color-mix(in srgb,#f5c044 18%,var(--sheet)) 50%,var(--sheet) 60%,var(--sheet) 100%);background-size:250% 100%;animation:gshine 6s ease-in-out infinite}@keyframes gshine{0%{background-position:100% 0}100%{background-position:-50% 0}}.golden.won{box-shadow:0 0 0 2px #f5c044,0 0 18px rgba(245,192,68,.35)}.gqhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.gqtag{font-weight:800;color:#b8860b;letter-spacing:.04em}
 .shake{animation:shake .4s}.bossbar.miss{animation:dim .4s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes dim{50%{opacity:.5}}
 .chestwrap{text-align:center;margin:24px 0}.chest{position:relative;width:150px;height:120px;margin:0 auto;cursor:pointer;user-select:none}.chest .body{position:absolute;left:10px;right:10px;bottom:0;height:70px;background:#8a5a2b;border:3px solid #4a2d12;border-radius:6px 6px 10px 10px}.chest .body::after{content:"";position:absolute;left:50%;top:-6px;width:22px;height:26px;margin-left:-11px;background:#e2b549;border:3px solid #4a2d12;border-radius:4px}.chest .lid{position:absolute;left:10px;right:10px;top:22px;height:44px;background:#a86c35;border:3px solid #4a2d12;border-radius:40px 40px 4px 4px;transform-origin:50% 100%;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}.chest .glow{position:absolute;left:20px;right:20px;top:36px;height:40px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,225,120,.9),rgba(255,225,120,0) 70%);opacity:0;transition:opacity .5s}
@@ -244,7 +245,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v37</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v38</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1645,7 +1646,7 @@ function renderSession(){
 }
 function pickSession(k){
   if(S.picked!==null)return;S.picked=k;S.run.t++;disarmShimmer();
-  const ok=k===S.cur.a; sfx(ok?"ok":"bad"); buddyReact(ok?"ok":"bad"); trackTopic(S.cur,ok); questEvent("answer",{ok,area:S.cur.areaCNT}); if(ok&&S.pool&&/weak/i.test(S.title||""))questEvent("weak");
+  const ok=k===S.cur.a; sfx(ok?"ok":"bad"); buddyReact(ok?"ok":"bad"); {const area=S.cur.areaCNT,cl=S.cluster||clusterOf(area,S.cur);const before=cl?topicStat(gameLoad(),area,cl).mastered:true;trackTopic(S.cur,ok);if(cl&&!before&&topicStat(gameLoad(),area,cl).mastered)setTimeout(()=>masteredPopup(area,cl),700)} questEvent("answer",{ok,area:S.cur.areaCNT}); if(ok&&S.pool&&/weak/i.test(S.title||""))questEvent("weak");
   if(ok){S.run.ok++;S.streak=(S.streak||0)+1;const aided=S.elim||S.hinted;const mult=streakMult(S.streak);awardXP(Math.round(((S.cur.diff===3?12:S.cur.diff===2?8:5)-(aided?3:0))*mult),mult>1?`×${mult} streak`:"");awardGold(Math.round((S.cur.diff===3?4:2)*mult));if(S.streak===3||S.streak===5||S.streak===10)sfx("rare")} else {S.streak=0;addWeak(S.cur);noteMiss(S.cur)}
   renderSession();
 }
@@ -1890,7 +1891,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v37. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v38. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2939,6 +2940,11 @@ const LABS={
  fund:{title:"Order these values smallest → largest",intro:"Drag the quantities into order from smallest to largest.",done:"A nibble < a byte < a kilobyte < a megabyte.",steps:["4 bits (one nibble)","8 bits (one byte)","2^10 bytes (one kilobyte)","2^20 bytes (one megabyte)"]},
  sec:{title:"Order the incident-response steps",intro:"Drag the response phases into the order a team works through them.",done:"Prepare, identify, contain, eradicate, recover, learn.",steps:["Preparation — tooling, backups and a plan in place beforehand","Identification — detect and confirm the incident","Containment — isolate affected hosts to stop the spread","Eradication — remove the malware/foothold","Recovery — restore clean systems from backup","Lessons learned — document and improve"]}
 };
+function masteredPopup(area,cl){const X=gameLoad();X.masteredSeen=X.masteredSeen||[];const k=area+"|"+cl;if(X.masteredSeen.includes(k))return;X.masteredSeen.push(k);gameSave(X);
+  if(!focusOn()){sfx("epic");confetti(90,"#2e9e5b");if(typeof buddyCheer==="function")buddyCheer()}awardGold(50,"mastered: "+cl);awardXP(60,"mastery");checkAchievements();
+  const o=document.createElement("div");o.className="lvlup mastered";o.innerHTML=`<div class="card"><div class="small" style="letter-spacing:.14em;color:#2e9e5b;font-weight:800">SUB-TOPIC MASTERED</div><div class="big" style="color:#2e9e5b">${esc(cl)}</div><div class="sub">${esc(SHORT[area])} · 8+ answered at 70% or better. It's cleared on the map and pays +50 gold.</div><div class="row" style="justify-content:center;gap:10px;margin-top:14px"><button class="btn" id="mp-home">Back to the map</button><button class="btn ghost" id="mp-stay">Keep drilling this</button></div></div>`;
+  document.body.appendChild(o);setTimeout(()=>o.classList.add("show"),20);
+  o.querySelector("#mp-stay").onclick=()=>o.remove();o.querySelector("#mp-home").onclick=()=>{o.remove();show("home")}}
 function markLearned(area,c){const X=gameLoad();X.learned=X.learned||[];const k=area+"|"+c;if(!X.learned.includes(k)){X.learned.push(k);gameSave(X)}}
 function learnCardHTML(area,cluster,L,t){const pct=t.t?Math.round(t.pct*100):0;return `<div class="ghead"><div><div class="small muted">${esc(SHORT[area])} · learn</div><h1 style="margin:2px 0 0">${esc(L.t)}</h1></div><button class="btn ghost sm" id="lrn-back">← Map</button></div>
    <div class="learn">${L.p.map(p=>`<p>${p}</p>`).join("")}<div class="lex"><div class="lex-h">Worked example</div>${L.ex.map(e=>`<div class="lex-e">${e}</div>`).join("")}</div>${L.tip?`<div class="ltip">💡 <b>Shortcut:</b> ${L.tip}</div>`:""}</div>
@@ -3638,7 +3644,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v37";
+const APP_VERSION="v38";
 window.__filter="all";
 window.__booted=true;
 (function(){
