@@ -168,6 +168,9 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .ladder{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.ladder span{background:var(--accent-soft);border-radius:8px;padding:6px 8px;text-align:center;font-size:.8rem;line-height:1.2}.ladder span i{display:block;font-style:normal;font-weight:800;font-size:1rem;color:var(--accent)}
 @media print{.topbar,.tooldock,.toolwin,#buddy,#badges,.tabs,#cs-print{display:none!important}.cs{break-inside:avoid}}
 .score.defeated{color:var(--bad)}.kodown{position:relative;height:120px;margin:10px auto 0;max-width:420px}.kodown .floor{position:absolute;left:10%;right:10%;bottom:10px;height:14px;border-radius:50%;background:rgba(0,0,0,.25);filter:blur(3px)}.kodown .kobody{position:absolute;left:50%;bottom:14px;width:130px;transform:translateX(-30%) rotate(96deg);transform-origin:50% 50%;animation:kofall 1s cubic-bezier(.3,1.2,.5,1) both}@keyframes kofall{0%{transform:translateX(-30%) rotate(0) translateY(-80px);opacity:0}60%{opacity:1}100%{transform:translateX(-30%) rotate(96deg) translateY(0)}}.kodown .stars{position:absolute;left:50%;top:0;transform:translateX(10px);color:#f5c044;font-size:1.1rem;animation:starspin 2.2s linear infinite}@keyframes starspin{0%,100%{letter-spacing:0;opacity:.6}50%{letter-spacing:6px;opacity:1}}.kodown .kopet{position:absolute;left:50%;bottom:24px;width:70px;height:70px;margin-left:-130px;animation:petstomp 1.2s ease-in-out 1s infinite}.kodown .kopet img,.kodown .kopet svg{width:100%;height:100%}@keyframes petstomp{0%,100%{transform:translateY(0) translateX(0)}30%{transform:translateY(-22px) translateX(40px)}50%{transform:translateY(0) translateX(60px) scaleY(.85)}80%{transform:translateY(-8px) translateX(20px)}}
+.learn p{font-size:1rem;line-height:1.55;margin:8px 0}.learn code{background:color-mix(in srgb,var(--ink) 8%,var(--sheet));padding:1px 5px;border-radius:4px;font-size:.9em}.lex{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;background:color-mix(in srgb,var(--accent) 5%,var(--sheet))}.lex-h{font-weight:800;color:var(--accent);font-size:.85rem;letter-spacing:.04em;margin-bottom:6px}.lex-e{font-size:.98rem;margin:5px 0;line-height:1.5}.ltip{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:.95rem}
+.provebar{margin-top:14px}.provebar .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}.provebar .bar i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.dragl{list-style:none;padding:0;margin:14px 0;display:flex;flex-direction:column;gap:8px}.dragl li{display:flex;align-items:center;gap:10px;background:var(--sheet);border:1.5px solid var(--line);border-radius:10px;padding:12px 12px;cursor:grab;transition:border-color .15s,transform .1s}.dragl li.dragging{opacity:.5}.dragl li.over{border-color:var(--accent);transform:scale(1.01)}.dragl li.locked{cursor:default;border-color:#2e9e5b}.dragl .dh{color:var(--muted);cursor:grab;font-size:1.1rem}.dragl .dn{width:24px;height:24px;flex:0 0 24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:800;display:grid;place-items:center;font-size:.85rem}.dragl .dt{flex:1;font-size:.95rem;line-height:1.4}
 .golden{border-color:#d4a72c;background:linear-gradient(110deg,var(--sheet) 0%,var(--sheet) 40%,color-mix(in srgb,#f5c044 18%,var(--sheet)) 50%,var(--sheet) 60%,var(--sheet) 100%);background-size:250% 100%;animation:gshine 6s ease-in-out infinite}@keyframes gshine{0%{background-position:100% 0}100%{background-position:-50% 0}}.golden.won{box-shadow:0 0 0 2px #f5c044,0 0 18px rgba(245,192,68,.35)}.gqhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.gqtag{font-weight:800;color:#b8860b;letter-spacing:.04em}
 .shake{animation:shake .4s}.bossbar.miss{animation:dim .4s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes dim{50%{opacity:.5}}
 .chestwrap{text-align:center;margin:24px 0}.chest{position:relative;width:150px;height:120px;margin:0 auto;cursor:pointer;user-select:none}.chest .body{position:absolute;left:10px;right:10px;bottom:0;height:70px;background:#8a5a2b;border:3px solid #4a2d12;border-radius:6px 6px 10px 10px}.chest .body::after{content:"";position:absolute;left:50%;top:-6px;width:22px;height:26px;margin-left:-11px;background:#e2b549;border:3px solid #4a2d12;border-radius:4px}.chest .lid{position:absolute;left:10px;right:10px;top:22px;height:44px;background:#a86c35;border:3px solid #4a2d12;border-radius:40px 40px 4px 4px;transform-origin:50% 100%;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}.chest .glow{position:absolute;left:20px;right:20px;top:36px;height:40px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,225,120,.9),rgba(255,225,120,0) 70%);opacity:0;transition:opacity .5s}
@@ -241,7 +244,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v36</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v37</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1684,7 +1687,7 @@ function renderGuide(){
   el.querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{
     const a=b.dataset.a,m=b.dataset.m;
     if(m==="sub"){pickSub(a);return}
-    if(m==="sub1"){startSession({host:"guide",back:"guide",title:SHORT[a]+" · "+b.dataset.s,cluster:b.dataset.s,mode:"practice",el,mkDealer:r=>sessionDealer(a,b.dataset.s,r)});return}
+    if(m==="sub1"){startTopic(a,b.dataset.s);return}
     startSession({host:"guide",back:"guide",title:SHORT[a]+" practice",mode:m,el,mkDealer:r=>sessionDealer(a,null,r)});
   });
   el.querySelector("#weak").onclick=()=>{const w=weakList();if(!w.length){alert("No missed questions yet — they'll collect here as you practice.");return}
@@ -1729,7 +1732,7 @@ let T=null;
 function fmt(s){const m=Math.floor(s/60),x=s%60;return m+":"+String(x).padStart(2,"0")}
 setInterval(()=>{if(PAUSE)return;const el=document.getElementById("clock");if(el&&T&&T.timed)el.textContent=fmt(Math.floor((Date.now()-T.start)/1000))},1000);
 function streakMult(n){return n>=10?1.5:n>=5?1.25:n>=3?1.1:1}
-function qHTML(q){return esc(q).replace(/\b(TRUE|FALSE)\b/g,"<b>$1</b>")}
+function qHTML(q){return esc(q).replace(/\n/g,"<br>").replace(/\b(TRUE|FALSE)\b/g,"<b>$1</b>")}
 function stemKey(it){const o=it.opts?it.opts.map(x=>typeof x==="string"?x:x.t).slice().sort().join("~"):"";return (it.q+"|"+(it.code||"")+"|"+o).trim().toLowerCase()}
 function drawUnique(drawFn,r,used,tries){
   tries=tries||60;
@@ -1887,7 +1890,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v36. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v37. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2396,9 +2399,10 @@ function renderHome(){
   const showSector=n=>{const area={bios:"fund",bus:"net",nb:"os",sb:"sec"}[n.id];let subs="";
     if(area){subs=`<div class="subhex">${CLUSTERS[area].map(c=>{const t=topicStat(X,area,c.n);return `<button class="shx ${t.mastered?"m":""}" data-sub="${esc(c.n)}" data-area="${area}" title="${t.t?`${t.ok}/${t.t} correct`:"Not started"} · master at ${MASTER_N}+ answered, 70%+"><span class="fill" style="--f:${(t.fill*100).toFixed(0)}%"></span><span class="lbl">${esc(c.n)}</span><span class="pc">${t.mastered?"✓":t.t?Math.round(t.pct*100)+"%":"—"}</span></button>`}).join("")}</div>`}
     const p=area?areaProgress(area):null;
-    sector.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start"><div><b>${esc(n.label)}</b> <span class="small muted">· ${esc(LORE[n.id]||"")}</span><div class="small muted" style="margin-top:4px">${n.st==="locked"?"Locked — ":""}${esc(n.need)}${p?` · so far ${p.ok}/${p.t} (need ${p.need})`:""}</div></div>${n.st!=="locked"?`<button class="btn sm" id="secgo">${n.st==="done"?"Replay":"Start"}</button>`:""}</div>${subs}`;
+    sector.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start"><div><b>${esc(n.label)}</b> <span class="small muted">· ${esc(LORE[n.id]||"")}</span><div class="small muted" style="margin-top:4px">${n.st==="locked"?"Locked — ":""}${esc(n.need)}${p?` · so far ${p.ok}/${p.t} (need ${p.need})`:""}</div></div>${n.st!=="locked"?`<button class="btn sm" id="secgo">${n.st==="done"?"Replay":"Start"}</button>`:""}${area&&LABS[area]&&n.st!=="locked"?`<button class="btn sm ghost" id="seclab" title="A quick drag-to-order challenge">🧩 Lab</button>`:""}</div>${subs}`;
     const g=sector.querySelector("#secgo");if(g)g.onclick=()=>n.go();
-    sector.querySelectorAll("[data-sub]").forEach(b=>b.onclick=()=>{if(n.st==="locked")return;show("guide");startSession({host:"guide",back:"guide",title:SHORT[b.dataset.area]+" · "+b.dataset.sub,cluster:b.dataset.sub,mode:"practice",el:document.getElementById("view-guide"),mkDealer:r=>sessionDealer(b.dataset.area,b.dataset.sub,r)})});
+    sector.querySelectorAll("[data-sub]").forEach(b=>b.onclick=()=>{if(n.st==="locked")return;startTopic(b.dataset.area,b.dataset.sub)});
+    const lb=sector.querySelector("#seclab");if(lb)lb.onclick=()=>renderLab(area);
   };
   const next=nodes.find(n=>n.st==="open")||nodes[nodes.length-2];showSector(next);claimSectorRewards(nodes);
   el.querySelectorAll("[data-node]").forEach(g=>{const n=byId[g.dataset.node];g.onclick=()=>{showSector(n);sfx("click")};g.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();showSector(n)}}});
@@ -2480,6 +2484,482 @@ function renderCheat(){
   </div>`;
   el.querySelector("#cs-print").onclick=()=>window.print();
 }
+
+/* ================= LEARN: one-screen explainers per sub-topic (read in ~60s), each with a worked example ================= */
+const LEARN={
+"fund|Hex / binary / decimal":{t:"Hex, binary, decimal",p:["Binary is base 2: each digit is a power of two — 128 64 32 16 8 4 2 1. Hex is base 16: one hex digit is exactly four binary digits (a nibble), which is why hex is the shorthand for bytes.","Decimal → binary: subtract the biggest power that fits, write a 1, keep going. Binary → hex: split into groups of four from the right and convert each group.","Hex → decimal: multiply each digit by its place (16, 1) and add."],ex:["Convert 0x2F to decimal: 2×16 + 15 = <b>47</b>.","Convert 201 to binary: 128 ✓ (73 left), 64 ✓ (9), 32 ✗, 16 ✗, 8 ✓ (1), 4 ✗, 2 ✗, 1 ✓ → <b>1100 1001</b> → hex C9."],tip:"On the test, write the 128-64-32-16-8-4-2-1 row at the top of your scratch paper once and reuse it."},
+"fund|Two's complement":{t:"Two's complement",p:["Computers store negative numbers by flipping every bit and adding one. The top bit becomes the sign: 1 means negative.","To read a negative value back: flip, add one, put a minus sign on it. An 8-bit signed number runs from −128 to +127."],ex:["−5 in 8 bits: 5 = 0000 0101 → flip → 1111 1010 → +1 → <b>1111 1011</b> (0xFB).","0xF0 as signed: top bit 1 → negative. Flip 1111 0000 → 0000 1111, +1 → 0001 0000 = 16 → <b>−16</b>."],tip:"If the top bit is 0 the number is just its ordinary value — no work needed."},
+"fund|Memory offsets":{t:"Memory offsets",p:["An offset is a distance from a starting address. If a structure starts at address A and a field is at offset N, the field lives at A + N.","A region that starts at S and has length L occupies S through S + L − 1. The byte after it is S + L."],ex:["A buffer starts at 0x1000 and is 0x40 bytes long. Its last byte is 0x1000 + 0x3F = <b>0x103F</b>; the next region starts at <b>0x1040</b>.","Field at offset 0x0C in a struct at 0x2000 → <b>0x200C</b>."],tip:"Keep everything in hex; converting to decimal and back is where mistakes happen."},
+"fund|Boolean logic":{t:"Boolean logic",p:["AND is true only if both inputs are true. OR is true if either is. XOR is true if exactly one is. NOT flips. NAND and NOR are AND and OR with a NOT on the output.","In code, these decide branches: <code>if (a && b)</code> needs both; <code>if (a || b)</code> needs one."],ex:["1 AND 0 = 0 · 1 OR 0 = 1 · 1 XOR 1 = 0 · NAND(1,1) = 0 · NOR(0,0) = 1.","<code>if (x > 3 && x < 10)</code> with x = 12 → false (second test fails)."],tip:"XOR = 'different'. Same inputs give 0, different inputs give 1."},
+"fund|Bitwise ops":{t:"Bitwise operations",p:["Bitwise operators work on each bit position independently: & (AND), | (OR), ^ (XOR), ~ (NOT), << and >> (shift).","Masks: AND with a mask keeps bits (x & 0x0F keeps the low nibble); OR sets bits; XOR toggles bits. Shifting left by n multiplies by 2ⁿ, shifting right divides."],ex:["0b1100 & 0b1010 = <b>0b1000</b>. 0b1100 | 0b1010 = 0b1110. 0b1100 ^ 0b1010 = 0b0110.","5 << 2 = 20. 0xFF >> 4 = 0x0F."],tip:"Write both numbers in binary, line them up, and work one column at a time."},
+"fund|Kernel, hardware, virtualization":{t:"Kernel, hardware, virtualization",p:["The kernel runs in privileged mode and owns the hardware; applications run in user mode and ask the kernel for things through system calls. A driver crash takes the whole machine down; an app crash takes one process.","Boot: firmware (BIOS/UEFI) → bootloader → kernel → first user process. A type-1 hypervisor runs on bare metal; type-2 runs on top of a host OS. Containers share the host kernel; VMs have their own."],ex:["Your laptop running VirtualBox is type-2. An ESXi host in a datacenter is type-1.","Docker containers on one host all see the same kernel — that's why they start in seconds."],tip:"Ring 0 = kernel. Ring 3 = you."},
+"net|Subnetting / VLSM":{t:"Subnetting",p:["A CIDR prefix says how many leading bits are the network. The mask is that many 1-bits: /24 = 255.255.255.0. For in-between prefixes, count the extra bits in the next octet: 1→128, 2→192, 3→224, 4→240, 5→248, 6→252, 7→254.","Block size in the interesting octet = 256 − mask octet. Networks start at multiples of the block size. Usable hosts = 2^(32−prefix) − 2."],ex:["192.168.10.77/27 → mask .224, block 32 → networks at .0 .32 .64 .96… → 77 is in <b>.64–.95</b>, broadcast .95, 30 usable hosts.","/21 → 16 bits fill two octets, 5 more bits → 248 → <b>255.255.248.0</b>, block size 8 in the third octet."],tip:"Find the block size first. Everything else falls out of it."},
+"net|OSI & packet transit":{t:"OSI and how a packet travels",p:["Layers 1–7: Physical, Data link, Network, Transport, Session, Presentation, Application. Switches work at 2 (MAC), routers at 3 (IP), ports live at 4.","As a packet crosses routers, the source and destination IPs stay the same but the MAC addresses change at every hop — each router strips the old frame and builds a new one for the next link. TTL drops by one per router."],ex:["PC → router → router → server: IP src/dst never change; the frame's MACs change three times; TTL 64 arrives as 62.","A VLAN tag, a MAC address, a switch: all Layer 2. A subnet, a route, ping: Layer 3."],tip:"'Who changes per hop?' MACs and TTL. 'Who stays?' IPs and ports (unless NAT)."},
+"net|TCP / handshake / flags":{t:"TCP handshake and flags",p:["TCP opens with SYN → SYN-ACK → ACK. It closes with FIN/ACK from each side. RST aborts immediately — a closed port answers a SYN with RST; a firewalled one often answers nothing.","Sequence and acknowledgement numbers track bytes so lost segments get resent. The window tells the sender how much it may send before an ACK. UDP has none of this."],ex:["In tcpdump: [S] = SYN, [S.] = SYN-ACK, [.] = ACK, [F.] = FIN-ACK, [R] = RST, [P.] = push data.","SYN flood: thousands of SYNs with no final ACK leave the server holding half-open connections."],tip:"Three packets to open, four to close, one to slam the door."},
+"net|Routing & admin distance":{t:"Routing and administrative distance",p:["A router picks the most specific route (longest prefix) first. If two sources offer the same prefix, the lower administrative distance wins: connected 0, static 1, eBGP 20, EIGRP 90, OSPF 110, RIP 120.","Default route 0.0.0.0/0 is the catch-all. ACLs are read top to bottom and stop at the first match; an implicit deny sits at the end."],ex:["OSPF offers 10.1.0.0/16, a static route offers 10.1.4.0/24 → the static /24 wins for 10.1.4.x by longest match, not by distance.","OSPF (110) and RIP (120) both offer 10.2.0.0/16 → <b>OSPF</b> is installed."],tip:"Longest prefix first; administrative distance only breaks ties between equal prefixes."},
+"net|Switching & VLANs":{t:"Switching and VLANs",p:["A switch learns source MACs on each port and forwards by destination MAC; unknown destinations are flooded. A VLAN is a separate broadcast domain on the same switch — hosts in different VLANs need a router (or Layer-3 switch) to talk.","Access ports carry one VLAN untagged. Trunks carry many VLANs with 802.1Q tags; the native VLAN crosses untagged. Spanning Tree blocks redundant links to stop loops."],ex:["PC in VLAN 10 pings PC in VLAN 20 on the same switch, no router → <b>no reply</b>, by design.","Two switches with native VLAN 1 on one side and 99 on the other → frames leak between VLANs (mismatch)."],tip:"Same VLAN = same broadcast domain. Different VLANs = need Layer 3."},
+"net|Ports & services":{t:"Ports and services",p:["Well-known ports 0–1023 identify services on the server side; clients use random high (ephemeral) ports. Know the common ones cold: 20/21 FTP, 22 SSH, 23 Telnet, 25 SMTP, 53 DNS, 67/68 DHCP, 80 HTTP, 88 Kerberos, 110 POP3, 123 NTP, 143 IMAP, 161 SNMP, 389 LDAP, 443 HTTPS, 445 SMB, 3389 RDP.","Protocol matters: DNS queries are UDP 53, zone transfers TCP 53. SNMP, DHCP, NTP, TFTP are UDP."],ex:["A capture shows traffic to port 3389 from an outside IP → someone is reaching RDP from the internet.","netstat shows a LISTENING socket on 445 → the host is sharing files over SMB."],tip:"Pair each port with the protocol too — 'DNS = 53' is only half the answer."},
+"net|Tunnels & crypto on the wire":{t:"Tunnels and encryption in transit",p:["A tunnel wraps one packet inside another. GRE wraps but does not encrypt; IPsec adds encryption (ESP) or integrity only (AH). Tunnel mode hides the whole original packet, transport mode only the payload.","TLS sits above TCP and protects HTTPS, LDAPS, SMTPS: asymmetric crypto to agree a key, symmetric (AES) for the data. Hashes give integrity; HMACs add a key so they also prove who sent it."],ex:["Site-to-site VPN between two offices: IPsec tunnel mode — outside sees only the two gateways' IPs.","GRE over the internet with no IPsec → anyone on the path can read it."],tip:"Encapsulate ≠ encrypt. GRE only encapsulates."},
+"net|Wireless":{t:"Wireless",p:["WEP is broken; WPA2 (AES-CCMP) is the baseline; WPA3 adds SAE which resists offline password cracking. WPA2-Personal uses one shared passphrase; Enterprise uses 802.1X with per-user credentials.","Wireless uses CSMA/CA, not CD. 2.4 GHz reaches further; 5 GHz is faster with more channels. Hiding the SSID and MAC filtering are not security — both are trivially bypassed. Deauth frames can be spoofed to force clients off."],ex:["An attacker captures the WPA2 four-way handshake and runs a dictionary attack offline → a weak passphrase falls; WPA3 would not.","Two APs with the same SSID, one not yours → evil twin."],tip:"WEP < WPA2 < WPA3. Personal = passphrase, Enterprise = RADIUS."},
+"os|Windows commands":{t:"Windows commands",p:["The ones that come up: ipconfig /all (addresses, DNS, MAC), netstat -ano (connections with PIDs), tasklist / taskkill, sc query (services), net user / net localgroup, whoami, systeminfo, reg query, icacls (permissions), dir /a (hidden files).","Read output, don't memorize it: a LISTENING line in netstat is a server; an ESTABLISHED line to an outside IP is a live connection; -o gives the PID you then look up in tasklist."],ex:["<code>netstat -ano | findstr 4444</code> shows ESTABLISHED to 203.0.113.9:4444 with PID 3120 → <code>tasklist /fi \"pid eq 3120\"</code> names the process.","<code>net localgroup administrators</code> lists who is admin."],tip:"netstat -ano + tasklist /fi is the two-step that finds a suspicious connection's process."},
+"os|Event logs & logon types":{t:"Windows event logs",p:["Security log IDs to know: 4624 logon success, 4625 failure, 4634/4647 logoff, 4648 explicit credentials (runas), 4672 admin rights assigned, 4688 process created, 4720 user created, 4740 lockout, 7045 service installed, 1102 log cleared.","Logon type inside a 4624: 2 interactive (keyboard), 3 network (share/SMB), 4 batch, 5 service, 7 unlock, 10 RemoteInteractive (RDP), 11 cached credentials."],ex:["Dozens of 4625 for one account then a 4624 type 3 → password guessing that succeeded over the network.","A 4624 type 10 at 03:00 from an unknown IP → someone RDP'd in overnight."],tip:"4624 says 'in'. The type says 'how'."},
+"os|SIDs, ACLs & ADS":{t:"SIDs, ACLs, alternate data streams",p:["A SID identifies a user or group; the last number (RID) tells you who: 500 Administrator, 501 Guest, 512 Domain Admins, 1000+ ordinary accounts. Renaming Administrator does not change its RID.","ACLs list who may do what; an explicit deny beats an allow. NTFS alternate data streams hide data behind a file: <code>file.txt:hidden.exe</code> — <code>dir /r</code> shows them."],ex:["S-1-5-21-…-500 named 'helpdesk' → that is still the built-in Administrator.","A 2 KB text file with a 4 MB stream attached → look at <code>dir /r</code>."],tip:"Trust the RID, not the name."},
+"os|Processes & boot":{t:"Windows processes and boot",p:["Boot order: firmware → bootmgr/winload → ntoskrnl + hal → smss → csrss, wininit, winlogon → services.exe, lsass.exe → svchost.exe (many) → userinit → explorer.exe.","Normal: svchost under services.exe from System32; many of them. Suspicious: a process name slightly misspelled, running from Temp or AppData, or a shell spawned by Word/Excel/Outlook."],ex:["<code>scvhost.exe</code> running from C:\\Users\\x\\AppData → malware pretending to be svchost.","winword.exe → cmd.exe → powershell.exe in a process tree → a macro ran."],tip:"Parent process + path. Those two answer most 'is this normal?' questions."},
+"os|Registry & persistence":{t:"Registry and persistence",p:["Persistence = surviving a reboot. Classic spots: HKLM/HKCU …\\CurrentVersion\\Run and RunOnce, scheduled tasks, services, WMI event subscriptions, the Winlogon Userinit/Shell values, IFEO debugger keys, startup folders.","HKLM keys apply to everyone; HKCU to the logged-on user. Hives are files on disk (SYSTEM, SOFTWARE, SAM, NTUSER.DAT). The hosts file overrides DNS and is a favourite for redirecting update servers."],ex:["<code>reg query HKCU\\…\\Run</code> shows <code>updater = C:\\Users\\x\\AppData\\Roaming\\u.exe</code> → persistence in a user-writable path.","Winlogon Shell set to <code>explorer.exe, evil.exe</code> → both start at logon."],tip:"Anything that starts automatically from a user-writable folder deserves a look."},
+"os|Authentication":{t:"Authentication",p:["Windows stores local password hashes in the SAM (NTLM). The hash is a secret by itself: pass-the-hash authenticates without the password. Domains use Kerberos tickets from the KDC on port 88.","Hashing is one-way; a salt makes equal passwords hash differently. MFA combines something you know, have, or are — two passwords is one factor. Code signing proves a binary came from the publisher and wasn't modified."],ex:["Attacker dumps lsass, gets an NTLM hash, and logs in to another server with it → pass-the-hash, no cracking needed.","A signed driver fails its signature check → it was altered after signing."],tip:"Hash ≠ encrypt. Nothing decrypts a hash."},
+"os|Linux basics":{t:"Linux basics",p:["Permissions: r=4 w=2 x=1 for owner, group, others → chmod 755 = rwxr-xr-x. Hashed passwords live in /etc/shadow (root only); users in /etc/passwd; logs in /var/log; scheduled jobs in cron.","Pipes (|) send output to the next command; > writes a file, >> appends, 2> redirects errors. ps aux / top show processes; netstat -tulpn or ss shows listening ports; grep, cut, sort, uniq read logs."],ex:["<code>chmod 600 id_rsa</code> → only the owner can read/write the key.","<code>grep 'Failed password' /var/log/auth.log | wc -l</code> counts failed SSH logins."],tip:"4-2-1 per group, three groups, add them up."},
+"os|Antivirus & integrity":{t:"Antivirus and file integrity",p:["Signature AV matches known patterns; it misses new malware and packed/obfuscated files. Heuristic and behavioural detection watch what code does and catch unknowns at the cost of false positives.","A file hash (SHA-256) changes if a single byte changes, so hashes verify downloads and spot tampered system files. MD5 collisions are practical, so it is fine for identification but not for security."],ex:["Same malware, repacked → new hash, signature scan silent, behaviour (keylogging, persistence) still fires.","Vendor publishes SHA-256 for an ISO; yours differs → corrupted or tampered, do not install."],tip:"A false positive is noise; a false negative is a breach."},
+"os|Cloud & mobile":{t:"Cloud, containers, mobile",p:["IaaS = you manage the OS up (VMs). PaaS = you deploy code, provider runs the platform. SaaS = you just use the app. Shared responsibility: the provider secures the infrastructure; you secure your data, identities and configuration.","Containers share the host kernel; VMs don't. Mobile: full-disk encryption protects a lost phone; MDM enforces policy and remote-wipes; rooting/jailbreaking removes the sandbox; sideloading skips store review."],ex:["A public S3 bucket leaking files is a customer misconfiguration, not an AWS failure.","A rooted phone on the corporate Wi-Fi → MDM should flag and block it."],tip:"The provider guards the building; you guard what you put in the room."},
+"prog|Python traces":{t:"Tracing Python",p:["range(a,b) runs a up to b−1. Slices are [start:stop] with stop excluded; negative indexes count from the end. // is integer division (floors), % is remainder, ** is power.","Trace loops with a table: variable values on each pass. Watch for off-by-one, integer division, and mutable defaults."],ex:["<code>for i in range(2,8,2): print(i)</code> → 2 4 6.","<code>s='network'; s[1:4]</code> → 'etw'; <code>s[-3:]</code> → 'ork'; <code>17//5</code> → 3, <code>17%5</code> → 2."],tip:"Stop is exclusive. Always."},
+"prog|C traces":{t:"Tracing C",p:["Arrays start at 0; sizeof an int is usually 4. Integer division truncates toward zero. i++ uses then increments; ++i increments then uses. A for loop checks the condition before each pass.","Pointers hold addresses; *p reads what p points to; p+1 moves by one element, not one byte."],ex:["<code>for(int i=0;i<5;i++) sum+=i;</code> → 0+1+2+3+4 = 10.","<code>int x=7/2;</code> → 3. <code>int a[3]={1,2,3}; a[2]</code> → 3."],tip:"Count the loop passes on paper before you guess the output."},
+"prog|Bash":{t:"Bash",p:["$1 $2 are arguments, $# the count, $? the last exit status (0 = success), $$ the PID. Double quotes expand variables, single quotes don't. $(cmd) inserts a command's output.","| pipes, > overwrites, >> appends, 2>&1 merges errors. [ -f file ] tests a file exists; -d directory; -z empty string. Globs: * any, ? one char."],ex:["<code>echo \"$HOME\"</code> prints your home; <code>echo '$HOME'</code> prints $HOME literally.","<code>grep -c ssh auth.log</code> counts matching lines; <code>ls *.log | wc -l</code> counts log files."],tip:"$? right after a command tells you if it worked."},
+"prog|PowerShell":{t:"PowerShell",p:["Verb-Noun cmdlets: Get-Process, Get-Service, Get-ChildItem, Get-Content, Select-Object, Where-Object, Sort-Object. Objects flow through the pipeline, not text — you filter on properties.","Execution policy controls which scripts may run (Restricted, RemoteSigned, Unrestricted). Script block logging records what ran; attackers use -EncodedCommand and -WindowStyle Hidden."],ex:["<code>Get-Process | Where-Object {$_.CPU -gt 100} | Sort-Object CPU -Descending</code> → heavy processes, biggest first.","<code>powershell -enc SQBFAFgA…</code> in a 4688 event → base64-encoded command, almost always malicious."],tip:"Get- reads, Set- changes, Where- filters, Select- picks columns."},
+"prog|Bitwise in code":{t:"Bitwise in code",p:["& | ^ ~ << >> appear in flag checks and masks: <code>if (flags & 0x04)</code> tests one bit; <code>flags |= 0x04</code> sets it; <code>flags &= ~0x04</code> clears it; <code>x ^ x</code> is 0.","x << 1 doubles, x >> 1 halves. Masking with 0xFF keeps the low byte."],ex:["<code>0x5A & 0x0F</code> → 0x0A. <code>1 << 4</code> → 16.","<code>perms & 0x2</code> nonzero → the write bit is set."],tip:"Convert to binary, line up, one column at a time."},
+"sec|Malware & rootkits":{t:"Malware classes",p:["Virus needs a host file and a user; worm spreads itself over the network; trojan pretends to be something useful; rootkit hides itself (and others) by hooking the OS; ransomware encrypts for money; spyware/keyloggers steal; a logic bomb waits for a trigger; a botnet is many infected hosts under one C2.","Fileless malware lives in memory via PowerShell/WMI — no file to scan. Polymorphic malware rewrites itself to dodge signatures. NOP sled + shellcode is the shape of an exploit payload."],ex:["Hundreds of hosts on the LAN beaconing to the same odd domain every 60 seconds → botnet C2.","Files renamed .locked and a note demanding bitcoin → ransomware; restore from offline backups."],tip:"Ask two things: how does it spread, and what does it do."},
+"sec|Log analysis":{t:"Reading logs",p:["Look for the pattern, not one line: many failures then one success (brute force), the same account from two countries in an hour, logons at odd hours, a service installing itself, a log that was cleared.","auth.log/secure: 'Failed password for root from 203.0.113.5' repeated = SSH brute force. Web logs: ../../ in a URL = path traversal; ' OR 1=1 = SQL injection attempt."],ex:["200 'Failed password for admin' from one IP in 3 minutes, then 'Accepted password' → compromised; rotate the password, block the IP, check what admin did next.","1102 'audit log cleared' at 02:14 → someone covering tracks."],tip:"Sort by source IP and count. The attacker is the one with the big number."},
+"sec|Firewalls & packet filtering":{t:"Firewalls and packet filtering",p:["Rules are read top to bottom, first match wins, and a default deny sits at the end. Stateful firewalls remember outbound connections and allow the replies; stateless ones need explicit rules both ways.","iptables: -A INPUT appends to the inbound chain, -p tcp --dport 22 matches SSH, -s 10.0.0.0/8 matches a source, -j ACCEPT/DROP/REJECT decides. DROP is silent; REJECT answers. IDS detects, IPS blocks."],ex:["<code>iptables -A INPUT -p tcp --dport 22 -s 10.1.0.0/16 -j ACCEPT</code> then <code>-A INPUT -p tcp --dport 22 -j DROP</code> → SSH only from 10.1.x.x.","Rule 1 'allow any to 443', rule 2 'deny 203.0.113.0/24' → that subnet still reaches 443 because rule 1 matched first."],tip:"Order is everything. Specific rules go above general ones."},
+"sec|Packet capture":{t:"Packet capture",p:["tcpdump -i picks the interface, -n skips name lookups, -w writes a pcap, -r reads one, -c stops after N; filters are host, net, port, src, dst, and/or/not. Wireshark reads the same files.","Reading a line: time, IP src.port > dst.port, flags. [S] opens, [S.] accepts, [R] refuses, [F.] closes, [P.] carries data. Many [S] to many ports from one host = a port scan."],ex:["<code>tcpdump -n -i eth0 'host 10.1.4.7 and port 445'</code> → only SMB traffic involving that host.","One source, SYNs to ports 21, 22, 23, 25, 80, 443 in two seconds, RSTs back → a scan; the ports that answered [S.] are open."],tip:"src/dst narrow direction; and/or/not combine; -w to keep it."},
+"sec|Crypto & PKI":{t:"Cryptography and PKI",p:["Symmetric (AES): one shared key, fast, used for the data. Asymmetric (RSA/ECC): public key encrypts or verifies, private key decrypts or signs; used to exchange keys and prove identity. Hashes (SHA-256) give integrity; signatures give authenticity and non-repudiation.","A certificate binds a public key to a name and is signed by a CA you trust. Revocation is checked by CRL or OCSP. Diffie-Hellman agrees a secret without sending it; ephemeral DH gives forward secrecy."],ex:["To email someone securely: encrypt with <b>their public</b> key, sign with <b>your private</b> key.","Browser warning 'certificate not trusted' → the chain doesn't reach a root in your store, or it's expired/revoked/for another name."],tip:"Public encrypts and verifies. Private decrypts and signs."},
+"sec|Network attacks":{t:"Network attacks and defence in depth",p:["ARP spoofing poisons LAN caches for man-in-the-middle; DNS poisoning sends users to the wrong server; VLAN hopping abuses the native VLAN; SSL stripping downgrades HTTPS; a rogue DHCP server hands out a malicious gateway; evil twin APs impersonate Wi-Fi; phishing and pretexting target people.","Defence in depth layers independent controls — segmentation, least privilege, MFA, patching, logging, backups — so one failure isn't a breach. IoT devices with default passwords are the easy way in."],ex:["Users complain the bank site shows a padlock warning and the gateway's MAC changed → ARP spoof on the LAN.","Printer VLAN can reach the finance VLAN → flat network; segment it."],tip:"On the LAN, ARP. In the browser, DNS/TLS. On the wire, encryption. Everywhere, least privilege."}
+};
+
+/* Scenario questions — Networking. Each returns {s:setup, q:question, opts, a, e:explanation}; specifics are randomized by a generator so they don't repeat. */
+function _distinct(r,bad,lo,hi,n){const out=[];let g=0;while(out.length<n&&g++<200){const v=ri(r,lo,hi);if(v!==bad&&!out.includes(v))out.push(v)}return out}
+function _mk(r,correct,wrongs,extra){const qq={t:correct,why:extra.e};const ds=wrongs.map(t=>({t,why:extra.e}));const {opts,a}=mk(r,qq,ds);return Object.assign({opts,a},extra)}
+function _ip(r,net){return net+"."+ri(r,2,60)}
+const SCN_NET={
+"Subnetting / VLSM":[
+ function(r){ // same subnet?
+   const octet=pick(r,[[26,192,64],[27,224,32],[28,240,16],[25,128,128]]);const[cidr,m,blk]=octet;
+   const base=ri(r,0,(256/blk)-1)*blk;const a=base+ri(r,1,blk-2);const sameNet=r()<0.5;
+   const b=sameNet?base+ri(r,1,blk-2):((base+blk)%256)+ri(r,1,blk-2);
+   const ip=`192.168.5.${a}`,ip2=`192.168.5.${b}`;const same=Math.floor(a/blk)===Math.floor(b/blk);
+   return _mk(r,same?"Yes — both fall in the same block":"No — they are in different blocks",
+     [same?"No — different blocks":"Yes — same block","Only if they share a gateway","Only on the same switch port"],
+     {s:`Host A is ${ip}/${cidr}, Host B is ${ip2}/${cidr}.`,q:"Are they on the same subnet?",
+      e:`Mask /${cidr} → block size ${blk}. Networks start at multiples of ${blk}: A is in the .${Math.floor(a/blk)*blk} block, B is in the .${Math.floor(b/blk)*blk} block. ${same?"Same block, so same subnet.":"Different blocks, so they need a router to talk."}`});
+ },
+ function(r){ // broadcast
+   const o=pick(r,[[26,192,64],[27,224,32],[28,240,16],[25,128,128]]);const[cidr,m,blk]=o;
+   const base=ri(r,0,(256/blk)-1)*blk;const host=base+ri(r,1,blk-2);const bcast=base+blk-1;
+   return _mk(r,`192.168.8.${bcast}`,[`192.168.8.${base}`,`192.168.8.${host}`,"255.255.255.255"],
+     {s:`A server is 192.168.8.${host} with mask 255.255.255.${m}.`,q:"What is the broadcast address of its subnet?",
+      e:`Block size ${blk}. The network is 192.168.8.${base}; the broadcast is the last address in the block, 192.168.8.${bcast}.`});
+ },
+ function(r){ // enough hosts?
+   const o=pick(r,[[24,254],[25,126],[26,62],[27,30],[28,14]]);const[cidr,usable]=o;
+   const need=pick(r,[10,25,50,60,100,200]);const fits=usable>=need;
+   return _mk(r,fits?`Yes — it provides ${usable} usable hosts`:`No — it only provides ${usable} usable hosts`,
+     [fits?`No — only ${usable} usable`:`Yes — ${usable} is enough`,"The mask doesn't limit host count","Only with NAT"],
+     {s:`A department of ${need} devices is assigned a /${cidr} block.`,q:"Is it big enough?",
+      e:`Usable hosts = 2^(32−${cidr}) − 2 = ${usable}. ${fits?`${usable} ≥ ${need}, so yes.`:`${usable} < ${need}, so you need a larger block (smaller prefix).`}`});
+ }
+],
+"OSI & packet transit":[
+ function(r){ // what changes per hop
+   return _mk(r,"The source and destination MAC addresses — the IPs stay the same",
+     ["The source and destination IPs","Nothing until the final router","The destination port"],
+     {s:`A packet leaves a PC bound for a web server, crossing three routers.`,q:"Which addresses change at each router?",
+      e:"Each router rebuilds the Layer-2 frame for the next link, so MACs change every hop. The IP header (minus TTL) is carried through unchanged unless NAT rewrites it."});
+ },
+ function(r){ // TTL
+   const start=pick(r,[64,128,255]);const hops=ri(r,2,6);
+   return _mk(r,String(start-hops),[String(start),String(start-hops+1),"0"],
+     {s:`A host sends a packet with TTL ${start}. It passes through ${hops} routers.`,q:"What TTL does the destination see?",
+      e:`Each router decrements TTL by one: ${start} − ${hops} = ${start-hops}. At 0 the packet is dropped and an ICMP time-exceeded is returned — the mechanism behind traceroute.`});
+ },
+ function(r){ // gateway fault
+   return _mk(r,"A wrong or missing default gateway",
+     ["A duplicate MAC address","The wrong VLAN on the port","DNS is down"],
+     {s:`One user can ping hosts on their own subnet but not the server on another subnet. Everyone else on the subnet can.`,q:"Most likely cause on that machine?",
+      e:"Same-subnet traffic never uses the gateway, so it works. Leaving the subnet needs the gateway — a wrong one breaks only off-subnet traffic, and only for that host."});
+ }
+],
+"TCP / handshake / flags":[
+ function(r){ // RST = closed
+   const port=pick(r,[22,445,3389,8080,23]);
+   return _mk(r,"The host is up but nothing is listening on that port (closed)",
+     ["The port is open","The host is down","A firewall silently dropped it"],
+     {s:`A host sends a SYN to port ${port} and immediately gets an RST back.`,q:`What does that say about port ${port}?`,
+      e:"A live host with a closed port answers RST. A firewall dropping the SYN gives no reply at all; an open port answers SYN-ACK."});
+ },
+ function(r){ // flags reading
+   const f=pick(r,[["[S]","a SYN opening a connection","the first step of the three-way handshake"],["[S.]","a SYN-ACK","the server accepting — step two of the handshake"],["[F.]","a FIN-ACK","one side closing its direction of the connection"],["[R]","a reset","an abrupt abort — often a closed port or a dropped connection"],["[P.]","data with PSH set","payload being pushed straight to the application"]]);
+   const[flag,ans,why]=f;
+   return _mk(r,ans,["a keep-alive with no data","a retransmission after loss","a port scan probe"].filter((_,i)=>i<3),
+     {s:`A tcpdump line shows Flags ${flag} between a client and a server.`,q:`What is ${flag}?`,
+      e:`${flag} is ${ans} — ${why}. Reference: [S] open, [S.] accept, [.] ack, [F.] close, [R] abort, [P.] push data.`});
+ }
+],
+"Routing & admin distance":[
+ function(r){ // admin distance tie
+   const pair=pick(r,[["OSPF",110,"RIP",120],["eBGP",20,"OSPF",110],["EIGRP",90,"OSPF",110],["a static route",1,"OSPF",110]]);
+   const[a,ad,b,bd]=pair;
+   return _mk(r,`${a} (AD ${ad})`,[`${b} (AD ${bd})`,"Both are installed and load-balanced","Whichever was learned first"],
+     {s:`Two sources advertise the same prefix 10.2.0.0/16: ${a} and ${b}.`,q:"Which route does the router install?",
+      e:`Equal prefixes are broken by administrative distance — lower wins. ${a} is ${ad}, ${b} is ${bd}, so ${a} is installed. (If the prefixes differed, longest-match would decide instead.)`});
+ },
+ function(r){ // longest prefix beats AD
+   return _mk(r,"The static /24 — longest prefix match wins before administrative distance",
+     ["The OSPF /16 — lower administrative distance","They load-balance","Neither; it's ambiguous"],
+     {s:`OSPF knows 10.1.0.0/16; a static route knows 10.1.4.0/24. A packet is bound for 10.1.4.9.`,q:"Which route is used?",
+      e:"The router picks the most specific (longest) matching prefix first. /24 is more specific than /16, so the static route is used — administrative distance only breaks ties between equal prefixes."});
+ }
+],
+"Switching & VLANs":[
+ function(r){ // cross-VLAN no router
+   const v1=pick(r,[10,20,30]),v2=pick(r,[40,50,99]);
+   return _mk(r,"No reply — different VLANs are separate broadcast domains and need a router",
+     ["It works — same switch","It works only if both are access ports","It works after the switch learns both MACs"],
+     {s:`A PC in VLAN ${v1} pings a PC in VLAN ${v2}. Both are on the same switch; there is no router or Layer-3 switch.`,q:"What happens?",
+      e:`VLANs are separate broadcast domains. Traffic between VLAN ${v1} and VLAN ${v2} has to be routed; with no Layer-3 device the ping fails — by design.`});
+ },
+ function(r){ // access vs trunk
+   return _mk(r,"Configure the port as a trunk (802.1Q) carrying both VLANs",
+     ["Set it as an access port in both VLANs","Disable spanning tree on the port","Give the port two IP addresses"],
+     {s:`A link between two switches must carry VLANs 10 and 20.`,q:"How do you configure that port?",
+      e:"Access ports carry one VLAN untagged. A link carrying multiple VLANs is a trunk, which tags frames with 802.1Q so the far switch knows which VLAN each frame belongs to."});
+ },
+ function(r){ // native vlan mismatch
+   const a=pick(r,[1,10]),b=pick(r,[99,20]);
+   return _mk(r,"Native-VLAN mismatch — frames can leak between VLANs across the trunk",
+     ["Nothing; native VLANs are cosmetic","The trunk won't come up at all","Spanning tree will block the link"],
+     {s:`A trunk has native VLAN ${a} on one switch and native VLAN ${b} on the other.`,q:"What's the risk?",
+      e:`Native-VLAN frames cross the trunk untagged. If the two ends disagree, traffic from one native VLAN pops out in the other — a segmentation and security problem.`});
+ }
+],
+"Ports & services":[
+ function(r){ // identify service from capture
+   const svc=pick(r,[["RDP",3389,"someone is reaching Remote Desktop"],["SMB",445,"file sharing is exposed"],["SSH",22,"remote shell access"],["Telnet",23,"cleartext remote login — should not be exposed"],["LDAP",389,"a directory lookup"]]);
+   const[name,port,note]=svc;
+   return _mk(r,`${name} (port ${port})`,shuffle(r,[["HTTP",80],["DNS",53],["SMTP",25],["HTTPS",443]].filter(x=>x[1]!==port)).slice(0,3).map(([n,p])=>`${n} (port ${p})`),
+     {s:`A firewall log shows an inbound connection from an outside address to TCP port ${port}.`,q:"What service is being reached?",
+      e:`Port ${port} is the well-known port for ${name} — ${note}.`});
+ },
+ function(r){ // udp vs tcp
+   const svc=pick(r,[["a DNS lookup","UDP 53","TCP 53 is only for zone transfers and oversized replies"],["DHCP","UDP 67/68","DHCP is connectionless"],["an HTTPS page","TCP 443","web traffic is connection-oriented"],["NTP time sync","UDP 123","time sync is lightweight and connectionless"]]);
+   const[what,ans,why]=svc;
+   return _mk(r,ans,["TCP 80","UDP 443","TCP 22"].filter(x=>x!==ans).slice(0,3),
+     {s:`You need a firewall rule for ${what}.`,q:"Which protocol and port?",
+      e:`${what} uses ${ans} — ${why}.`});
+ }
+],
+"Tunnels & crypto on the wire":[
+ function(r){
+   return _mk(r,"Add IPsec — GRE encapsulates but does not encrypt",
+     ["Nothing; GRE already encrypts","Switch to a longer GRE key","Enable a firewall on each end"],
+     {s:`Two offices are connected by a GRE tunnel over the internet. Management asks whether the traffic is protected.`,q:"What do you tell them?",
+      e:"GRE only wraps one packet inside another — anyone on the path can read it. Pairing GRE with IPsec (or using IPsec directly) adds the encryption."});
+ },
+ function(r){
+   return _mk(r,"IPsec tunnel mode — the whole original packet is encrypted and given a new header",
+     ["IPsec transport mode","GRE without IPsec","TLS on each host"],
+     {s:`A site-to-site VPN between two gateways must hide the internal IP addresses from anyone watching the internet link.`,q:"Which protects the whole original packet?",
+      e:"Tunnel mode encrypts the entire original packet and adds a new outer header, so observers see only the two gateways. Transport mode leaves the original IP header visible."});
+ }
+],
+"Wireless":[
+ function(r){
+   return _mk(r,"WPA3 — SAE resists offline guessing even after the handshake is captured",
+     ["A longer WEP key","WPA2 with a hidden SSID","MAC filtering"],
+     {s:`An attacker captured your Wi-Fi handshake and is guessing the passphrase offline.`,q:"Which protection would have stopped this?",
+      e:"WPA3's SAE handshake resists offline dictionary attacks. WEP is broken regardless of key length; hiding the SSID and MAC filtering are trivially bypassed."});
+ },
+ function(r){
+   return _mk(r,"An evil twin — a rogue AP broadcasting the same SSID",
+     ["A deauth storm","Normal roaming between APs","A DHCP exhaustion attack"],
+     {s:`Users connect to an access point with your network's exact SSID, but it isn't one of yours, and their traffic is being intercepted.`,q:"What is this?",
+      e:"A rogue AP impersonating a legitimate SSID is an evil twin. Clients auto-associate to the familiar name and the attacker sits in the middle."});
+ }
+]
+};
+
+/* Scenario questions — OS, Security, Fundamentals, Programming. Recognition/defensive framing only. */
+const SCN_OS={
+"Windows commands":[
+ function(r){
+   const port=pick(r,[4444,8080,1337,9001]);const pid=ri(r,1200,6000);
+   return _mk(r,`netstat -ano to find the PID on that port, then tasklist to name the process`,
+     ["ipconfig /all","sc query","whoami /priv"],
+     {s:`You suspect a connection is open to an outside host on port ${port} and want to know which program owns it.`,q:"Which two commands get you there?",
+      e:`netstat -ano lists connections with their PID (say ${pid}); tasklist /fi "pid eq ${pid}" names the process. The -o flag is the link between the two.`});
+ },
+ function(r){
+   return _mk(r,"net localgroup administrators",
+     ["net user","whoami","systeminfo"],
+     {s:`You need to see which accounts are local administrators on a Windows host.`,q:"Which command?",
+      e:"net localgroup administrators lists the members of the local Administrators group. net user alone lists all users; whoami is just the current one."});
+ }
+],
+"Event logs & logon types":[
+ function(r){
+   const n=ri(r,40,300);
+   return _mk(r,"Password guessing over the network that eventually succeeded",
+     ["A user who forgot their password once","A scheduled task running","Normal morning logins"],
+     {s:`The Security log shows ${n} event 4625s for one account in a few minutes, then a single 4624 logon type 3.`,q:"What does this pattern mean?",
+      e:"4625 is a failed logon; many in a row is guessing. The 4624 type 3 (network logon) right after means a guess finally worked — treat the account as compromised."});
+ },
+ function(r){
+   const t=pick(r,[[2,"at the physical keyboard (interactive)"],[3,"over the network, e.g. a file share"],[10,"over RDP (RemoteInteractive)"]]);
+   const[type,mean]=t;
+   return _mk(r,mean,["a service starting","a batch job","a cached-credential logon"].slice(0,3),
+     {s:`A 4624 logon success shows logon type ${type}.`,q:"How did this user log on?",
+      e:`Logon type ${type} means the logon happened ${mean}. Types to know: 2 interactive, 3 network, 10 RDP.`});
+ }
+],
+"SIDs, ACLs & ADS":[
+ function(r){
+   return _mk(r,"It is still the built-in Administrator — the RID 500 gives it away",
+     ["It is a normal user account","It is the Guest account","Renaming changed its privileges"],
+     {s:`An account named "helpdesk" has a SID ending in -500.`,q:"What is it, really?",
+      e:"The RID (last number) identifies the account regardless of its name. 500 is always the built-in Administrator; renaming it doesn't change the RID."});
+ }
+],
+"Processes & boot":[
+ function(r){
+   return _mk(r,"A malicious process masquerading as a system file from a user-writable path",
+     ["A normal Windows service","A Windows update component","A driver"],
+     {s:`A process named svchost.exe is running from C:\\Users\\alex\\AppData\\Roaming instead of System32.`,q:"What should you conclude?",
+      e:"Real svchost.exe lives in System32 and is launched by services.exe. One running from a user folder is malware borrowing a trusted name — check the path and parent process."});
+ },
+ function(r){
+   return _mk(r,"A document macro spawned a shell — almost always malicious",
+     ["Normal Office behaviour","A Windows update","The user opened Command Prompt"],
+     {s:`A process tree shows winword.exe as the parent of cmd.exe, which is the parent of powershell.exe.`,q:"What does this tree suggest?",
+      e:"Word has no reason to launch a command shell. Office spawning cmd/powershell is the classic shape of a malicious macro."});
+ }
+],
+"Registry & persistence":[
+ function(r){
+   return _mk(r,"Persistence — it relaunches the program at every logon from a user-writable folder",
+     ["A Windows setting","A one-time installer","A printer configuration"],
+     {s:`reg query shows a value under HKCU\\...\\CurrentVersion\\Run pointing to an executable in the user's AppData folder.`,q:"Why does this matter?",
+      e:"Run keys launch their programs at every logon. One pointing into a user-writable path like AppData is a common, low-privilege persistence method."});
+ }
+],
+"Authentication":[
+ function(r){
+   return _mk(r,"Pass-the-hash — the stolen NTLM hash authenticates without the password",
+     ["Nothing; the hash is useless without the password","A brute-force attack","Kerberoasting"],
+     {s:`An attacker dumped an NTLM hash from a host's memory and used it to log in to another server, never knowing the plaintext password.`,q:"What technique is this?",
+      e:"NTLM authentication accepts the hash itself, so a stolen hash is as good as the password. That's why password hashes are treated as secrets."});
+ }
+],
+"Linux basics":[
+ function(r){
+   const m=pick(r,[["600","only the owner can read and write it"],["644","owner read/write, everyone else read"],["755","owner full, others read and execute"]]);
+   const[mode,mean]=m;
+   return _mk(r,mean,["everyone can read and write","no one can access it","only root can read"].slice(0,3),
+     {s:`A file has permissions set by chmod ${mode}.`,q:"Who can do what?",
+      e:`r=4 w=2 x=1 per group (owner, group, others). ${mode} means ${mean}.`});
+ },
+ function(r){
+   return _mk(r,"/etc/shadow",["/etc/passwd","/var/log/auth.log","/etc/hosts"],
+     {s:`You need the file that holds Linux users' hashed passwords (readable only by root).`,q:"Which file?",
+      e:"/etc/shadow holds the password hashes and is root-only. /etc/passwd holds account info but not the hashes anymore."});
+ }
+],
+"Antivirus & integrity":[
+ function(r){
+   return _mk(r,"The file was repacked — its signature changed but its behaviour didn't",
+     ["The antivirus is broken","The file is now safe","Signatures are always reliable"],
+     {s:`Known malware is repacked and now sails past the signature scanner, yet it still keylogs and installs persistence when run.`,q:"Why did the scan miss it?",
+      e:"Packing changes the file's bytes (and hash), so signature matching fails. Behavioural/heuristic detection, which watches what it does, would still catch it."});
+ }
+],
+"Cloud & mobile":[
+ function(r){
+   return _mk(r,"A customer misconfiguration — securing data and access is the customer's side of shared responsibility",
+     ["The cloud provider's fault","Impossible in the cloud","A platform bug"],
+     {s:`A company's cloud storage bucket is left open to the public internet and files leak.`,q:"Whose responsibility is this under the shared-responsibility model?",
+      e:"The provider secures the infrastructure; the customer secures their data, identities and configuration. An open bucket is a customer-side misconfiguration."});
+ }
+]
+};
+const SCN_SEC={
+"Malware & rootkits":[
+ function(r){
+   const d=ri(r,30,90);
+   return _mk(r,"A botnet beaconing to its command-and-control server",
+     ["Normal software updates","A backup job","DNS caching"],
+     {s:`Many hosts across the network all reach out to the same unusual domain every ${d} seconds, around the clock.`,q:"What does this regular beaconing suggest?",
+      e:"Fixed-interval callbacks from many machines to one destination is classic command-and-control traffic — the hosts are part of a botnet."});
+ },
+ function(r){
+   return _mk(r,"Ransomware — restore from offline backups rather than paying",
+     ["A failed disk","A Windows update","A corrupted profile"],
+     {s:`Files across a share are renamed with a new extension and a note appears demanding payment to recover them.`,q:"What happened, and what's the right response?",
+      e:"That's ransomware. The reliable recovery is restoring from offline, versioned backups; paying is discouraged and doesn't guarantee recovery."});
+ }
+],
+"Log analysis":[
+ function(r){
+   return _mk(r,"Someone cleared the audit log — likely covering their tracks",
+     ["Routine log rotation","A disk-space cleanup","A normal reboot"],
+     {s:`A Windows Security log contains event 1102 timestamped in the middle of the night.`,q:"Why is this worth investigating?",
+      e:"Event 1102 means the audit log was cleared. Legitimate rotation doesn't produce it; it often marks an intruder erasing evidence."});
+ },
+ function(r){
+   return _mk(r,"Correlate by source IP and count — the attacker is the IP with the spike",
+     ["Read every line in order","Trust the first error only","Delete the noisy lines"],
+     {s:`An auth log has thousands of failed-login lines from mixed sources and you need to find the attacker fast.`,q:"What's the efficient approach?",
+      e:"Group and count by source address. Brute-force stands out as one (or a few) IPs with far more attempts than anyone else."});
+ }
+],
+"Firewalls & packet filtering":[
+ function(r){
+   return _mk(r,"That subnet still reaches the service — the earlier allow rule matched first",
+     ["The subnet is blocked","Both rules apply equally","The firewall errors out"],
+     {s:`Rule 1 allows anyone to reach port 443. Rule 2, lower down, denies a specific subnet. Does that subnet reach 443?`,q:"What's the effect?",
+      e:"Rules are read top to bottom and stop at the first match. The broad allow in rule 1 matches first, so the deny in rule 2 never applies. Specific rules must go above general ones."});
+ },
+ function(r){
+   return _mk(r,"DROP is silent; REJECT sends a refusal back",
+     ["They behave identically","DROP sends an error, REJECT is silent","Both send a reset"],
+     {s:`You're choosing between -j DROP and -j REJECT for blocked traffic in iptables.`,q:"What's the difference the sender sees?",
+      e:"DROP discards the packet with no reply (the sender just times out). REJECT actively returns a refusal. DROP hides the host; REJECT is faster-failing but reveals a filter."});
+ }
+],
+"Packet capture":[
+ function(r){
+   return _mk(r,"A port scan — one source probing many ports; the ones that answer SYN-ACK are open",
+     ["Normal web browsing","A file download","A DNS lookup"],
+     {s:`A capture shows one source sending SYNs to ports 21, 22, 23, 25, 80 and 443 on a host within two seconds.`,q:"What is this, and which ports are open?",
+      e:"Rapid SYNs to many ports from one source is a scan. Ports that reply SYN-ACK ([S.]) are open; those that reply RST ([R]) are closed."});
+ },
+ function(r){
+   const host="10.1.4.7",port=pick(r,[445,22,443]);
+   return _mk(r,`tcpdump -n -i eth0 'host ${host} and port ${port}'`,
+     [`tcpdump -n -i eth0`,`tcpdump -w all.pcap`,`tcpdump -n port ${port} or any`],
+     {s:`You want to capture only traffic involving ${host} on port ${port}.`,q:"Which filter does that?",
+      e:`Combine conditions with 'and': host ${host} and port ${port}. -n skips name resolution, -i picks the interface.`});
+ }
+],
+"Crypto & PKI":[
+ function(r){
+   return _mk(r,"Encrypt with their public key, sign with your private key",
+     ["Encrypt with your private key, sign with their public key","Encrypt and sign with the same shared key","Encrypt with your public key"],
+     {s:`You want to send someone a confidential message that also proves it came from you.`,q:"Which keys do you use?",
+      e:"Confidentiality: encrypt with the recipient's public key (only their private key opens it). Authenticity: sign with your private key (anyone verifies with your public key)."});
+ },
+ function(r){
+   return _mk(r,"The certificate chain doesn't reach a trusted root, or it's expired/revoked/for another name",
+     ["The site is always malicious","Your clock is the only possible cause","The site uses no encryption at all"],
+     {s:`A browser shows "certificate not trusted" for an HTTPS site.`,q:"What does that actually mean?",
+      e:"The presented certificate failed validation: untrusted issuer, expired, revoked, or issued for a different hostname. It's not proof of attack, but it's a reason to stop and check."});
+ }
+],
+"Network attacks":[
+ function(r){
+   return _mk(r,"ARP spoofing on the local network — a host is posing as the gateway",
+     ["A DNS outage","A routing loop","A DHCP lease expiry"],
+     {s:`Users on one LAN see certificate warnings and the gateway's MAC address suddenly changed to an unexpected value.`,q:"What's the likely attack?",
+      e:"Poisoning ARP caches lets a host impersonate the gateway and sit in the middle. The changed gateway MAC and TLS warnings are the tell."});
+ },
+ function(r){
+   return _mk(r,"Segment the network — put the printers/IoT on their own VLAN away from finance",
+     ["Give every device admin rights","Open the firewall between them","Disable logging"],
+     {s:`A security review finds the printer and IoT devices share a flat network with the finance systems.`,q:"What's the right fix?",
+      e:"Defence in depth and least privilege: segment untrusted devices into their own VLAN so a compromised printer can't reach finance directly."});
+ }
+]
+};
+const SCN_FUND={
+"Hex / binary / decimal":[
+ function(r){
+   const n=ri(r,33,220);
+   return _mk(r,String(n),[String(n+1),String(n-8),String(n+16)],
+     {s:`A register holds the binary value ${n.toString(2).padStart(8,"0")}.`,q:"What is that in decimal?",
+      e:`Add the place values where there's a 1 (128 64 32 16 8 4 2 1): ${n.toString(2).padStart(8,"0")} = ${n}.`});
+ },
+ function(r){
+   const n=ri(r,2,15);const hx=n.toString(16).toUpperCase();
+   return _mk(r,n.toString(2).padStart(4,"0"),_distinct(r,n,0,15,3).map(v=>v.toString(2).padStart(4,"0")),
+     {s:`A byte's low nibble is the hex digit ${hx}.`,q:"What are those four bits?",
+      e:`One hex digit = 4 bits. ${hx} = ${n} = ${n.toString(2).padStart(4,"0")}.`});
+ }
+],
+"Two's complement":[
+ function(r){
+   const v=ri(r,1,120);const bits=(256-v).toString(2).padStart(8,"0");
+   return _mk(r,bits,_distinct(r,256-v,0,255,3).map(x=>x.toString(2).padStart(8,"0")),
+     {s:`You need to store −${v} as an 8-bit signed value.`,q:"What is the bit pattern?",
+      e:`Write ${v} in binary, flip every bit, add one: that gives ${bits}. The leading 1 marks it negative.`});
+ }
+],
+"Memory offsets":[
+ function(r){
+   const base=ri(r,16,240)*16;const len=ri(r,2,15)*16;
+   const last=base+len-1;
+   return _mk(r,"0x"+last.toString(16).toUpperCase(),["0x"+(base+len).toString(16).toUpperCase(),"0x"+base.toString(16).toUpperCase(),"0x"+(base+len-16).toString(16).toUpperCase()],
+     {s:`A buffer starts at 0x${base.toString(16).toUpperCase()} and is 0x${len.toString(16).toUpperCase()} bytes long.`,q:"What is the address of its last byte?",
+      e:`A region of length L starting at S ends at S + L − 1. 0x${base.toString(16).toUpperCase()} + 0x${(len-1).toString(16).toUpperCase()} = 0x${last.toString(16).toUpperCase()}. The next region starts at 0x${(base+len).toString(16).toUpperCase()}.`});
+ }
+],
+"Boolean logic":[
+ function(r){
+   const a=ri(r,0,1),b=ri(r,0,1);const op=pick(r,[["AND",a&&b],["OR",a||b],["XOR",a^b]]);
+   const[name,res]=op;
+   return _mk(r,String(res?1:0),[String(res?0:1),"depends on a third input","undefined"],
+     {s:`Evaluate ${a} ${name} ${b}.`,q:"What's the result?",
+      e:`${name}: ${name==="AND"?"both must be 1":name==="OR"?"either being 1":"exactly one being 1"} → ${a} ${name} ${b} = ${res?1:0}.`});
+ }
+],
+"Bitwise ops":[
+ function(r){
+   const a=ri(r,8,15),b=ri(r,8,15);const op=pick(r,[["&",a&b],["|",a|b],["^",a^b]]);
+   const[sym,res]=op;
+   return _mk(r,"0b"+res.toString(2).padStart(4,"0"),_distinct(r,res,0,15,3).map(v=>"0b"+v.toString(2).padStart(4,"0")),
+     {s:`Compute 0b${a.toString(2).padStart(4,"0")} ${sym} 0b${b.toString(2).padStart(4,"0")}.`,q:"What's the result?",
+      e:`Line the bits up and apply ${sym} per column: 0b${a.toString(2).padStart(4,"0")} ${sym} 0b${b.toString(2).padStart(4,"0")} = 0b${res.toString(2).padStart(4,"0")}.`});
+ }
+],
+"Kernel, hardware, virtualization":[
+ function(r){
+   return _mk(r,"A driver fault runs in kernel mode and can crash the whole system",
+     ["Both crash only one program","The app crash is worse","Neither can crash anything"],
+     {s:`A kernel-mode driver hits a fatal error, and separately a user app hits one.`,q:"What's the difference in impact?",
+      e:"Kernel-mode code (drivers) shares the system's fate — its fault is a BSOD/panic. A user-mode app fault is contained to that one process."});
+ }
+]
+};
+
+
+/* merge scenario banks + generator wrapper */
+const SCENARIOS={};
+for(const k in SCN_NET)SCENARIOS["net|"+k]=SCN_NET[k];
+for(const k in SCN_OS)SCENARIOS["os|"+k]=SCN_OS[k];
+for(const k in SCN_SEC)SCENARIOS["sec|"+k]=SCN_SEC[k];
+for(const k in SCN_FUND)SCENARIOS["fund|"+k]=SCN_FUND[k];
+function scnGen(area,cluster){const list=SCENARIOS[area+"|"+cluster];return function(r){const fn=list[Math.floor(r()*list.length)];const o=fn(r);return{q:o.s+"\n\n"+o.q,opts:o.opts,a:o.a,w:o.e,cat:area,sub:cluster,folder:"Scenario"};};}
+/* ================= LEARN → DRILL flow + drag-order labs ================= */
+const LABS={
+ net:{title:"Order the TCP three-way handshake",intro:"Drag the steps into the order they happen when a client opens a TCP connection to a server.",done:"That's the handshake: SYN, SYN-ACK, ACK — then data flows.",steps:["Client → Server: SYN (open request, picks an initial sequence number)","Server → Client: SYN-ACK (accepts and acknowledges)","Client → Server: ACK (handshake complete)","Data flows in both directions"]},
+ os:{title:"Order the Windows boot & logon sequence",intro:"Drag these into the order they run, from power-on to the desktop.",done:"Firmware → bootloader → kernel → smss → services/lsass → userinit → explorer.",steps:["Firmware (UEFI/BIOS) runs POST and hands off to the bootloader","Bootloader loads the kernel (ntoskrnl.exe) and HAL","smss.exe starts, then csrss.exe, wininit.exe and winlogon.exe","services.exe and lsass.exe start the service and security subsystems","userinit launches explorer.exe — the desktop appears"]},
+ fund:{title:"Order these values smallest → largest",intro:"Drag the quantities into order from smallest to largest.",done:"A nibble < a byte < a kilobyte < a megabyte.",steps:["4 bits (one nibble)","8 bits (one byte)","2^10 bytes (one kilobyte)","2^20 bytes (one megabyte)"]},
+ sec:{title:"Order the incident-response steps",intro:"Drag the response phases into the order a team works through them.",done:"Prepare, identify, contain, eradicate, recover, learn.",steps:["Preparation — tooling, backups and a plan in place beforehand","Identification — detect and confirm the incident","Containment — isolate affected hosts to stop the spread","Eradication — remove the malware/foothold","Recovery — restore clean systems from backup","Lessons learned — document and improve"]}
+};
+function markLearned(area,c){const X=gameLoad();X.learned=X.learned||[];const k=area+"|"+c;if(!X.learned.includes(k)){X.learned.push(k);gameSave(X)}}
+function learnCardHTML(area,cluster,L,t){const pct=t.t?Math.round(t.pct*100):0;return `<div class="ghead"><div><div class="small muted">${esc(SHORT[area])} · learn</div><h1 style="margin:2px 0 0">${esc(L.t)}</h1></div><button class="btn ghost sm" id="lrn-back">← Map</button></div>
+   <div class="learn">${L.p.map(p=>`<p>${p}</p>`).join("")}<div class="lex"><div class="lex-h">Worked example</div>${L.ex.map(e=>`<div class="lex-e">${e}</div>`).join("")}</div>${L.tip?`<div class="ltip">💡 <b>Shortcut:</b> ${L.tip}</div>`:""}</div>
+   <div class="provebar"><div class="bar"><i style="width:${Math.min(100,Math.round(t.t/8*100))}%"></i></div><div class="small muted">${t.mastered?"✓ Mastered — this sub-topic is cleared":`${t.t}/8 toward mastery${t.t?` · ${pct}% correct`:""} — answer 8 at 70%+ to master it`}</div></div>
+   <div class="row" style="margin-top:12px"><button class="btn" id="drillgo">${t.t?"Continue drilling":"Start drill"}</button></div>`;}
+function startTopic(area,cluster){show("guide");const el=document.getElementById("view-guide");const L=LEARN[area+"|"+cluster];const t=topicStat(gameLoad(),area,cluster);
+  const go=()=>{markLearned(area,cluster);startSession({host:"guide",back:"guide",title:SHORT[area]+" · "+cluster,cluster,mode:"practice",el,mkDealer:r=>sessionDealer(area,cluster,r)})};
+  if(!L){go();return}
+  el.innerHTML=learnCardHTML(area,cluster,L,t);el.querySelector("#lrn-back").onclick=()=>show("home");el.querySelector("#drillgo").onclick=go;window.scrollTo(0,0);}
+function renderLab(area){const lab=LABS[area];if(!lab)return;const el=document.getElementById("view-guide");let order=shuffle(mulberry32((Date.now()^0x5bd1)>>>0),lab.steps.map((_,i)=>i));if(order.every((x,i)=>x===i))order.reverse();
+  const bind=()=>{const list=el.querySelector("#dragl");let from=null;
+    list.querySelectorAll("li").forEach(li=>{li.addEventListener("dragstart",()=>{from=+li.dataset.pos;li.classList.add("dragging")});li.addEventListener("dragend",()=>li.classList.remove("dragging"));li.addEventListener("dragover",e=>{e.preventDefault();li.classList.add("over")});li.addEventListener("dragleave",()=>li.classList.remove("over"));li.addEventListener("drop",e=>{e.preventDefault();const to=+li.dataset.pos;if(from!=null&&from!==to){const m=order.splice(from,1)[0];order.splice(to,0,m);draw()}});});
+    el.querySelector("#lab-back").onclick=()=>show("home");
+    el.querySelector("#lab-check").onclick=()=>{const correct=order.every((idx,pos)=>idx===pos);const fb=el.querySelector("#lab-fb");
+      if(correct){sfx("rare");if(!focusOn())confetti(70,"#2e9e5b");const X=gameLoad();X.labsDone=X.labsDone||[];if(!X.labsDone.includes(area)){X.labsDone.push(area);gameSave(X);awardGold(40,"lab complete");awardXP(50,"lab")}else{awardGold(10,"lab");awardXP(10,"lab")}fb.innerHTML=`<div class="fb correct" style="margin-top:12px"><b>Correct order.</b> ${esc(lab.done)}</div><div class="row" style="margin-top:10px"><button class="btn" id="lab-done">Back to map</button></div>`;el.querySelector("#lab-done").onclick=()=>show("home");list.querySelectorAll("li").forEach(li=>{li.draggable=false;li.classList.add("locked")})}
+      else{sfx("bad");fb.innerHTML=`<div class="fb wrong" style="margin-top:12px">Not in order yet — drag the rows and check again.</div>`}};};
+  const draw=()=>{el.innerHTML=`<div class="ghead"><div><div class="small muted">${esc(SHORT[area])} · lab</div><h1 style="margin:2px 0 0">${esc(lab.title)}</h1></div><button class="btn ghost sm" id="lab-back">← Map</button></div>
+    <p class="muted">${esc(lab.intro)}</p>
+    <ol class="dragl" id="dragl">${order.map((idx,pos)=>`<li draggable="true" data-pos="${pos}"><span class="dh">⋮⋮</span><span class="dn">${pos+1}</span><span class="dt">${esc(lab.steps[idx])}</span></li>`).join("")}</ol>
+    <div class="row"><button class="btn" id="lab-check">Check order</button></div><div id="lab-fb"></div>`;bind()};
+  show("guide");draw();window.scrollTo(0,0);}
 
 /* ================= FACT-TABLE GENERATORS: endless original questions for conceptual sub-topics ================= */
 /* Each table: topic, T = true statements [text, why], F = false statements [text, why it's wrong].
@@ -2883,9 +3363,12 @@ function areaStatics(areaKey){return BANK.filter(q=>mapArea(q.a)===areaKey)}
 function areaGens(areaKey){const a=AREAS.find(x=>x.k===areaKey);const out=[];for(const c of a.gen)out.push(...GENS[c]);return out}
 /* drawArea now dealer-backed: the session owns the dealer so repeats can't happen within it */
 function sessionDealer(areaKey,clusterName,r){
-  if(clusterName){const c=CLUSTERS[areaKey].find(x=>x.n===clusterName);const st=clusterStatics(areaKey,c);const fb=c.gens.length?null:makeDealer(r,areaStatics(areaKey).filter(q=>!st.includes(q)),areaGens(areaKey),{genShare:0.5});return makeDealer(r,st,c.gens,{genShare:c.gens.length?(st.length<6?0.75:st.length<20?0.6:0.5):0,fallback:fb})}
-  const st=areaStatics(areaKey),g=areaGens(areaKey);
-  return makeDealer(r,st,g,{genShare:g.length?(st.length<20?0.8:st.length<40?0.6:0.5):0});
+  if(clusterName){const c=CLUSTERS[areaKey].find(x=>x.n===clusterName);const st=clusterStatics(areaKey,c);
+    const sg=SCENARIOS[areaKey+"|"+clusterName]?[scnGen(areaKey,clusterName)]:[];const gens=sg.concat(c.gens);
+    const fb=gens.length?null:makeDealer(r,areaStatics(areaKey).filter(q=>!st.includes(q)),areaGens(areaKey),{genShare:0.5});
+    return makeDealer(r,st,gens,{genShare:gens.length?(st.length<6?0.8:st.length<20?0.65:0.55):0,fallback:fb})}
+  const st=areaStatics(areaKey);const g=areaGens(areaKey).concat((CLUSTERS[areaKey]||[]).filter(c=>SCENARIOS[areaKey+"|"+c.n]).map(c=>scnGen(areaKey,c.n)));
+  return makeDealer(r,st,g,{genShare:g.length?0.65:0});
 }
 
 /* ---- aids bar (shared by CNT practice and matrix runs) ---- */
@@ -3155,7 +3638,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v36";
+const APP_VERSION="v37";
 window.__filter="all";
 window.__booted=true;
 (function(){
