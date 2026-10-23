@@ -246,7 +246,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v39</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v40</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -354,7 +354,7 @@ function gConv(r){
 }
 /* ---- memory offset ---- */
 function gOffset(r){
-  const start=ri(r,2,14)*16, len=pick(r,[8,16,32,4,12]);
+  const start=pick(r,[0x100,0x200,0x400,0x800,0x1000]), len=pick(r,[4,8,16,32]);
   const last=start+len-1;
   const q={t:hex(last),why:`Correct. Last byte = start + length − 1 = ${hex(start)} + ${hex(len)} − 1 = ${hex(last)}.`};
   const ds=[{t:hex(start+len),why:`That's the first byte AFTER the buffer. Subtract 1 for the last byte inside it.`},
@@ -1892,7 +1892,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v39. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v40. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2891,11 +2891,16 @@ const SCN_FUND={
 ],
 "Memory offsets":[
  function(r){
-   const base=ri(r,16,240)*16;const len=ri(r,2,15)*16;
-   const last=base+len-1;
-   return _mk(r,"0x"+last.toString(16).toUpperCase(),["0x"+(base+len).toString(16).toUpperCase(),"0x"+base.toString(16).toUpperCase(),"0x"+(base+len-16).toString(16).toUpperCase()],
-     {s:`A buffer starts at 0x${base.toString(16).toUpperCase()} and is 0x${len.toString(16).toUpperCase()} bytes long.`,q:"What is the address of its last byte?",
-      e:`A region of length L starting at S ends at S + L − 1. 0x${base.toString(16).toUpperCase()} + 0x${(len-1).toString(16).toUpperCase()} = 0x${last.toString(16).toUpperCase()}. The next region starts at 0x${(base+len).toString(16).toUpperCase()}.`});
+   const base=pick(r,[0x100,0x200,0x1000,0x2000]);const off=pick(r,[4,8,12,16]);const at=base+off;const H=x=>"0x"+x.toString(16).toUpperCase();
+   return _mk(r,H(at),[H(base),H(base+off+4),H(off)],
+     {s:`A record starts at ${H(base)}. One of its fields sits at offset ${off}.`,q:"Where is that field in memory?",
+      e:`Offset just means "this far from the start": ${H(base)} + ${off} = ${H(at)}. No conversion needed — add the offset to the start.`});
+ },
+ function(r){
+   const base=pick(r,[0x100,0x200,0x400,0x1000]);const len=pick(r,[8,16,32]);const last=base+len-1;const H=x=>"0x"+x.toString(16).toUpperCase();
+   return _mk(r,H(last),[H(base+len),H(base),H(base+len+1)],
+     {s:`A ${len}-byte buffer starts at ${H(base)}.`,q:"What is the address of its last byte?",
+      e:`Start + length − 1. The first byte is at ${H(base)}, so ${len} bytes end at ${H(base)} + ${len-1} = ${H(last)}. The next buffer would begin at ${H(base+len)}.`});
  }
 ],
 "Boolean logic":[
@@ -2964,7 +2969,7 @@ function renderLab(area){const lab=LABS[area];if(!lab)return;const el=document.g
     list.querySelectorAll("li").forEach(li=>{li.addEventListener("dragstart",()=>{from=+li.dataset.pos;li.classList.add("dragging")});li.addEventListener("dragend",()=>li.classList.remove("dragging"));li.addEventListener("dragover",e=>{e.preventDefault();li.classList.add("over")});li.addEventListener("dragleave",()=>li.classList.remove("over"));li.addEventListener("drop",e=>{e.preventDefault();const to=+li.dataset.pos;if(from!=null&&from!==to){const m=order.splice(from,1)[0];order.splice(to,0,m);draw()}});});
     el.querySelector("#lab-back").onclick=()=>show("home");
     el.querySelector("#lab-check").onclick=()=>{const correct=order.every((idx,pos)=>idx===pos);const fb=el.querySelector("#lab-fb");
-      if(correct){sfx("rare");if(!focusOn())confetti(70,"#2e9e5b");const X=gameLoad();X.labsDone=X.labsDone||[];if(!X.labsDone.includes(area)){X.labsDone.push(area);gameSave(X);awardGold(40,"lab complete");awardXP(50,"lab")}else{awardGold(10,"lab");awardXP(10,"lab")}fb.innerHTML=`<div class="fb correct" style="margin-top:12px"><b>Correct order.</b> ${esc(lab.done)}</div><div class="row" style="margin-top:10px"><button class="btn" id="lab-done">Back to map</button></div>`;el.querySelector("#lab-done").onclick=()=>show("home");list.querySelectorAll("li").forEach(li=>{li.draggable=false;li.classList.add("locked")})}
+      if(correct){const btn=el.querySelector("#lab-check");btn.disabled=true;btn.textContent="Solved";sfx("rare");if(!focusOn())confetti(70,"#2e9e5b");const X=gameLoad();X.labsDone=X.labsDone||[];const first=!X.labsDone.includes(area);if(first){X.labsDone.push(area);gameSave(X);awardGold(40,"lab complete");awardXP(50,"lab")}fb.innerHTML=`<div class="fb correct" style="margin-top:12px"><b>Correct order.</b> ${esc(lab.done)}${first?"":" <span class=\"muted\">(already rewarded)</span>"}</div><div class="row" style="margin-top:10px"><button class="btn" id="lab-done">Back to map</button></div>`;el.querySelector("#lab-done").onclick=()=>show("home");list.querySelectorAll("li").forEach(li=>{li.draggable=false;li.classList.add("locked")})}
       else{sfx("bad");fb.innerHTML=`<div class="fb wrong" style="margin-top:12px">Not in order yet — drag the rows and check again.</div>`}};};
   const draw=()=>{el.innerHTML=`<div class="ghead"><div><div class="small muted">${esc(SHORT[area])} · lab</div><h1 style="margin:2px 0 0">${esc(lab.title)}</h1></div><button class="btn ghost sm" id="lab-back">← Map</button></div>
     <p class="muted">${esc(lab.intro)}</p>
@@ -3649,7 +3654,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v39";
+const APP_VERSION="v40";
 window.__filter="all";
 window.__booted=true;
 (function(){
