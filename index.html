@@ -162,6 +162,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 @keyframes flagaura{0%,100%{box-shadow:0 0 0 3px rgba(60,130,255,.12),0 0 18px rgba(60,130,255,.25)}50%{box-shadow:0 0 0 3px rgba(60,130,255,.22),0 0 34px rgba(60,130,255,.5)}}
 .flagico{position:absolute;left:12px;top:10px;font-size:1.3rem}
 .weakrow.flagged{border-color:rgba(60,130,255,.6);border-style:solid;box-shadow:0 0 12px rgba(60,130,255,.3)}
+.devtag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:6px;background:#d33;color:#fff;font-size:.68rem;font-weight:800;letter-spacing:.1em;vertical-align:middle}
 .contact{max-width:640px}.ccard{border-color:var(--accent)}.cname{font-size:1.5rem;font-weight:800;margin-top:4px}.thanks{font-size:1.6rem;font-weight:800;letter-spacing:.02em}
 .pccard{text-align:left!important;max-width:560px;width:calc(100vw - 32px);max-height:88vh;overflow:auto}
 .pclist{display:flex;flex-direction:column;gap:4px}
@@ -270,7 +271,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v54</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v55</span><span class="devtag" hidden id="devtag" title="Dev preview — separate progress from the live site">DEV</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1321,7 +1322,8 @@ const BANK=[
 const MEM={};
 function jload(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):(k in MEM?MEM[k]:d)}catch(e){return (k in MEM?MEM[k]:d)}}
 function jsave(k,v){MEM[k]=v;try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-const HIST="cnab-pro-hist-v2", WEAK="cnab-pro-weak-v2", PREF="cnab-pro-pref-v2";
+const CHANNEL="live";const KP=CHANNEL==="dev"?"dev-":"";
+const HIST=KP+"cnab-pro-hist-v2", WEAK=KP+"cnab-pro-weak-v2", PREF=KP+"cnab-pro-pref-v2";
 
 /* ---- CNT content-area model ---- */
 
@@ -2038,7 +2040,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v54. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v55. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div id="pcui"></div>
@@ -2053,7 +2055,7 @@ function renderProgress(){
 }
 
 /* ================= XP / LEVELS ================= */
-const XPKEY="cnab-pro-xp-v1";
+const XPKEY=KP+"cnab-pro-xp-v1";
 function xpLoad(){return jload(XPKEY,{xp:0,steps:{},mstats:{}})}
 function xpSave(x){jsave(XPKEY,x)}
 function levelFor(xp){let lvl=1,need=120,acc=0;while(xp>=acc+need){acc+=need;lvl++;need=Math.round(120*Math.pow(lvl,1.35))}return{lvl,into:xp-acc,need}}
@@ -2592,7 +2594,7 @@ function renderHome(){
 
 function toolIcons(){const inTest=typeof T!=="undefined"&&!!T;return `<span class="qtools"><button class="qtb" onclick="toggleNote()" title="Notes (N)">📝</button><button class="qtb" onclick="toggleCalc()" title="${inTest?"No calculator during the Practice Test":"Calculator (C)"}" ${inTest?"disabled":""}>🧮</button></span>`}
 /* ================= TOOLS: notepad + calculator (no calculator during the Practice Test) ================= */
-const NOTEKEY="cnab-pro-notes-v1";
+const NOTEKEY=KP+"cnab-pro-notes-v1";
 function toolsInit(){
   if(document.getElementById("tooldock"))return;
   const d=document.createElement("div");d.id="tooldock";d.className="tooldock";
@@ -4100,7 +4102,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v54";
+const APP_VERSION="v55";if(CHANNEL==="dev"){const t=document.getElementById("devtag");if(t)t.hidden=false;document.title="[DEV] "+document.title}
 window.__filter="all";
 window.__booted=true;
 (function(){
