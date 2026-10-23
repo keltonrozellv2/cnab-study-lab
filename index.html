@@ -157,6 +157,7 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .chestscene .chest .beam{position:absolute;left:50%;top:20px;width:40px;height:0;margin-left:-20px;background:linear-gradient(to top,rgba(255,225,120,.9),rgba(255,225,120,0));filter:blur(6px);transition:height .5s}.chest.stage2 .beam{height:70px;top:-40px}.chest.stage2{animation:slowshake 1.6s ease-in-out infinite}@keyframes slowshake{0%,100%{rotate:-1.5deg}50%{rotate:1.5deg}}.chest.stage3 .beam{height:160px;top:-130px;opacity:.8}
 .casehost{position:relative;margin-top:-170px;transform:scale(1.15);opacity:0;transform:scale(.9);transition:opacity .4s,transform .4s;z-index:3}.casehost.show{opacity:1;transform:scale(1.15)}.casehost .casewrap{background:#121820;border-color:#2a3542}.casehost .lootcard{background:#121820;color:#fff}
 .mline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.82rem;margin:-4px 0 10px;color:var(--ink)}
+.retrytag{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:2px 8px;font-weight:700;font-size:.8rem}
 .qcount{display:inline-flex;align-items:center;gap:8px}.qstreak{background:#ffe9c7;color:#b8500b;border-radius:999px;padding:2px 8px;font-weight:800;animation:flick 1.4s ease-in-out infinite}html[data-theme=dark] .qstreak{background:#3a2208;color:#ffb067}.qtools{display:inline-flex;gap:4px}.qtb{border:1px solid var(--line);background:var(--sheet);border-radius:6px;padding:2px 6px;font-size:1rem;cursor:pointer}.qtb:disabled{opacity:.4;cursor:not-allowed}
 .tooldock{position:fixed;right:0;top:136px;z-index:40;display:flex;flex-direction:column;gap:6px}.tbtn{border:1.5px solid var(--line);border-right:0;background:var(--sheet);border-radius:10px 0 0 10px;padding:8px 10px;font-size:1.1rem;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:-2px 2px 8px rgba(0,0,0,.12);cursor:pointer}.tbtn span{font-size:.65rem;font-weight:700;color:var(--muted)}.tbtn.on{border-color:var(--accent);background:var(--accent-soft)}.tbtn:disabled{opacity:.45;cursor:not-allowed}
 .toolwin{position:fixed;z-index:45;background:var(--sheet);border:1.5px solid var(--line);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25);overflow:hidden}.toolwin .th{display:flex;align-items:center;gap:8px;padding:8px 10px;background:color-mix(in srgb,var(--ink) 6%,var(--sheet));cursor:move;font-weight:700;user-select:none}.toolwin .tctl{margin-left:auto;display:flex;gap:6px;align-items:center}.iconbtn.sm{padding:3px 8px;font-size:.8rem}
@@ -246,7 +247,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v42</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v43</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1607,7 +1608,7 @@ function startSession(cfg){ // cfg:{title,mode:'practice'|'flash',dealer:fn(r)->
 }
 function nextSession(){
   if(S.pool){ if(S.idx>=S.pool.length){S.cur=null;return} S.cur=S.pool[S.idx]; }
-  else if(S.dealer){ S.cur=S.dealer.next(); }
+  else if(S.dealer){ const due=(S.retry||[]).findIndex(x=>S.run.t>=x.due);if(due>=0){const x=S.retry.splice(due,1)[0];S.cur=Object.assign(shuffleItem(S.r,x.it),{retry:true})}else S.cur=S.dealer.next(); }
   else { if(!S.recent)S.recent=[]; let it,k,tries=0; do{it=S.draw(S.r);k=stemKey(it)}while(S.recent.includes(k)&&++tries<40); S.recent.push(k);if(S.recent.length>12)S.recent.shift(); S.cur=it; }
   S.picked=null;S.revealed=false;S.elim=false;S.elimIdx=-1;S.used={};S.hinted=false;
 }
@@ -1631,7 +1632,7 @@ function renderSession(){
   }
   // practice mode (instant feedback)
   const answered=S.picked!==null;
-  el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span class="qcount">${S.streak>=3?`<span class="qstreak" title="Answer streak: +${Math.round((streakMult(S.streak)-1)*100)}% XP and gold">🔥 ${S.streak}</span>`:""}${S.run.ok} ✓ of ${S.run.t} answered${toolIcons()}</span></div>${masteryLineHTML(it)}
+  el.innerHTML=`<div class="qhead"><span class="tag">${esc(SHORT[it.areaCNT]||it.areaCNT)}${it.sub?" · "+esc(it.sub):""}${S.widened?` <span class="muted">· widened to all ${esc(SHORT[it.areaCNT]||"")}</span>`:""}</span><span class="qcount">${it.retry?`<span class="retrytag" title="You missed this one earlier in this run — second look">↻ second look</span>`:""}${S.streak>=3?`<span class="qstreak" title="Answer streak: +${Math.round((streakMult(S.streak)-1)*100)}% XP and gold">🔥 ${S.streak}</span>`:""}${S.run.ok} ✓ of ${S.run.t} answered${toolIcons()}</span></div>${masteryLineHTML(it)}
   <p class="qtext">${qHTML(it.q)}</p>${it.code?`<pre>${esc(it.code)}</pre>`:""}
   <div class="choices" id="ch">${it.opts.map((o,k)=>{let c="choice";const gone=S.elim&&k===S.elimIdx&&!answered;if(answered){if(k===it.a)c+=" correct";else if(k===S.picked)c+=" wrong"}if(gone)c+=" gone";return `<button class="${c}" data-k="${k}" ${answered||gone?"disabled":""}><span class="b">${L8[k]}</span><span>${esc(o.t)}</span></button>`}).join("")}</div>
   ${S.hinted&&!answered?`<div class="callout small"><b>Reveal:</b> ${esc(hintFor(it))}</div>`:""}
@@ -1648,7 +1649,8 @@ function renderSession(){
 function pickSession(k){
   if(S.picked!==null)return;S.picked=k;S.run.t++;disarmShimmer();
   const ok=k===S.cur.a; sfx(ok?"ok":"bad"); buddyReact(ok?"ok":"bad"); {const area=S.cur.areaCNT,cl=S.cluster||clusterOf(area,S.cur);const before=cl?topicStat(gameLoad(),area,cl).mastered:true;trackTopic(S.cur,ok);if(cl&&!before&&topicStat(gameLoad(),area,cl).mastered)setTimeout(()=>masteredPopup(area,cl),700)} questEvent("answer",{ok,area:S.cur.areaCNT}); if(ok&&S.pool&&/weak/i.test(S.title||""))questEvent("weak");
-  if(ok){S.run.ok++;S.streak=(S.streak||0)+1;const aided=S.elim||S.hinted;const mult=streakMult(S.streak);awardXP(Math.round(((S.cur.diff===3?12:S.cur.diff===2?8:5)-(aided?3:0))*mult),mult>1?`×${mult} streak`:"");awardGold(Math.round((S.cur.diff===3?4:2)*mult));if(S.streak===3||S.streak===5||S.streak===10)sfx("rare")} else {S.streak=0;addWeak(S.cur);noteMiss(S.cur)}
+  if(ok){S.run.ok++;S.streak=(S.streak||0)+1;const aided=S.elim||S.hinted;const mult=streakMult(S.streak);awardXP(Math.round(((S.cur.diff===3?12:S.cur.diff===2?8:5)-(aided?3:0))*mult),mult>1?`×${mult} streak`:"");awardGold(Math.round((S.cur.diff===3?4:2)*mult));if(S.streak===3||S.streak===5||S.streak===10)sfx("rare")} else {S.streak=0;addWeak(S.cur);noteMiss(S.cur);if(S.dealer&&!S.cur.retry){S.retry=S.retry||[];S.retry.push({it:S.cur,due:S.run.t+ri(S.r,5,8)})}}
+  if(ok&&S.cur.retry){const X=gameLoad();const k=stemKey(S.cur);if(X.miss[k]&&X.miss[k].n>0){X.miss[k].n--;gameSave(X)}}
   renderSession();
 }
 function elimOne(){ // aid: remove one wrong option
@@ -1894,7 +1896,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%) <button class="link xdel" data-del="${a.date}" title="Remove this attempt from history">×</button></td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v42. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v43. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2934,12 +2936,140 @@ const SCN_FUND={
 };
 
 
+/* Scenario questions — Programming (code-trace situations) + extra depth for thin sub-topics */
+const SCN_PROG={
+"Python traces":[
+ function(r){const a=ri(r,0,3),b=ri(r,6,12),st=pick(r,[1,2,3]);const vals=[];for(let i=a;i<b;i+=st)vals.push(i);
+   const wr=[...new Set([Array.from({length:vals.length+1},(_,i)=>a+i*st).join(" "),[...vals,b].join(" "),vals.slice(1).join(" ")||"nothing",[a+1,...vals.slice(1)].join(" "),vals.map(v=>v+1).join(" ")])].filter(x=>x!==vals.join(" ")).slice(0,3);
+   return _mk(r,vals.join(" "),wr,
+     {s:`A script runs:\n\nfor i in range(${a}, ${b}${st>1?", "+st:""}):\n    print(i, end=" ")`,q:"What is printed?",
+      e:`range(start, stop${st>1?", step":""}) stops BEFORE ${b}. Starting at ${a}${st>1?` and stepping by ${st}`:""} gives: ${vals.join(" ")}.`});},
+ function(r){const w=pick(r,["network","firewall","packet","gateway","kernel"]);const i=ri(r,1,2),j=ri(r,i+2,Math.min(w.length-1,i+4));
+   return _mk(r,`'${w.slice(i,j)}'`,[`'${w.slice(i,j+1)}'`,`'${w.slice(i-1,j)}'`,`'${w.slice(i,j-1)}'`],
+     {s:`s = "${w}"\nprint(s[${i}:${j}])`,q:"What is printed?",
+      e:`A slice [start:stop] includes index ${i} and stops before index ${j}: characters ${i}–${j-1} of "${w}" → '${w.slice(i,j)}'.`});},
+ function(r){const a=ri(r,11,29),b=pick(r,[3,4,5]);const d=Math.floor(a/b),m=a%b;const op=pick(r,[["//",d,"integer division floors the result"],["%",m,"% is the remainder"]]);const[sym,res,why]=op;
+   return _mk(r,String(res),_distinct(r,res,0,30,3).map(String),
+     {s:`print(${a} ${sym} ${b})`,q:"What is printed?",
+      e:`${a} ${sym} ${b}: ${why}. ${a} = ${d}×${b} + ${m}, so // gives ${d} and % gives ${m}.`});},
+ function(r){const n=ri(r,3,6);let tot=0;for(let i=1;i<=n;i++)tot+=i;
+   return _mk(r,String(tot),[String(tot+n+1),String(tot-n),String(n*n)],
+     {s:`total = 0\nfor i in range(1, ${n+1}):\n    total += i\nprint(total)`,q:"What is printed?",
+      e:`range(1, ${n+1}) yields 1 through ${n}. Adding them: ${Array.from({length:n},(_,i)=>i+1).join("+")} = ${tot}. Trace loops with a running table.`});}
+],
+"C traces":[
+ function(r){const n=ri(r,3,6);let sum=0;for(let i=0;i<n;i++)sum+=i;
+   return _mk(r,String(sum),_distinct(r,sum,0,30,3).map(String),
+     {s:`int sum = 0;\nfor (int i = 0; i < ${n}; i++) {\n    sum += i;\n}\nprintf("%d", sum);`,q:"What is printed?",
+      e:`i runs 0 through ${n-1} (the condition is i < ${n}). 0+1+…+${n-1} = ${sum}.`});},
+ function(r){const a=ri(r,7,19),b=pick(r,[2,3,4]);const d=Math.trunc(a/b);
+   return _mk(r,String(d),[...new Set([(a/b).toFixed(1),String(d+1),String(a%b),String(d+2),String(Math.round(a/b)+1)])].filter(x=>x!==String(d)).slice(0,3),
+     {s:`int x = ${a} / ${b};\nprintf("%d", x);`,q:"What is printed?",
+      e:`Both operands are ints, so the division truncates: ${a} / ${b} = ${d} (the .${String((a/b).toFixed(2)).split(".")[1]} is dropped, not rounded).`});},
+ function(r){const arr=[ri(r,1,9),ri(r,10,19),ri(r,20,29),ri(r,30,39)];const i=ri(r,0,3);
+   return _mk(r,String(arr[i]),arr.filter((_,k)=>k!==i).map(String),
+     {s:`int a[] = {${arr.join(", ")}};\nprintf("%d", a[${i}]);`,q:"What is printed?",
+      e:`C arrays start at index 0, so a[${i}] is the ${["first","second","third","fourth"][i]} element: ${arr[i]}.`});}
+],
+"Bash":[
+ function(r){const v=pick(r,["HOME","USER","PATH"]);
+   return _mk(r,`The value of $${v} — double quotes expand variables`,[`The literal text $${v}`,"An error","Nothing"],
+     {s:`echo "$${v}"`,q:"What does this print?",
+      e:`Double quotes let the shell expand variables. Single quotes would print the literal $${v}.`});},
+ function(r){const v=pick(r,["HOME","USER","SHELL"]);
+   return _mk(r,`The literal text $${v}`,[`The value of $${v}`,"An error","An empty line"],
+     {s:`echo '$${v}'`,q:"What does this print?",
+      e:"Single quotes stop all expansion — the shell prints exactly what's between them."});},
+ function(r){const n=ri(r,2,6);const args=Array.from({length:n},(_,i)=>"arg"+(i+1)).join(" ");
+   return _mk(r,String(n),[String(n+1),"arg1","0"],
+     {s:`A script contains:\n\necho $#\n\nIt is run as:  ./run.sh ${args}`,q:"What is printed?",
+      e:`$# is the number of arguments. ${n} were passed, so it prints ${n}. ($0 is the script name, $1 the first argument.)`});},
+ function(r){return _mk(r,"0 — the last command succeeded",["1 — the last command failed","The PID of the last command","The number of arguments"],
+     {s:`ls /etc > /dev/null\necho $?`,q:"What does the second line print, and what does it mean?",
+      e:"$? holds the exit status of the previous command. ls on an existing directory succeeds, so it's 0. Non-zero means failure."});}
+],
+"PowerShell":[
+ function(r){return _mk(r,"Processes using more than 100 seconds of CPU, highest first",["All processes sorted by name","Only the first 100 processes","Services, not processes"],
+     {s:`Get-Process | Where-Object { $_.CPU -gt 100 } | Sort-Object CPU -Descending`,q:"What does this pipeline show?",
+      e:"Get-Process lists processes; Where-Object keeps those whose CPU property is greater than 100; Sort-Object orders them with the largest first. Objects, not text, flow through the pipe."});},
+ function(r){return _mk(r,"A base64-encoded command — hides what's being run; treat as suspicious",["A compressed script — normal for updates","An error in the command","A signed, trusted script"],
+     {s:`A 4688 process-creation event shows:  powershell.exe -WindowStyle Hidden -EncodedCommand SQBFAFgA...`,q:"What is this and how should you treat it?",
+      e:"-EncodedCommand runs a base64 string so the real command isn't visible in logs; -WindowStyle Hidden keeps it off screen. Legitimate admin scripts rarely need either. Decode and investigate."});},
+ function(r){const v=pick(r,[["Get-","reads or lists something"],["Set-","changes a setting or property"],["Stop-","stops a process or service"],["New-","creates something"]]);const[verb,mean]=v;
+   return _mk(r,mean,["deletes something","exports to a file","connects to a remote host"].slice(0,3),
+     {s:`You see a cmdlet starting with ${verb}.`,q:"What kind of action is that?",
+      e:`PowerShell cmdlets are Verb-Noun. ${verb} ${mean}. Knowing the verb tells you whether a command is read-only or makes changes.`});}
+],
+"Bitwise in code":[
+ function(r){const flags=ri(r,1,15);const bit=pick(r,[1,2,4,8]);const set=(flags&bit)!==0;
+   return _mk(r,set?"True — that bit is set in flags":"False — that bit is clear in flags",[set?"False — that bit is clear":"True — that bit is set","It depends on the other bits","A syntax error"],
+     {s:`flags = 0b${flags.toString(2).padStart(4,"0")}\nif flags & 0b${bit.toString(2).padStart(4,"0")}:\n    print("set")`,q:"Does it print \"set\"?",
+      e:`& with a single-bit mask tests that one bit. 0b${flags.toString(2).padStart(4,"0")} & 0b${bit.toString(2).padStart(4,"0")} = ${(flags&bit)?"non-zero":"0"}, so the test is ${set?"true":"false"}.`});},
+ function(r){const x=ri(r,1,7);const sh=pick(r,[1,2,3]);
+   return _mk(r,String(x<<sh),_distinct(r,x<<sh,0,64,3).map(String),
+     {s:`x = ${x}\nprint(x << ${sh})`,q:"What is printed?",
+      e:`Shifting left by ${sh} multiplies by 2^${sh} = ${1<<sh}: ${x} × ${1<<sh} = ${x<<sh}.`});}
+]
+};
+/* extra depth for the thinner sub-topics */
+const SCN_MORE={
+"os|SIDs, ACLs & ADS":[
+ function(r){return _mk(r,"Deny wins — an explicit deny overrides an allow",["Allow wins because it was listed first","Access depends on which group was joined last","The user gets read-only"],
+     {s:`A user is in two groups. One group is allowed Full Control on a folder; the other is explicitly denied Read.`,q:"Can the user open the folder?",
+      e:"In Windows ACLs an explicit Deny takes precedence over Allow, no matter the order of the groups."});},
+ function(r){return _mk(r,"Alternate data streams — hidden content attached behind the file; list them with dir /r",["Disk compression","A corrupted file","A shortcut"],
+     {s:`A text file shows 2 KB in Explorer, but the volume says the file uses 4 MB.`,q:"What explains the difference?",
+      e:"NTFS alternate data streams store extra data behind a file's main stream. Explorer shows only the main stream's size; dir /r (or streams tools) reveals the rest."});}
+],
+"os|Authentication":[
+ function(r){return _mk(r,"One factor — both are 'something you know'",["Two factors","Three factors","Zero factors"],
+     {s:`A login asks for a password and then a secret answer to a question.`,q:"How many authentication factors is that?",
+      e:"Factors are categories: know, have, are. A password and a secret answer are both knowledge, so it's a single factor. Adding a phone code or hardware key would make two."});},
+ function(r){return _mk(r,"Kerberos — tickets from the domain controller over port 88",["NTLM over SMB","LDAP over 389","RADIUS over 1812"],
+     {s:`A domain-joined PC gets a ticket from the domain controller, then uses it to open a file share without sending a password again.`,q:"What authentication system is this?",
+      e:"Kerberos issues a ticket-granting ticket at logon, then service tickets for each resource. The password never travels to the file server. The KDC listens on port 88."});}
+],
+"os|Antivirus & integrity":[
+ function(r){return _mk(r,"Don't install it — the hash mismatch means the file changed in transit or was tampered with",["Install it; hashes vary by download mirror","Install it after a virus scan","Rename it and install"],
+     {s:`A vendor publishes a SHA-256 for its installer. The file you downloaded produces a different hash.`,q:"What should you do?",
+      e:"A hash changes if even one byte differs. A mismatch means it is not the file the vendor published — corrupted or altered. Re-download from the official source and compare again."});}
+],
+"os|Cloud & mobile":[
+ function(r){return _mk(r,"PaaS — you deploy code, the provider runs the OS and runtime",["IaaS — you'd manage the VM","SaaS — you'd just use an app","On-premises hosting"],
+     {s:`Your team pushes application code to a platform and never patches an operating system or installs a runtime.`,q:"Which cloud model is this?",
+      e:"IaaS gives you VMs you manage; PaaS gives you a managed runtime you deploy into; SaaS gives you a finished app. No OS or runtime work means PaaS."});},
+ function(r){return _mk(r,"Remote-wipe it through MDM — full-disk encryption protects the data in the meantime",["Nothing; phones are safe when locked","Change the Wi-Fi password","Call the carrier to disable data"],
+     {s:`An employee loses a company phone enrolled in mobile device management.`,q:"What's the right response?",
+      e:"MDM exists for this: remote wipe removes the data; device encryption means a thief can't read it before the wipe lands."});}
+],
+"sec|Crypto & PKI":[
+ function(r){return _mk(r,"Symmetric (AES) — fast enough for bulk data; the key was exchanged with asymmetric crypto first",["Asymmetric (RSA) for everything","A hash function","No encryption; TLS only signs"],
+     {s:`After a TLS handshake, a browser streams a large file over HTTPS.`,q:"Which kind of encryption protects the file data itself?",
+      e:"Asymmetric crypto is slow, so TLS uses it only to agree a session key. The data is then encrypted with a symmetric cipher like AES."});}
+],
+"net|Routing & admin distance":[
+ function(r){return _mk(r,"The default route 0.0.0.0/0 — the catch-all when nothing more specific matches",["It's dropped","The router broadcasts it","It's sent back to the source"],
+     {s:`A packet arrives for a destination that matches none of the router's specific routes.`,q:"What happens if a default route is configured?",
+      e:"0.0.0.0/0 matches everything, so it's used only when no longer prefix matches. Without a default route the packet is dropped and ICMP unreachable may be sent."});},
+ function(r){return _mk(r,"It's denied — the implicit deny at the end of the ACL catches it",["It's allowed by default","The router asks the next ACL","It's logged and forwarded"],
+     {s:`An access list has three permit lines. A packet matches none of them.`,q:"What happens to it?",
+      e:"ACLs are processed top to bottom, first match wins, and an invisible deny-all sits at the bottom. Anything not explicitly permitted is dropped."});}
+],
+"net|Wireless":[
+ function(r){return _mk(r,"Wireless can't detect collisions while transmitting, so it avoids them (CSMA/CA)",["Wi-Fi is full duplex","Wireless has no collisions","Switches handle it"],
+     {s:`A colleague asks why Wi-Fi uses CSMA/CA when Ethernet used CSMA/CD.`,q:"What's the answer?",
+      e:"A radio can't listen for a collision while it's transmitting, so Wi-Fi tries to avoid collisions up front (wait, random backoff, optional RTS/CTS) instead of detecting them after the fact."});}
+]
+};
+
 /* merge scenario banks + generator wrapper */
 const SCENARIOS={};
 for(const k in SCN_NET)SCENARIOS["net|"+k]=SCN_NET[k];
 for(const k in SCN_OS)SCENARIOS["os|"+k]=SCN_OS[k];
 for(const k in SCN_SEC)SCENARIOS["sec|"+k]=SCN_SEC[k];
 for(const k in SCN_FUND)SCENARIOS["fund|"+k]=SCN_FUND[k];
+for(const k in SCN_PROG)SCENARIOS["prog|"+k]=SCN_PROG[k];
+for(const k in SCN_MORE)SCENARIOS[k]=(SCENARIOS[k]||[]).concat(SCN_MORE[k]);
 function scnGen(area,cluster){const list=SCENARIOS[area+"|"+cluster];return function(r){const fn=list[Math.floor(r()*list.length)];const o=fn(r);return{q:o.s+"\n\n"+o.q,opts:o.opts,a:o.a,w:o.e,cat:area,sub:cluster,folder:"Scenario"};};}
 /* ================= LEARN → DRILL flow + drag-order labs ================= */
 const LABS={
@@ -3663,7 +3793,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v42";
+const APP_VERSION="v43";
 window.__filter="all";
 window.__booted=true;
 (function(){
