@@ -233,7 +233,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v32</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v33</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="ctrls">
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
@@ -1857,7 +1857,7 @@ function renderProgress(){
   ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v32. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v33. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2339,7 +2339,7 @@ function renderHome(){
     const vis=revealed(c,r);
     if(node){const [id,m]=node;const n=byId[id];const st=n.st;const ms=["bios","bus","nb","sb"].includes(id)?areaMastery(X,{bios:"fund",bus:"net",nb:"os",sb:"sec"}[id]):null;
       const reward=SECTOR_REWARD[id]||0;
-      nodesSvg+=`<g class="hx ${st}" data-node="${id}" role="button" tabindex="0" aria-label="${esc(n.label)} — ${st}">${st==="open"?`<ellipse cx="${x+HEXW/2}" cy="${y+HEXH-36}" rx="52" ry="20" class="beacon"/><rect x="${x+HEXW/2-18}" y="${y-60}" width="36" height="${HEXH-20}" class="beam"/>`:""}<image href="${SPRITE_TILES[m.tile]}" x="${x}" y="${y}" width="${HEXW}" height="${HEXH}" class="tile"/>${st==="locked"?`<polygon points="${hexPoly(x,y)}" class="shade"/>`:""}${st!=="done"&&reward&&vis?`<g class="rtag" transform="translate(${x+HEXW/2},${y+HEXH-14})"><rect x="-30" y="-10" width="60" height="20" rx="10"/><text y="4" text-anchor="middle">+${reward} 🪙</text></g>`:""}
+      nodesSvg+=`<g class="hx ${st}" data-node="${id}" role="button" tabindex="0" aria-label="${esc(n.label)} — ${st}">${st==="open"?`<ellipse cx="${x+HEXW/2}" cy="${y+HEXH-36}" rx="52" ry="20" class="beacon"/><rect x="${x+HEXW/2-18}" y="${y-60}" width="36" height="${HEXH-20}" class="beam"/>`:""}<image href="${SPRITE_TILES[m.tile]}" x="${x}" y="${y}" width="${HEXW}" height="${HEXH}" class="tile"/>${st==="locked"?`<polygon points="${hexPoly(x,y)}" class="shade"/>`:""}${st!=="done"&&reward&&vis?`<g transform="translate(${x+HEXW/2},${y+HEXH-14})"><g class="rtag"><rect x="-30" y="-10" width="60" height="20" rx="10"/><text y="4" text-anchor="middle">+${reward} 🪙</text></g></g>`:""}
         ${ms&&ms.total?`<g class="ring" transform="translate(${x+HEXW-26},${y+40})"><circle r="18" class="rb"/><circle r="18" class="rf" stroke-dasharray="${(ms.frac*113.1).toFixed(1)} 113.1" transform="rotate(-90)"/><text y="4.5" text-anchor="middle" class="rt">${ms.done}/${ms.total}</text></g>`:st==="done"?`<g transform="translate(${x+HEXW-26},${y+40})"><circle r="16" class="rb done"/><text y="5" text-anchor="middle" class="rt">✓</text></g>`:""}
         ${st==="open"?`<polygon points="${hexPoly(x,y)}" class="pulse"/>`:""}</g>`;
       if(vis)labels+=`<text x="${x+HEXW/2}" y="${y+HEXH+2}" text-anchor="middle" class="hl ${st}">${esc(n.label)}</text>`;
@@ -3116,7 +3116,7 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v32";
+const APP_VERSION="v33";
 window.__filter="all";
 window.__booted=true;
 (function(){
