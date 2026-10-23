@@ -110,7 +110,8 @@ th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;verti
 .shopitem{display:flex;gap:14px;align-items:center}.si-icon{font-size:2rem;width:44px;text-align:center}.si-body{flex:1}
 .bossbar{background:var(--sheet);border:2px solid var(--bad);border-radius:10px;padding:12px 14px;margin-bottom:12px}.bosshead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.bossname{font-weight:800;font-size:1.1rem;color:var(--bad)}
 .hp{position:relative;height:18px;background:var(--line);border-radius:9px;overflow:hidden}.hp i{display:block;height:100%;background:var(--bad);transition:width .7s cubic-bezier(.2,1.3,.4,1)}.hp .hpn{position:absolute;inset:0;text-align:center;font-size:.75rem;font-weight:700;line-height:18px;color:var(--ink)}
-.bossbar.shake{animation:shake .4s}.bossbar.miss{animation:dim .4s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes dim{50%{opacity:.5}}
+.bossbar.updbar{animation:updglow 3s ease-in-out infinite}@keyframes updglow{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent)}50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 35%,transparent),0 0 24px color-mix(in srgb,var(--accent) 45%,transparent)}}.upddot{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;animation:dotpulse 2s ease-in-out infinite}@keyframes dotpulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.5);opacity:1}}
+.shake{animation:shake .4s}.bossbar.miss{animation:dim .4s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}@keyframes dim{50%{opacity:.5}}
 .chestwrap{text-align:center;margin:24px 0}.chest{position:relative;width:150px;height:120px;margin:0 auto;cursor:pointer;user-select:none}.chest .body{position:absolute;left:10px;right:10px;bottom:0;height:70px;background:#8a5a2b;border:3px solid #4a2d12;border-radius:6px 6px 10px 10px}.chest .body::after{content:"";position:absolute;left:50%;top:-6px;width:22px;height:26px;margin-left:-11px;background:#e2b549;border:3px solid #4a2d12;border-radius:4px}.chest .lid{position:absolute;left:10px;right:10px;top:22px;height:44px;background:#a86c35;border:3px solid #4a2d12;border-radius:40px 40px 4px 4px;transform-origin:50% 100%;transition:transform .6s cubic-bezier(.3,1.4,.5,1)}.chest .glow{position:absolute;left:20px;right:20px;top:36px;height:40px;border-radius:50%;background:radial-gradient(ellipse,rgba(255,225,120,.9),rgba(255,225,120,0) 70%);opacity:0;transition:opacity .5s}
 .chest.stage1 .lid{transform:rotateX(0) translateY(-6px) rotate(-6deg)}.chest.stage2 .lid{transform:translateY(-14px) rotate(-16deg);animation:jiggle .5s 2}.chest.stage2 .glow{opacity:.5}.chest.stage3 .lid{transform:translateY(-40px) rotate(-70deg)}.chest.stage3 .glow{opacity:1;animation:pulseglow 1.2s infinite alternate}.chest.stage3{animation:pop .5s}
 @keyframes jiggle{0%,100%{transform:translateY(-14px) rotate(-16deg)}25%{transform:translateY(-16px) rotate(-12deg) translateX(-3px)}75%{transform:translateY(-16px) rotate(-20deg) translateX(3px)}}@keyframes pulseglow{to{transform:scale(1.15)}}@keyframes pop{30%{transform:scale(1.08)}}
@@ -167,7 +168,7 @@ body.legend-flash::after{content:"";position:fixed;inset:0;pointer-events:none;z
 <body>
 <div class="topbar">
   <div class="in">
-    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v25</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
+    <span class="brand">CNAB / CNT Study Lab <span class="ver" id="verlbl" title="build">v26</span></span><span class="xpbar" id="xpbar" aria-live="polite"></span>
     <span class="zoomwrap"><button class="iconbtn" id="zout" aria-label="Zoom out">A−</button><span class="z" id="zval">100%</span><button class="iconbtn" id="zin" aria-label="Zoom in">A+</button><button class="iconbtn" id="zreset" aria-label="Reset zoom">Reset</button></span>
     <span class="sndctl" id="sndctl"></span>
     <button class="iconbtn" id="focusbtn" aria-pressed="false" title="Focus mode">◎</button>
@@ -1462,7 +1463,23 @@ function explainHTML(item,picked){
 
 /* ================= tabs / shell ================= */
 const VIEWS={home:"view-home",guide:"view-guide",phase1:"view-phase1",test:"view-test",matrix:"view-matrix",progress:"view-progress",shop:"view-shop"};
+/* Close any live session when the user leaves it: count only what was answered. */
+function abandonSessions(){
+  if(typeof PAUSE!=="undefined"&&PAUSE)resumeNow();
+  if(typeof S!=="undefined"&&S){if(S.run.t>0)logAttempt({mode:"Practice",scope:S.title,ok:S.run.ok,total:S.run.t,area:null,partial:true});disarmShimmer();S=null}
+  if(typeof MX!=="undefined"&&MX){clearInterval(MTIMER);MTIMER=null;disarmShimmer();const isGate=MX.kind==="gate";let ok=0,t=0;const secs=Math.floor((Date.now()-MX.start)/1000);
+    MX.items.forEach((it,k)=>{if(MX.ans[k]===undefined)return;t++;const good=MX.ans[k]===(isGate?it.a:it.answer);if(good)ok++;if(MX.fb!=="instant")recordMatrixStat(isGate?"gate":it.cat,it.gate,good,MX.times[k]||Math.round(secs/Math.max(1,t)))});
+    if(t>0){logAttempt({mode:isGate?"Gate drill":"Matrix test",scope:MX.step?MX.step.name:"Matrix",ok,total:t,secs,area:null,partial:true});if(MX.fb!=="instant"){awardXP(ok*(isGate?8:15),"matrix (left early)");awardGold(ok*(isGate?1:3))}}
+    MX=null}
+  if(typeof T!=="undefined"&&T){let ok=0,t=0;const area={};["fund","net","os","prog","sec"].forEach(k=>area[k]={ok:0,t:0});const secs=Math.floor((Date.now()-T.start)/1000);
+    T.items.forEach((it,k)=>{if(T.ans[k]===undefined)return;t++;const a=area[it.areaCNT];a.t++;if(T.ans[k]===it.a){ok++;a.ok++}else{addWeak(it);noteMiss(it)}});
+    if(t>0){logAttempt({mode:T.timed?"Test (timed)":"Test (untimed)",scope:"Full CNT",ok,total:t,secs,area,partial:true});awardXP(ok*8,"test (left early)");awardGold(ok*2)}
+    T=null}
+  if(typeof BOSS!=="undefined"&&BOSS)BOSS=null;
+}
+window.addEventListener("pagehide",()=>{try{abandonSessions()}catch(e){}});
 function show(tab){
+  abandonSessions();
   document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===tab?"true":"false"));
   for(const k in VIEWS) document.getElementById(VIEWS[k]).hidden=(k!==tab);
   ({home:renderHome,guide:renderGuide,phase1:renderPhase1,test:renderTestSetup,matrix:renderMatrix,progress:renderProgress,shop:renderShop})[tab]();
@@ -1733,10 +1750,17 @@ function renderProgress(){
   const area={};["fund","net","os","prog","sec"].forEach(k=>area[k]={ok:0,t:0});
   tests.forEach(a=>{if(a.area)for(const k in a.area){area[k].ok+=a.area[k].ok;area[k].t+=a.area[k].t}});
   const areaSorted=Object.entries(area).filter(([k,v])=>v.t).sort((a,b)=>a[1].ok/a[1].t-b[1].ok/b[1].t);
-  const trend=tests.slice(-16).map(a=>Math.round(a.ok/a.total*100));
-  const first=tests.length?Math.round(tests[0].ok/tests[0].total*100):0, last=tests.length?Math.round(tests[tests.length-1].ok/tests[tests.length-1].total*100):0;
+  const full=tests.filter(a=>!a.partial);
+  const trend=full.slice(-16).map(a=>Math.round(a.ok/a.total*100));
+  const first=full.length?Math.round(full[0].ok/full[0].total*100):0, last=full.length?Math.round(full[full.length-1].ok/full[full.length-1].total*100):0;
   const X=gameLoad();const LV=levelFor(X.xp);const fam=Object.entries(X.mstats).filter(([k,v])=>v.t>=3).map(([k,v])=>({k,p:v.ok/v.t,avg:v.secs/v.t})).sort((a,b)=>a.p-b.p);
+  const todayK=new Date().toISOString().slice(0,10);const today=h.filter(a=>dayKey(a.date)===todayK);const tOK=today.reduce((x,a)=>x+a.ok,0),tT=today.reduce((x,a)=>x+a.total,0);
+  const byMode={};today.forEach(a=>{const m=a.mode.replace(/ \(.*\)/,"");const o=byMode[m]||(byMode[m]={ok:0,t:0,n:0});o.ok+=a.ok;o.t+=a.total;o.n++});
+  const allOK=h.reduce((x,a)=>x+a.ok,0),allT=h.reduce((x,a)=>x+a.total,0);
   el.innerHTML=`<h1>Progress</h1>
+  <div class="sheet" style="margin-bottom:12px"><div class="row" style="justify-content:space-between;align-items:baseline"><b>Today</b><span class="small muted">${today.length} session${today.length===1?"":"s"}</span></div>
+   ${tT?`<div class="score" style="font-size:1.6rem">${tOK}/${tT} <span style="font-size:1rem" class="muted">correct (${Math.round(tOK/tT*100)}%)</span></div><div class="small muted">${Object.entries(byMode).map(([m,o])=>`${esc(m)}: ${o.ok}/${o.t} across ${o.n}`).join(" · ")}</div>`:`<p class="small muted" style="margin:4px 0 0">Nothing answered yet today.</p>`}
+   <div class="small muted" style="margin-top:6px">All time: ${allOK}/${allT} correct (${allT?Math.round(allOK/allT*100):0}%) over ${h.length} sessions on ${days.length} day${days.length===1?"":"s"}.</div></div>
   <div class="row"><div class="sheet" style="flex:1;min-width:120px"><div class="muted small">Level · rank</div><div class="score" style="font-size:1.8rem">${LV.lvl} <span style="font-size:1rem;color:var(--accent)">${esc(rankFor(X).n)}</span></div><div class="small muted">${X.xp} XP · ${LV.need-LV.into} to next · ${esc(rankFor(X).proof)}${nextRank(X)?`<br><b>Next rank:</b> ${esc(nextRank(X).n)} — ${esc(nextRank(X).proof)}`:""}</div></div>
   <div class="sheet" style="flex:1;min-width:120px"><div class="muted small">Gold · backpack · bosses</div><div class="score" style="font-size:1.8rem">🪙 ${X.gold||0}</div><div class="small muted">🎒 ${bagCount(X)} aids · ⚔ ${X.bossWins||0} boss kill${(X.bossWins||0)===1?"":"s"}</div></div><div class="sheet" style="flex:1;min-width:120px"><div class="muted small">Attempts</div><div class="score" style="font-size:1.8rem">${h.length}</div></div>
   <div class="sheet" style="flex:1;min-width:120px"><div class="muted small">Days studied</div><div class="score" style="font-size:1.8rem">${days.length}</div></div>
@@ -1746,10 +1770,10 @@ function renderProgress(){
   <p style="margin-top:12px"><b>Focus:</b> ${areaSorted.filter(([k,v])=>v.ok/v.t<0.7).map(([k])=>`<button class="link" data-go="${k}">${esc(SHORT[k])}</button>`).join(" · ")||"all areas at or above 70% — keep it up."}</p>`:""}
   ${fam.length?`<h2>Matrix families</h2><p class="muted small">Weakest first — accuracy and average seconds per item.</p><div class="cats">${fam.map(f=>`<div class="cat"><div class="top"><span>${esc(famName(f.k))}</span><span><b>${Math.round(f.p*100)}%</b> · ${Math.round(f.avg)}s</span></div><div class="track"><i style="width:${Math.max(f.p*100,2)}%;background:${f.p>=.8?"var(--ok)":f.p>=.6?"var(--accent)":"var(--bad)"}"></i></div></div>`).join("")}</div>`:""}
   <h2>History</h2><div class="scroll"><table><thead><tr><th>When</th><th>Activity</th><th>Score</th></tr></thead><tbody>
-  ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
+  ${h.slice().reverse().slice(0,40).map(a=>`<tr><td>${new Date(a.date).toLocaleString([], {month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}</td><td>${esc(a.mode)}${a.scope?` · ${esc(a.scope)}`:""}${a.partial?' <span class="tag" title="You left before finishing — only answered questions are counted">left early</span>':""}</td><td>${a.ok}/${a.total} (${Math.round(a.ok/a.total*100)}%)</td></tr>`).join("")}
   </tbody></table></div>
   <h2>Save or move your progress</h2>
-  <p class="small muted">Build v25. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
+  <p class="small muted">Build v26. When you're online the app checks for updates and offers a reload; your progress is kept.</p>
   <p class="small">Progress is stored in this browser only. To keep a backup, move to another device, or continue after clearing browser data, export it to a small file and import it there.</p>
   <div class="row"><button class="btn sm" id="exp">Export progress file</button><label class="btn sm ghost" for="impf" style="cursor:pointer">Import progress file</label><input type="file" id="impf" accept="application/json,.json" hidden></div>
   <div class="row" style="margin-top:14px"><button class="link" id="reset">Reset all progress</button></div><div id="pbox"></div>`;
@@ -2651,7 +2675,7 @@ function renderMatrixQ(){
   const box=el.querySelector("#mbox");
   const fin=()=>{const left=n-done;if(!left){finishMatrix(false);return}askInline(box,`${left} unanswered will be marked wrong. Finish and score anyway?`,"Finish & score",()=>finishMatrix(false))};
   const f=el.querySelector("#finish");if(f)f.onclick=fin;el.querySelector("#finishNow").onclick=fin;
-  el.querySelector("#quit").onclick=()=>askInline(box,"Quit without scoring?","Quit",()=>{clearInterval(MTIMER);MX=null;renderMatrix();window.scrollTo(0,0)});
+  el.querySelector("#quit").onclick=()=>askInline(box,`Quit now? The ${done} you answered will be recorded; the rest won't count.`,"Quit",()=>{abandonSessions();renderMatrix();window.scrollTo(0,0)});
 }
 function finishMatrix(timeout){
   if(!MX)return;clearInterval(MTIMER);MTIMER=null;disarmShimmer();
@@ -2713,17 +2737,20 @@ document.addEventListener("keydown",e=>{
 });
 
 /* ================= boot ================= */
-const APP_VERSION="v25";
+const APP_VERSION="v26";
 window.__filter="all";
 window.__booted=true;
 (function(){
   if(!("serviceWorker" in navigator)||!/^https?:/.test(location.protocol))return;
-  const banner=()=>{if(document.getElementById("upd"))return;const d=document.createElement("div");d.id="upd";d.className="updbar";d.innerHTML=`<span>A new version of the Study Lab is ready.</span><button class="btn sm" id="updgo">Reload to update</button><button class="link" id="updlater">later</button>`;document.body.appendChild(d);d.querySelector("#updgo").onclick=()=>{navigator.serviceWorker.getRegistration().then(reg=>{const w=reg&&reg.waiting;if(w){navigator.serviceWorker.addEventListener("controllerchange",()=>location.reload(),{once:true});w.postMessage("SKIP_WAITING");setTimeout(()=>location.reload(),2000)}else location.reload()})};d.querySelector("#updlater").onclick=()=>d.remove()};
+  const banner=()=>{if(document.getElementById("upd"))return;if(window.__updSnooze&&Date.now()<window.__updSnooze)return;const d=document.createElement("div");d.id="upd";d.className="updbar";d.innerHTML=`<span class="upddot"></span><span>A new version of the Study Lab is ready. Update now?</span><button class="btn sm" id="updgo">Update now</button><button class="link" id="updlater">Not now</button>`;document.body.appendChild(d);d.querySelector("#updgo").onclick=()=>{navigator.serviceWorker.getRegistration().then(reg=>{const w=reg&&reg.waiting;if(w){navigator.serviceWorker.addEventListener("controllerchange",()=>location.reload(),{once:true});w.postMessage("SKIP_WAITING");setTimeout(()=>location.reload(),2000)}else location.reload()})};d.querySelector("#updlater").onclick=()=>{d.remove();window.__updSnooze=Date.now()+60*60*1000;setTimeout(banner,60*60*1000)}};
   navigator.serviceWorker.register("sw.js").then(reg=>{
     if(reg.waiting)banner();
     reg.addEventListener("updatefound",()=>{const nw=reg.installing;if(!nw)return;nw.addEventListener("statechange",()=>{if(nw.state==="installed"&&navigator.serviceWorker.controller)banner()})});
-    setInterval(()=>reg.update().catch(()=>{}),60*60*1000); // check hourly while open
-    window.addEventListener("online",()=>reg.update().catch(()=>{}));
+    const chk=()=>reg.update().catch(()=>{});
+    setInterval(chk,5*60*1000); // every 5 minutes while open
+    window.addEventListener("online",chk);
+    document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")chk()});
+    window.addEventListener("focus",chk);
   }).catch(()=>{});
 })();
 sndLoad();renderSoundCtl();renderXPBar();
