@@ -55,3 +55,7 @@ push reaches them within minutes.
 ## Review profile
 `cd tools/harness && GODMODE_OUT=../../cnab-godmode-profile.json node godmode.js` (needs `full_script.js` next to it — `tools/test.sh` shows how it is extracted).
 Import it on a throwaway browser: it has 1,000,000 gold, level 60, every sector, badge, theme and companion.
+
+## Usage analytics (no server)
+Testers paste their **full** profile code in Discord; save them to a file as `name: CNAB1D....` one per line, then
+`node tools/analyze.js codes.txt` → per-person and group report (activity, accuracy by sub-topic, feature adoption, shared misses, retention).
